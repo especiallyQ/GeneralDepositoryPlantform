@@ -1,7 +1,6 @@
 import url from './url';
 import { post, get, patch, put, deleted } from './http';
 import { reviseParam } from './util';
-import { getConfigOpt } from './config';
 import qs from 'qs';
 
 // token测试
@@ -536,25 +535,6 @@ export function chainOrgList(data, list) {
     })
 }
 
-// 新增链上组织
-export function addChainOrg(data) {
-    let chainIdentityModel = getConfigOpt('chainIdentityModel');
-    let uri = '';
-    if (chainIdentityModel === 'CA') {
-        uri = '/org/chainOrgInfo';
-    } else if (chainIdentityModel === 'PWK') {
-        uri = '/org/pwk/chainOrgInfo';
-    }
-    return post({
-        url: `${url.ORG_LIST}${uri}`,
-        method: 'post',
-        data: data,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
-            'Content-Type': 'multipart/form-data'
-        }
-    })
-}
 
 // 编辑链上组织
 export function updateChainOrg(data) {
@@ -569,23 +549,6 @@ export function updateChainOrg(data) {
     })
 }
 
-// 删除链上组织
-export function deleteChainOrg(data) {
-    let chainIdentityModel = getConfigOpt('chainIdentityModel');
-    let uri = '';
-    if (chainIdentityModel === 'CA') {
-        uri = '/org/';
-    } else if (chainIdentityModel === 'PWK') {
-        uri = '/org/pwk/';
-    }
-    return deleted({
-        url: `${url.ORG_LIST}${uri}${data}`,
-        method: 'delete',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    });
-}
 
 // 组织详情-获取组织信息
 export function getChainOrgDetail(chainOrgId) {
@@ -678,25 +641,6 @@ export function getChainOrgNodeList(data) {
     });
 }
 
-// 组织详情-节点新增
-export function addChainOrgNode(data) {
-    let chainIdentityModel = getConfigOpt('chainIdentityModel');
-    let uri = '';
-    if (chainIdentityModel === 'CA') {
-        uri = '/orgDetail/addOrgNode';
-    } else if (chainIdentityModel === 'PWK') {
-        uri = '/orgDetail/pwk/addOrgNode';
-    }
-    return post({
-        url: `${url.ORG_LIST}${uri}`,
-        method: 'post',
-        data: data,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
-            'Content-Type': 'multipart/form-data'
-        }
-    });
-}
 
 // 组织详情-节点修改
 export function modifyChainOrgNode(data) {
@@ -711,23 +655,6 @@ export function modifyChainOrgNode(data) {
     });
 }
 
-// 组织详情-节点删除
-export function deleteChainOrgNode(data) {
-    let chainIdentityModel = getConfigOpt('chainIdentityModel');
-    let uri = '';
-    if (chainIdentityModel === 'CA') {
-        uri = '/orgDetail/deleteOrgNode/';
-    } else if (chainIdentityModel === 'PWK') {
-        uri = '/orgDetail/pwk/deleteOrgNode/';
-    }
-    return deleted({
-        url: `${url.ORG_LIST}${uri}${data}`,
-        method: 'delete',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    });
-}
 
 // 组织详情-链上用户列表
 export function getChainOrgUserList(data) {
@@ -741,25 +668,6 @@ export function getChainOrgUserList(data) {
     });
 }
 
-// 组织详情-链上用户新增
-export function addChainOrgUser(data) {
-    let chainIdentityModel = getConfigOpt('chainIdentityModel');
-    let uri = '';
-    if (chainIdentityModel === 'CA') {
-        uri = '/orgDetail/addOrgUser';
-    } else if (chainIdentityModel === 'PWK') {
-        uri = '/orgDetail/pwk/addOrgUser';
-    }
-    return post({
-        url: `${url.ORG_LIST}${uri}`,
-        method: 'post',
-        data: data,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
-            'Content-Type': 'multipart/form-data'
-        }
-    });
-}
 
 // 组织详情-链上用户修改
 export function modifyChainOrgUser(data) {
@@ -774,41 +682,7 @@ export function modifyChainOrgUser(data) {
     });
 }
 
-// 组织详情-链上用户删除
-export function deleteChainOrgUser(data) {
-    let chainIdentityModel = getConfigOpt('chainIdentityModel');
-    let uri = '';
-    if (chainIdentityModel === 'CA') {
-        uri = '/orgDetail/deleteOrgUser/';
-    } else if (chainIdentityModel === 'PWK') {
-        uri = '/orgDetail/pwk/deleteOrgUser/';
-    }
-    return deleted({
-        url: `${url.ORG_LIST}${uri}${data}`,
-        method: 'delete',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    });
-}
 
-// 组织详情-链上用户批量删除
-export function batchDeleteChainOrgUser(data) {
-    let chainIdentityModel = getConfigOpt('chainIdentityModel');
-    let uri = '';
-    if (chainIdentityModel === 'CA') {
-        uri = '/orgDetail/batchDeleteOrgUser/';
-    } else if (chainIdentityModel === 'PWK') {
-        uri = '/orgDetail/pwk/batchDeleteOrgUser/';
-    }
-    return deleted({
-        url: `${url.ORG_LIST}${uri}${data}`,
-        method: 'delete',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    });
-}
 
 // 获取应用链列表
 export function getAppChainList(data, list) {

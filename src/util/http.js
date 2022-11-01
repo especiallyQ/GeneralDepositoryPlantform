@@ -7,24 +7,10 @@ axiosIns.defaults.headers.get['X-Requested-With'] = 'XMLHttpRequest';
 axiosIns.defaults.headers.post['X-Requested-With'] = 'XMLHttpRequest';
 axiosIns.defaults.responseType = 'json';
 axiosIns.defaults.withCredentials = true;
-axiosIns.defaults.validateStatus = function () {
-    return true
-};
+
 // http response interceptor
 axiosIns.interceptors.response.use(
     response => {
-
-        // if (response.data && response.data.code === 302000) {
-        //     router.push({
-        //         path: '/login',
-        //         query: { redirect: router.currentRoute.fullPath }
-        //     })
-        // }
-        // if (response.data && (response.data.code === 202052 || response.data.code === 202053)) {
-        //     router.push({
-        //         path: "/login"
-        //     })
-        // }
         return response;
     },
     error => {
