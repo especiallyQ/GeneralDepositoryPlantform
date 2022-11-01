@@ -1,4 +1,3 @@
-let mgr = process.env.MGR_PATH;
 export default {
-    ORG_LIST: `${mgr}`
+    ORG_LIST: 'http://192.168.1.152:5010/GDP-service'
 }

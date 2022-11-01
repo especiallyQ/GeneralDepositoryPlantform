@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <Login></Login>
+    <InitializeTemplate></InitializeTemplate>
   </div>
 </template>
 
 <script>
-import Login from "@/views/login/login.vue";
+import InitializeTemplate from '@/views/initializeTemplate'
 export default {
   name: "App",
   components: {
-    Login,
+    InitializeTemplate,
   },
 };
 </script>

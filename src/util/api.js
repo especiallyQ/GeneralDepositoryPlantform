@@ -3,6 +3,7 @@ import { post, get, patch, put, deleted } from './http';
 import { reviseParam } from './util';
 import qs from 'qs';
 
+
 // token测试
 export function checkToken() {
     return get({
@@ -14,21 +15,10 @@ export function checkToken() {
     })
 }
 
-// 获取当前账号有链上身份的组织和订阅的应用链
-export function getOrgAndChain() {
-    return get({
-        url: `${url.ORG_LIST}/config/currentChainUserList`,
-        method: 'get',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
-
 // 获取验证码
 export function getPictureCheckCode() {
     return get({
-        url: `${url.ORG_LIST}/account/pictureCheckCode`,
+        url: `${url.ORG_LIST}/pictureCheckCode`,
         method: 'get'
     })
 }
@@ -38,7 +28,7 @@ export function login(data, code, token) {
     return post({
         url: `${url.ORG_LIST}/account/login?checkCode=${code}`,
         method: 'post',
-        data: qs.stringify(data),
+        data: JSON.stringify(data),
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'token': token
@@ -68,6 +58,49 @@ export function resetPassword(data) {
         }
     })
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 获取当前账号有链上身份的组织和订阅的应用链
+export function getOrgAndChain() {
+    return get({
+        url: `${url.ORG_LIST}/config/currentChainUserList`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+
+
+
 
 // 数据概览-关键监控指标
 export function getChartData() {

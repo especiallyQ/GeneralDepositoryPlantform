@@ -1,13 +1,25 @@
 <template>
-  <div class="GDP-login-container">
+  <div class="gdp-login-container">
     <canvas id="canvas"></canvas>
+    <div class="gdp-header">
+      <div class="gdp-title">通用存证平台</div>
+      <ul @click="changeTemplate">
+        <li type="login">登录</li>
+      </ul>
+    </div>
+    <Login v-if="show.login"></Login>
   </div>
 </template>
 
 <script>
 import { random } from "@/util/util";
+import Login from "@/views/initializeTemplate/login/login.vue";
 export default {
-  name: "Login",
+  name: "Template",
+
+  components: {
+    Login,
+  },
 
   data() {
     return {
@@ -21,6 +33,11 @@ export default {
       hue: 217,
       stars: [], // 星星数据集
       maxStars: 2000, // 星星数量
+
+      // 显示内容
+      show: {
+        login: false,
+      },
     };
   },
 
@@ -31,6 +48,11 @@ export default {
   },
 
   methods: {
+    // 切换初始页内容
+    changeTemplate(e) {
+      this.show[e.target.type] = !this.show[e.target.type];
+    },
+
     // 画布初始化
     initCanvas() {
       this.canvas1 = document.getElementById("canvas");
@@ -122,7 +144,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.GDP-login-container {
+.gdp-login-container {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -132,5 +154,49 @@ export default {
   height: 100%;
   background-color: #070c14;
   overflow: hidden;
+
+  .gdp-header {
+    width: 100%;
+    height: 60px;
+    background-color: #3f3f3f;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+
+    .gdp-title {
+      width: 200px;
+      height: 100%;
+      background-color: #979797;
+      line-height: 60px;
+      font-size: 20px;
+      font-weight: bolder;
+      text-align: center;
+      color: #f5f5f5;
+      font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    }
+
+    ul {
+      height: 100%;
+      display: flex;
+      font-size: 20px;
+      line-height: 60px;
+      margin-right: 30px;
+      font-weight: bold;
+      color: wheat;
+
+      li {
+        height: 100%;
+        padding-left: 15px;
+        padding-right: 15px;
+        cursor: pointer;
+
+        &:hover {
+          color: red;
+        }
+      }
+    }
+  }
 }
 </style>
