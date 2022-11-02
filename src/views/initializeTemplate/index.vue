@@ -4,10 +4,10 @@
     <div class="gdp-header">
       <div class="gdp-title">通用存证平台</div>
       <ul @click="changeTemplate">
-        <li type="login">登录</li>
+        <li id="Login">登录</li>
       </ul>
     </div>
-    <Login v-if="show.login"></Login>
+    <component :is="comName"></component>
   </div>
 </template>
 
@@ -34,10 +34,8 @@ export default {
       stars: [], // 星星数据集
       maxStars: 2000, // 星星数量
 
-      // 显示内容
-      show: {
-        login: false,
-      },
+      // 组件名称
+      comName: "",
     };
   },
 
@@ -50,7 +48,7 @@ export default {
   methods: {
     // 切换初始页内容
     changeTemplate(e) {
-      this.show[e.target.type] = !this.show[e.target.type];
+      this.comName = e.target.id;
     },
 
     // 画布初始化
@@ -184,7 +182,7 @@ export default {
       line-height: 60px;
       margin-right: 30px;
       font-weight: bold;
-      color: wheat;
+      color: #fff;
 
       li {
         height: 100%;
@@ -193,7 +191,7 @@ export default {
         cursor: pointer;
 
         &:hover {
-          color: red;
+          color: wheat;
         }
       }
     }

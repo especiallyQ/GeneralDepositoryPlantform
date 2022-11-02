@@ -1,7 +1,6 @@
 import url from './url';
 import { post, get, patch, put, deleted } from './http';
 import { reviseParam } from './util';
-import qs from 'qs';
 
 
 // token测试

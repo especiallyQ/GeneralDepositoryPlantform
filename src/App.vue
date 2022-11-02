@@ -1,15 +1,18 @@
 <template>
   <div id="app">
-    <InitializeTemplate></InitializeTemplate>
+    <!-- <InitializeTemplate></InitializeTemplate> -->
+    <Main></Main>
   </div>
 </template>
 
 <script>
-import InitializeTemplate from '@/views/initializeTemplate'
+import InitializeTemplate from "@/views/initializeTemplate";
+import Main from "@/views/index/main.vue";
 export default {
   name: "App",
   components: {
-    InitializeTemplate,
+    // InitializeTemplate,
+    Main,
   },
 };
 </script>

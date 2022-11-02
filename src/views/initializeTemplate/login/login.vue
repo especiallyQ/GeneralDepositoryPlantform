@@ -74,7 +74,6 @@
 import { getPictureCheckCode, login } from "@/util/api";
 import url from "@/util/url";
 import { sm3 } from "sm-crypto";
-import qs from "qs";
 export default {
   name: "Login",
   data() {
@@ -167,15 +166,16 @@ export default {
 
     // 登录
     userLogin() {
+      const { user, password, vercode } = this.loginForm;
       let reqData = {
-        account: this.loginForm.user,
-        accountPwd: sm3(this.loginForm.password),
+        account: user,
+        accountPwd: sm3(password),
       };
-      let checkCode = this.loginForm.vercode;
+      let checkCode = vercode;
       login(reqData, checkCode, this.authToken)
         .then((res) => {
+          console.log(res);
           if (res.data.code === 0) {
-            console.log(res);
           } else {
             this.changeCode();
             this.msgErrorContent = this.$chooseLang(res.data.code);

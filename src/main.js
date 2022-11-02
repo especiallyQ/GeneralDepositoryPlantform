@@ -3,7 +3,7 @@ import promise from 'es6-promise';
 promise.polyfill();
 import App from './App.vue';
 /* 路由 */
-import router from './router';
+import router from './router/index1';
 /* element-ui */
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
