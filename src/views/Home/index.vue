@@ -13,9 +13,9 @@
 
 <script>
 import { random } from "@/util/util";
-import Login from "@/views/initializeTemplate/login/login.vue";
+import Login from "@/views/Home/login/login.vue";
 export default {
-  name: "Template",
+  name: "Home",
 
   components: {
     Login,

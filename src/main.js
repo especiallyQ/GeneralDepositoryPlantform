@@ -34,7 +34,6 @@ Vue.config.productionTip = false
 // Vue.prototype.delCookie = delCookie;
 Vue.prototype.$message = message;
 
-
 new Vue({
   router,
   render: h => h(App),
