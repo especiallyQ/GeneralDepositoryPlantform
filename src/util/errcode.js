@@ -219,6 +219,10 @@ let errCode = {
         en: "invalid role id",
         zh: "无效的角色编号"
     },
+    "202033":{
+        en: "The account or password is incorrect",
+        zh: "账号或密码错误"
+    },
     "202035": {
         en: "The account has been used by the chain and cannot be change group",
         zh: "该账号已与链上用户关联，无法变更群组"
@@ -792,7 +796,8 @@ let errCode = {
 export default errCode;
 
 export function chooseLang(code, value) {
-    let message = errCode[code];
+    // let lang = localStorage.getItem('lang');
+    let message = errCode[code]['zh'];
     if (value) {
         let oldMessage;
         let arry = message.split('/');

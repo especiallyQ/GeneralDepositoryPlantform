@@ -1,19 +1,12 @@
 <template>
   <div id="app">
-    <Home></Home>
-    <!-- <Main></Main> -->
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Home from "@/views/Home";
-import Main from "@/views/index/main.vue";
 export default {
   name: "App",
-  components: {
-    Home,
-    // Main,
-  },
 };
 </script>
 

@@ -3,7 +3,7 @@ import promise from 'es6-promise';
 promise.polyfill();
 import App from './App.vue';
 /* 路由 */
-import router from './router/index1';
+import router from './router';
 /* element-ui */
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
@@ -24,6 +24,9 @@ import '@/assets/icon/extension/iconfont_ext.css';
 import '@/assets/css/common.css';
 /* 消息弹窗 */
 import { message } from '@/util/message.js';
+/* 错误码 */
+import errcode from './util/errcode';
+import { chooseLang } from './util/errcode.js';
 
 Vue.use(router);
 Vue.use(ElementUI);
@@ -33,6 +36,8 @@ Vue.config.productionTip = false
 // Vue.prototype.setCookie = setCookie;
 // Vue.prototype.delCookie = delCookie;
 Vue.prototype.$message = message;
+Vue.prototype.errcode = errcode;
+Vue.prototype.$chooseLang = chooseLang;
 
 new Vue({
   router,

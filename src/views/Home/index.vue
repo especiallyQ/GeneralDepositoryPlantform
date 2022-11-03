@@ -13,7 +13,7 @@
 
 <script>
 import { random } from "@/util/util";
-import Login from "@/views/Home/login/login.vue";
+import Login from "@/views/home/login/login.vue";
 export default {
   name: "Home",
 

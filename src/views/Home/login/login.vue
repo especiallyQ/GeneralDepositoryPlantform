@@ -74,6 +74,7 @@
 import { getPictureCheckCode, login } from "@/util/api";
 import url from "@/util/url";
 import { sm3 } from "sm-crypto";
+import router from "@/router";
 export default {
   name: "Login",
   data() {
@@ -176,6 +177,21 @@ export default {
         .then((res) => {
           console.log(res);
           if (res.data.code === 0) {
+            const { data } = res.data;
+            // 账号名
+            localStorage.setItem("user", data.accountName);
+            // 账号唯一标识
+            localStorage.setItem("userId", data.accountId);
+            // 账号类型(权限角色)
+            localStorage.setItem("rootId", data.accountRoleId);
+            // 登录系统token
+            localStorage.setItem("token", data.AuthorizationToken);
+            // 默认选中的菜单
+            localStorage.setItem("sidebarActive", "");
+            // 菜单默认不隐藏
+            localStorage.setItem("sidebarHide", "false");
+
+            router.push("/main");
           } else {
             this.changeCode();
             this.msgErrorContent = this.$chooseLang(res.data.code);

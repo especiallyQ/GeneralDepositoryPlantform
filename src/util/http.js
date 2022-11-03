@@ -1,5 +1,5 @@
 import Axios from 'axios'
-import router from '../router/index1'
+import router from '../router'
 let axiosIns = Axios.create({
     timeout: 60 * 1000
 });
