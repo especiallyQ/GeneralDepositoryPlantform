@@ -3,8 +3,8 @@ import Router from 'vue-router';
 
 const Home = () => import('@/views/home')
 const Main = () => import('@/views/index/main.vue')
-const Depository = () => import('../views/depository/depository.vue')
-
+const Depository = () => import('@/views/depository/depository.vue')
+const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
 
 Vue.use(Router);
 
@@ -19,7 +19,20 @@ const routes = [{
     component: Home
 }, {
     path: '/main',
-    name: 'main',
+    name: 'data',
+    nameKey: 'data',
+    leaf: true,
+    iconCls: 'ext-icon-regulatory sidebar-icon',
+    component: Main,
+    children: [
+        {
+            path: '/dataOverview', component: DataOverview, name: 'dataOverview', nameKey: 'dataOverview', meta: { requireAuth: true }
+        }
+    ]
+},
+{
+    path: '/main',
+    name: 'depository',
     nameKey: 'depositoryTitle',
     leaf: true,
     iconCls: 'ext-icon-regulatory sidebar-icon',

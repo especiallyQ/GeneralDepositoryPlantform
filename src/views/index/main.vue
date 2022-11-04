@@ -52,11 +52,11 @@ export default {
             if (this.$route.path && this.$route.path !== "/main") {
               router.push(this.$route.path);
             } else if (this.$route.path == "/main") {
-              router.push("/depository");
-              Bus.$emit("routing", "/depository");
+              router.push("/dataOverview");
+              Bus.$emit("routing", "/dataOverview");
             } else {
-              router.push("/depository");
-              Bus.$emit("routing", "/depository");
+              router.push("/dataOverview");
+              Bus.$emit("routing", "/dataOverview");
             }
           } else {
             this.$message({
