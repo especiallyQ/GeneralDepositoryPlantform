@@ -121,6 +121,7 @@ export default {
         if (item.children) {
           item.children.forEach((it) => {
             it.name = {
+              dataOverview: "数据概览",
               depositoryTitle: "存证管理",
             }[it.nameKey];
           });
@@ -183,6 +184,7 @@ export default {
             home: false,
             main: false,
             depositoryTitle: true,
+            data: true,
           }[item.nameKey] || false;
 
         // 子菜单权限

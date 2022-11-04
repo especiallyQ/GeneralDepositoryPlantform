@@ -1,8 +1,8 @@
 <template>
   <div>
-    <ContentHead headTitle="存证管理" headSubTitle="存证模板列表"></ContentHead>
+    <ContentHead headTitle="数据概览"></ContentHead>
     <div class="module-wrapper">
-      <div class="search-part">123456</div>
+      <div class="search-part">数据概览</div>
     </div>
   </div>
 </template>
@@ -10,7 +10,7 @@
 <script>
 import ContentHead from "@/components/contentHead";
 export default {
-  name: "depository",
+  name: "dataOverview",
   components: {
     ContentHead,
   },
