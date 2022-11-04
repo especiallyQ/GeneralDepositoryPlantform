@@ -30,6 +30,7 @@
           <el-input
             v-model="loginForm.password"
             placeholder="请输入密码"
+            show-password="true"
             type="password"
             prefix-icon="ext-icon-lock"
           >
@@ -41,6 +42,7 @@
               style="width: 220px"
               v-model="loginForm.vercode"
               placeholder="请输入验证码"
+              maxlength="4"
               @keyup.enter.native="submit('loginForm')"
               prefix-icon="ext-icon-xitongguanli"
             >
