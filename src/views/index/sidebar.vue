@@ -212,11 +212,11 @@ export default {
     hideMune(val) {
       this.$emit("sidebarChange", val);
       localStorage.setItem("sidebarHide", val);
-      if (!this.menuShow) {
-        if (!!this.activeIndex) {
-          this.$refs.elMenu.open(this.activeIndex);
-        }
-      }
+      // if (!this.menuShow) {
+      //   if (!!this.activeIndex) {
+      //     this.$refs.elMenu.open(this.activeIndex);
+      //   }
+      // }
     },
     // 路由跳转时,通过目标路由的path来变更菜单的选中状态
     routing(path) {
@@ -235,7 +235,6 @@ export default {
           }
         }
       }
-
       if (!!indexPath) {
         this.$refs.elMenu.activeIndex = indexPath;
         this.activeIndex = indexPath;

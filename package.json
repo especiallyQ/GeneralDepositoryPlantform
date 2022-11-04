@@ -19,8 +19,7 @@
     "sm-crypto": "^0.3.11",
     "vue": "^2.6.11",
     "vue-dompurify-html": "^3.1.1",
-    "vue-router": "^3.6.5",
-    "web3-utils": "^1.8.0"
+    "vue-router": "^3.6.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.15",

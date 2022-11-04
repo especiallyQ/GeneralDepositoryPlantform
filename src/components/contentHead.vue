@@ -27,7 +27,7 @@
         </div>
         <a class="browse-user" slot="reference">
           <i class="ext-icon-user-icon"></i>
-          <i style="marginleft: 2px">{{ accountName }}</i>
+          <i style="marginLeft: 2px">{{ accountName }}</i>
         </a>
       </el-popover>
     </div>

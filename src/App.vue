@@ -21,4 +21,8 @@ export default {
   color: #2e384d;
   min-width: 1280px;
 }
+ul,
+li {
+    list-style: none;
+}
 </style>

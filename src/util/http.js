@@ -11,6 +11,17 @@ axiosIns.defaults.withCredentials = true;
 // http response interceptor
 axiosIns.interceptors.response.use(
     response => {
+        if (response.data && response.data.code === 302000) {
+            router.push({
+                path: '/home',
+                query: { redirect: router.currentRoute.fullPath }
+            })
+        }
+        if (response.data && (response.data.code === 202003 || response.data.code === 202004)) {
+            router.push({
+                path: "/home"
+            })
+        }
         return response;
     },
     error => {
@@ -85,7 +96,6 @@ export function put(options) {
  * @return {Promise}
  */
 export function deleted(options) {
-    console.log('options', options);
     return new Promise((resolve, reject) => {
         axiosIns(options).then(response => {
             resolve(response)

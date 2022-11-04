@@ -175,7 +175,6 @@ export default {
       let checkCode = vercode;
       login(reqData, checkCode, this.authToken)
         .then((res) => {
-          console.log(res);
           if (res.data.code === 0) {
             const { data } = res.data;
             // 账号名

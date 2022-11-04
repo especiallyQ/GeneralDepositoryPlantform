@@ -41,7 +41,7 @@ export default {
     },
   },
   mounted() {
-    // this.checkToken();
+    this.checkToken();
   },
   methods: {
     // 登录状态token测试
