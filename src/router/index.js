@@ -5,6 +5,7 @@ const Home = () => import('@/views/home')
 const Main = () => import('@/views/index/main.vue')
 const Depository = () => import('@/views/depository/depository.vue')
 const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
+const userManagement = () => import('@/views/userManagement/index.vue');
 
 Vue.use(Router);
 
@@ -43,7 +44,21 @@ const routes = [{
         }
     ]
 
-}];
+    },
+    {
+        path:'/main',
+        component: Main,
+        name: 'main',
+        nameKey: 'userManagement',
+        leaf:false,
+        menuShow: true,
+        iconCls: 'el-icon-connection sidebar-icon',
+        children: [{
+            path: '/userManagement', component: userManagement, name: 'userManagement', nameKey: 'userManagement', menuShow: true,meta :{requireAuth: false}
+        },
+        ]
+    },
+];
 
 const router = new Router({
     // mode: 'history',

@@ -61,7 +61,29 @@ export function resetPassword(data) {
 
 // 账号相关接口-----------------------------
 
+// export function accountList(data) {
+//     const { page, sizes } = data
+//     return get({
+//         url: `${url.ORG_LIST}/account/accountList/${page ? page : 1}/${sizes}`,
+//         method: 'get',
+//         data:data,
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
+export function accountList(data, list) {
+    const params = reviseParam(data, list);
+    return get({
+        url: `${url.ORG_LIST}/account/accountList/${params.str}`,
+        method: 'get',
+        params: params.querys,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
 
 
 
@@ -356,17 +378,17 @@ export function accountTypeList(data, list) {
 }
 
 // 获取账号列表
-export function accountList(data, list) {
-    const params = reviseParam(data, {});
-    return post({
-        url: `${url.ORG_LIST}/account/accountList/${params.str}`,
-        method: 'post',
-        data: list,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function accountList(data, list) {
+//     const params = reviseParam(data, {});
+//     return post({
+//         url: `${url.ORG_LIST}/account/accountList/${params.str}`,
+//         method: 'post',
+//         data: list,
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 // contract path list
 export function getContractPathList(data) {
@@ -1047,15 +1069,15 @@ export function getAlarmRuleList() {
 }
 
 // 获取账号列表(告警配置使用)
-export function getAccountList() {
-    return get({
-        url: `${url.ORG_LIST}/alarmrule/modifyAlarmRuleInit`,
-        method: 'get',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function getAccountList() {
+//     return get({
+//         url: `${url.ORG_LIST}/alarmrule/modifyAlarmRuleInit`,
+//         method: 'get',
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 // 编辑告警配置
 export function modifyAlarmRule(data) {
