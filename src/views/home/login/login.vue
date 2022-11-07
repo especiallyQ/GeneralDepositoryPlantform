@@ -30,7 +30,7 @@
           <el-input
             v-model="loginForm.password"
             placeholder="请输入密码"
-            show-password="true"
+            :show-password="true"
             type="password"
             prefix-icon="ext-icon-lock"
           >

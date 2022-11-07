@@ -35,6 +35,105 @@ export function login(data, code, token) {
     })
 }
 
+
+
+
+
+// 账号相关接口-----------------------------
+
+
+
+
+
+
+
+// 存证相关接口-----------------------------
+
+
+// 存证管理-获取存证模板创建者名称
+export function getDepositoryTemplateCreator() {
+    return get({
+        url: `${url.ORG_LIST}/account/getSelectAccountList`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 存证管理-获取存证列表数据
+export function getTemplateListData(currentPage, pageSize, creatorId, templateName) {
+    return get({
+        url: `${url.ORG_LIST}/depository/getDepositoryTemplateList/${currentPage}/${pageSize}?creatorId=${creatorId}&depositoryTemplateName=${templateName}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
+        }
+    })
+}
+
+// 存证信息-保存存证模板
+export function saveDepoTemplate(data) {
+    return post({
+        url: `${url.ORG_LIST}/depository/addDepositoryTemplate`,
+        method: 'post',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 存证管理-获取存证模板编辑信息
+export function getEditDepositoryTemplate() {
+    return get({
+        url: `${url.ORG_LIST}/account/getSelectAccountList`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+
+
+// 存证信息-编辑存证模板
+export function editDepoTemplate(data) {
+    return post({
+        url: `${url.ORG_LIST}/depository/addDepositoryTemplate`,
+        method: 'post',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
+            'Content-Type': 'application/json'
+        }
+    })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // 退出
 export function loginOut() {
     return get({
@@ -45,6 +144,7 @@ export function loginOut() {
         }
     })
 }
+
 
 // 修改密码
 export function resetPassword(data) {
@@ -59,36 +159,6 @@ export function resetPassword(data) {
 }
 
 
-// 账号相关接口-----------------------------
-
-
-
-
-
-
-
-// 存证相关接口-----------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // 获取当前账号有链上身份的组织和订阅的应用链
@@ -97,7 +167,7 @@ export function getOrgAndChain() {
         url: `${url.ORG_LIST}/config/currentChainUserList`,
         method: 'get',
         headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
         }
     })
 }
@@ -1510,18 +1580,6 @@ export function getDepositoryHistoryList(data) {
     return get({
         url: `${url.ORG_LIST}/depository/depositoryContentVersionList/${params.str}`,
         method: 'get',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
-
-// 存证信息-保存存证模板
-export function saveDepoTemplate(data) {
-    return post({
-        url: `${url.ORG_LIST}/depository/addDepositoryTemplate`,
-        method: 'post',
-        data: data,
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
         }

@@ -186,6 +186,7 @@ export default {
 
       li {
         height: 100%;
+        line-height: 60px;
         padding-left: 15px;
         padding-right: 15px;
         cursor: pointer;
