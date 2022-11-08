@@ -35,7 +35,7 @@ const routes = [{
     name: 'depository',
     nameKey: 'depositoryTitle',
     leaf: true,
-    iconCls: 'ext-icon-regulatory sidebar-icon',
+    iconCls: 'ext-icon-baocun sidebar-icon',
     component: Main,
     children: [
         {

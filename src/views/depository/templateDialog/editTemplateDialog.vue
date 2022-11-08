@@ -31,7 +31,7 @@
           <el-input
             v-model="key.parameterType"
             class="el-input-width"
-            style="marginLeft: 10px"
+            style="marginLeft: 8px"
             :disabled="true"
           ></el-input>
         </el-form-item>
@@ -50,7 +50,7 @@
           <el-input
             v-model="key.parameterType"
             class="el-input-width"
-            style="marginLeft: 10px"
+            style="marginLeft: 8px"
             :disabled="true"
           ></el-input>
         </el-form-item>
@@ -104,16 +104,6 @@ export default {
         remark: null, //备注
         parameterParamsForm1: [], //存证参数
         parameterParamsForm2: [], //存证参数
-
-        // depositoryTemplateName: "模板一号", //存证模板名称
-        // remark: "备注备注备注备注备注备注备注备注备注备注备注备注备注备注", //备注
-        // parameterParamsForm1: [
-        //   { parameterName: "参数一", parameterType: "字符串" },
-        // ], //存证参数
-        // parameterParamsForm2: [
-        //   { parameterName: "参数二", parameterType: "整数" },
-        //   { parameterName: "参数三", parameterType: "文件" },
-        // ], //存证参数
       },
     };
   },
@@ -124,7 +114,7 @@ export default {
   },
 
   mounted() {
-    // this.open();
+    this.open();
   },
 
   methods: {
@@ -136,7 +126,7 @@ export default {
     open() {
       // 获取模板数据
       getEditDepositoryTemplate(this.editTemplateNameId)
-        .then(() => {
+        .then((res) => {
           if (res.data.code === 0) {
             const { depositoryTemplateName, remark, params } = res.data.data;
             this.form.depositoryTemplateName = depositoryTemplateName;
@@ -163,8 +153,12 @@ export default {
     // 存证模板新建方法
     editDepositoryTemplate() {
       const { remark } = this.form;
+      let data = {
+        id: this.editTemplateNameId,
+        remark,
+      };
       this.loading = true;
-      editDepoTemplate(remark)
+      editDepoTemplate(data)
         .then((res) => {
           if (res.data.code === 0) {
             this.close();
@@ -203,7 +197,7 @@ export default {
 }
 
 .el-input-width {
-  width: 140px;
+  width: 163px;
   margin-right: 5px;
 }
 

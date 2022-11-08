@@ -35,7 +35,7 @@
               ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" size="small" @click="getTemplateList"
+              <el-button type="primary" size="small" @click="searchTemplateName"
                 >搜索</el-button
               >
             </el-form-item>
@@ -52,7 +52,12 @@
         </div>
       </div>
       <div class="depository-list">
-        <el-table :data="tableData" style="width: 100%" empty-text="暂无数据">
+        <el-table
+          :data="tableData"
+          v-loading="loading"
+          style="width: 100%"
+          empty-text="暂无数据"
+        >
           <el-table-column
             v-for="item in tableHeader"
             :key="item.label"
@@ -122,6 +127,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import ContentHead from "@/components/contentHead";
 import { getDepositoryTemplateCreator, getTemplateListData } from "@/util/api";
 import CreateTemplateDialog from "@/views/depository/templateDialog/createTemplateDialog";
@@ -151,7 +157,7 @@ export default {
       pageSize: 10, // 分页-每页数据条目数
       role: localStorage.getItem("rootId"), // 登录账号的类型(角色) 1超级管理员 2普通管理员 3普通用户
       user: localStorage.getItem("user"),
-
+      loading: false, //loading标识
       // 存证管理列表表头
       tableHeader: [
         {
@@ -212,6 +218,7 @@ export default {
 
     // 获取存证模板列表数据
     getTemplateList() {
+      this.loading = true;
       getTemplateListData(
         this.currentPage,
         this.pageSize,
@@ -222,7 +229,9 @@ export default {
           if (res.data.code === 0) {
             this.tableData = res.data.data;
             this.total = res.data.total;
+            this.loading = false;
           } else {
+            this.loading = false;
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
@@ -231,6 +240,7 @@ export default {
           }
         })
         .catch(() => {
+          this.loading = false;
           this.$message({
             message: "系统错误",
             type: "error",
@@ -238,10 +248,16 @@ export default {
           });
         });
     },
+
+    //搜索模板名称
+    searchTemplateName: _.debounce(function () {
+      this.getTemplateList();
+    }, 400),
+
     // 新建存证模板后获取最新存证列表
     getNewTemplateList() {
+      console.log(this.pageSize);
       this.currentPage = 1;
-      this.pageSize = 10;
       this.creatorId = "";
       this.form.templateName = "";
       this.getTemplateList();

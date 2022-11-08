@@ -41,6 +41,7 @@
             placeholder="参数名"
             class="el-input-width"
             maxlength="20"
+            style="marginRight: 8px"
           ></el-input>
           <el-select
             v-model="key.parameterType"
@@ -77,6 +78,7 @@
             v-model="key.parameterName"
             placeholder="参数名"
             class="el-input-width"
+            style="marginRight: 8px"
           ></el-input>
           <el-select
             v-model="key.parameterType"
@@ -340,7 +342,7 @@ export default {
 }
 
 .el-input-width {
-  width: 140px;
+  width: 145px;
   margin-right: 5px;
 }
 

@@ -75,7 +75,7 @@ export function getTemplateListData(currentPage, pageSize, creatorId, templateNa
 // 存证信息-保存存证模板
 export function saveDepoTemplate(data) {
     return post({
-        url: `${url.ORG_LIST}/depository/addDepositoryTemplate`,
+        url: `${url.ORG_LIST}/depository/createDepositoryTemplate`,
         method: 'post',
         data: data,
         headers: {
@@ -87,7 +87,7 @@ export function saveDepoTemplate(data) {
 // 存证管理-获取存证模板编辑信息
 export function getEditDepositoryTemplate(templateId) {
     return get({
-        url: `${url.ORG_LIST}/depository/getSelectAccountList/${templateId}`,
+        url: `${url.ORG_LIST}/depository/getDepositoryTemplateById/${templateId}`,
         method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
@@ -96,16 +96,14 @@ export function getEditDepositoryTemplate(templateId) {
 }
 
 
-
 // 存证信息-编辑存证模板
 export function editDepoTemplate(data) {
-    return post({
-        url: `${url.ORG_LIST}/depository/addDepositoryTemplate`,
-        method: 'post',
+    return put({
+        url: `${url.ORG_LIST}/depository/updateDepositoryTemplate`,
+        method: 'put',
         data: data,
         headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
-            'Content-Type': 'application/json'
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
         }
     })
 }
