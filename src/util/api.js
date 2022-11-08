@@ -61,24 +61,24 @@ export function resetPassword(data) {
 
 // 账号相关接口-----------------------------
 
-// export function accountList(data) {
-//     const { page, sizes } = data
-//     return get({
-//         url: `${url.ORG_LIST}/account/accountList/${page ? page : 1}/${sizes}`,
-//         method: 'get',
-//         data:data,
-//         headers: {
-//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-//         }
-//     })
-// }
-
+//账号管理初始化 
 export function accountList(data, list) {
     const params = reviseParam(data, list);
     return get({
         url: `${url.ORG_LIST}/account/accountList/${params.str}`,
         method: 'get',
         params: params.querys,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//编辑账号
+export function updateAccount(data) {
+    return put({
+        url: `${url.ORG_LIST}/account/updateAccount`,
+        method: 'put',
+        data: data,
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
         }

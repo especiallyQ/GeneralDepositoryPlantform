@@ -8,11 +8,11 @@
                     <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
-                <el-input placeholder="请输入内容" v-model="inputKeyWords" clearable class="search" @change="test">
+                <el-input placeholder="账号名" v-model="inputKeyWords" clearable class="search" @change="test">
                 </el-input>
                 <el-button class="searchButton" icon="el-icon-search" @click="getAccountList"></el-button>
                 <p class="p"></p>
-                <el-button type="primary" class="right" @click="newAccount">新建账号</el-button>
+                <el-button type="primary" class="right" @click="newAccount" v-if="id == 1 || id == 2">新建账号</el-button>
             </div>
             <div class="content-center">
                 <template>
@@ -22,12 +22,13 @@
                         <el-table-column prop="contact" label="联系方式">
                         </el-table-column>
                         <el-table-column prop="roleZh" label="账号类型"> </el-table-column>
-                        <el-table-column label="操作" align="center">
+                        <el-table-column label="操作" align="center" class="remarks">
                             <template slot-scope="{ row }">
-                                <el-button type="text" style="color: red; font-size: 12px" @click="delateAccount(row)">
+                                <el-button :disabled="isDisabled" type="text" style="color: red; font-size: 12px"
+                                    @click="delateAccount(row)">
                                     删除
                                 </el-button>
-                                <el-button type="text" style="font-size: 12px" @click="reviseAccount(row)">
+                                <el-button :disabled="isDisabled" type="text" style="font-size: 12px" @click="reviseAccount(row)">
                                     编辑</el-button>
                             </template>
                         </el-table-column>
@@ -41,7 +42,8 @@
                 </el-pagination>
             </div>
         </div>
-        <userDialog :createUserAccountDialogVisible.sync="createUserAccountDialogVisible">
+        <userDialog :createUserAccountDialogVisible.sync="createUserAccountDialogVisible"
+        >
         </userDialog>
         <el-dialog title="编辑账号" :visible.sync="reviseUserAccountDialogVisible" width="498px" align="center"
             :close-on-click-modal="false">
@@ -60,24 +62,25 @@
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="reviseUserAccountDialogVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="reviseUserAccountDialogVisible = false">确 定</el-button>
+                    <el-button type="primary" @click="update">确 定</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>
-        <el-dialog :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
+        <!-- <el-dialog :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
             <span>是否确定删除该账号</span>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="handleClose">确 定</el-button>
             </span>
-        </el-dialog>
+        </el-dialog> -->
     </div>
 </template>
 
 <script>
 import ContentHead from "@/components/contentHead.vue";
 import userDialog from "./components/userDialog.vue";
-import { accountList } from "@/util/api.js";
+import { accountList, updateAccount } from "@/util/api.js";
+import { JSONSwitchFormData } from "@/util/util.js";
 
 export default {
     name: "userManagement",
@@ -86,7 +89,8 @@ export default {
         return {
             pageNumber: 1, //分页器的第几页
             pageSize: 10, //每一页展示的条数
-            roleId: "",//用户权限id
+            roleId: '',//用户权限id
+            id: localStorage.getItem('rootId'),
             total: 0, //总共的条数
             createUserAccountDialogVisible: false,//控制新建dialog是否显示
             reviseUserAccountDialogVisible: false,//控制修改dialog是否显示
@@ -96,12 +100,18 @@ export default {
                 name: "",
                 contact: "",
                 type: "",
+                id: '',
             },
+            // accountId: '',
             accountListData: [],//账号管理页面初始化数据
             selectValue: "",//账号管理选择框结果
             inputKeyWords: "",//存放搜索数据
             //存放选择框数据
             roleOptions: [
+                {
+                    value: '',
+                    label: '全部',
+                },
                 {
                     value: 1,
                     label: "超级管理员",
@@ -119,22 +129,39 @@ export default {
     },
     mounted() {
         this.getAccountList();
-
+        console.log(this.id);
+    },
+    computed: {
+        isDisabled() {
+            if (this.id == 1 || this.id == 2) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
     },
     methods: {
-        test() {
-            console.log(this.inputKeyWords);
-        },
+        // getAccountForm(msg) {
+        //     console.log(msg,'1111111111');
+        // },
+        // test() {
+        //     console.log(1111);
+        // },
         //账号管理初始化
         async getAccountList() {
+            // console.log('被子组件调用了');
             const res = await accountList({
                 pageNumber: this.pageNumber,
-                pageSize: `${this.pageSize}?accountName=${this.inputKeyWords}`,
+                pageSize: `${this.pageSize}?roleId=${this.selectValue}&accountName=${this.inputKeyWords}`,
             });
             if (res.data.code === 0) {
-                this.accountListData = res.data.data;
+                if (Object.prototype.toString.call(res.data.data) == '[object Object]') {
+                    this.accountListData = [res.data.data];
+                } else {
+                    this.accountListData = res.data.data
+                }
                 this.total = res.data.total;
-                console.log(res);
             } else {
                 this.$message({
                     message: this.$chooseLang(res.data.code),
@@ -146,29 +173,65 @@ export default {
 
         newAccount() {
             this.createUserAccountDialogVisible = true;
+                
         },
         reviseAccount(row) {
             this.reviseUserAccountDialogVisible = true;
-            console.log(row);
             this.accountForm.name = row.accountName;
             this.accountForm.contact = row.contact;
             this.accountForm.type = row.roleZh;
+            this.accountForm.id = row.accountId;
+        },
+        async update() {
+            this.reviseUserAccountDialogVisible = false;
+            let formData = JSONSwitchFormData(this.accountForm);
+            const res = await updateAccount(formData);
+            if (res.data.code === 0) {
+                this.$message({
+                    type: "success",
+                    message: "编辑成功!",
+                });
+                this.getAccountList();
+
+            } else {
+                this.$message({
+                    message: this.$chooseLang(res.data.code),
+                    type: "error",
+                    duration: 2000,
+                });
+            }
         },
         delateAccount(row) {
             this.dialogVisible = true;
-            console.log(9999);
-            
-        },
-        handleClose(done) {
-            this.$confirm("确认关闭？")
-                .then((_) => {
-                    this.dialogVisible = false;
-                    delateAccount();
+            this.$confirm(`确定删除账号${row.accountName}?`, {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+            })
+                .then(() => {
+                    this.$confirm(`确定删除${row.accountName}?`, {
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                    }).then(async () => {
+                        console.log(row);
+                        const res = await deleteChainOrg(row.accountId);
+                        if (res.data.code === 0) {
+                            this.$message({
+                                type: "success",
+                                message: "删除成功!",
+                            });
+                            this.getAccountList(
+                                this.accountListData.length > 1
+                                    ? this.pageNumber
+                                    : this.pageNumber - 1
+                            );
+                        }
+                    }).catch(() => {
+                    })
                 })
-                .catch((_) => {
-                    this.dialogVisible = false;
+                .catch(() => {
                 });
         },
+
         //底部页码跳转
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
@@ -225,7 +288,7 @@ export default {
 }
 
 .content-container .content-center {
-    margin-left: 80px;
+    margin:0 25px 0 25px;
 }
 
 .content-container .content-footer {
@@ -235,4 +298,10 @@ export default {
     align-items: center;
     gap: 40px;
 }
+
+.el-button.is-disabled {
+    background-color: transparent !important;
+    border-color:transparent !important;
+}
+
 </style>

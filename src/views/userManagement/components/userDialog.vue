@@ -1,29 +1,29 @@
 <template>
     <el-dialog title="新建账号" :visible.sync="createUserAccountDialogVisible" width="498px" align="center"
-        :close-on-click-modal="false" @close="resetForm('ruleForm')">
+        :close-on-click-modal="false" @open="resetForm1('ruleForm')" :before-close="closeDialog">
         <el-form :model="accountForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="活动名称" prop="name">
-                <el-input v-model="accountForm.name"></el-input>
+            <el-form-item label="账号名" prop="name">
+                <el-input v-model="accountForm.name" ></el-input>
             </el-form-item>
             <el-form-item label="联系方式" prop="contact">
-                <el-input v-model="accountForm.contact"></el-input>
+                <el-input v-model="accountForm.contact" ></el-input>
             </el-form-item>
-            <el-form-item label="活动区域" prop="type">
-                <el-select v-model="accountForm.type" placeholder="请选择活动区域" style="width: 100%">
-                    <el-option label="管理员" value="1"></el-option>
-                    <el-option label="普通用户" value="2"></el-option>
+            <el-form-item label="账号类型" prop="type">
+                <el-select v-model="accountForm.type" placeholder="请选择账号类型" style="width: 100%">
+                    <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
                 </el-select>
             </el-form-item>
             <el-form-item>
                 <el-button @click="resetForm('ruleForm')">取 消 </el-button>
-                <el-button type="primary" @click="submitForm(true, 'ruleForm')">确 定</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
 </template>
 
 <script>
-
+import { JSONSwitchFormData } from "@/util/util.js";
 export default {
     name: "userDialog",
     props: {
@@ -32,14 +32,20 @@ export default {
             default: false,
             required: true,
         },
-        // title: {
-        //     type: String,
-        //     default: "新建账号",
-        //     required: true,
-        // },
     },
     data() {
         return {
+            //存放选择框数据
+            roleOptions: [
+                {
+                    value: 2,
+                    label: "管理员",
+                },
+                {
+                    value: 3,
+                    label: "普通用户",
+                },
+            ],
             accountForm: {
                 name: "",
                 contact: "",
@@ -61,7 +67,7 @@ export default {
                 ],
                 contact: [
                     {
-                        required: true,
+
                         message: "请输入联系方式",
                         trigger: "blur",
                     },
@@ -83,52 +89,43 @@ export default {
         };
     },
     methods: {
-        submitForm(flag, formName) {
-            if (flag) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.$emit("update:createUserAccountDialogVisible", false);
-                        this.accountForm = {
-                            accountName: "",
-                            contact: "",
-                            type: "",
-                        };
+        // test() {
+        //     this.$emit("update:createUserAccountDialogVisible", false);
+        //     console.log(this.accountForm);
+        // },
+        submitForm(formName) {
+            console.log(this.accountForm);
+            this.$refs[formName].validate(async (valid) => {
+                if (valid) {
+                    this.$emit("update:createUserAccountDialogVisible", false);
+                    let formData = JSONSwitchFormData(this.accountForm);
+                    const res = await addChainOrg(formData);
+                    if (res.data.code === 0) {
+                        this.$parent.getAccountList()
                     } else {
+                        this.$message({
+                            message: this.$chooseLang(res.data.code),
+                            type: "error",
+                            duration: 2000,
+                        });
                     }
-                });
-            }
+                } else {
+                }
+            });
         },
         resetForm(formName) {
             this.$emit("update:createUserAccountDialogVisible", false);
             this.$refs[formName].resetFields();
+        },
+        resetForm1(formName) {
+            this.$refs[formName].resetFields();
+        },
+        closeDialog() {
+            this.$emit("update:createUserAccountDialogVisible", false);
         }
     },
 };
-    // computed: {
-    //     ...mapState({
-    //         test: state => state.userDialog.test,
-    //     }),
-    // },
-// ...mapActions({
-        //     getTest:"userDialog/getTest"
-        // }),
-        // ...mapMutations({
-        //     setTest: 'userDialog/setTest',
-        //     setForm:'userDialog/setForm'
-        // }),
-        // this.setTest(3211)
-            // this.setForm({
-            //     name: this.accountForm,name,
-            //     contact: this.accountForm.contact,
-            //     type:this.accountForm.type,
-            // })
-            // console.log(this.test2);
-            // this.$store.dispatch("userDialog/getTest", 321).then((val) => {
-                //     console.log(val);
-                // })
-                // this.getTest(321).then((val) => {
-                //     console.log(val,"这是mapActions");
-                // })
+
 </script>
 
 <style>
