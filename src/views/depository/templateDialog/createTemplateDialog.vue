@@ -259,9 +259,7 @@ export default {
             } else if (!this.params[i].parameterType) {
               this.$message({
                 type: "error",
-                message: `${this.params[i].parameterName}${this.$t(
-                  "参数未设置类型"
-                )}`,
+                message: `${this.params[i].parameterName}${"参数未设置类型"}`,
               });
               return;
             } else if (!this.checkParamName(this.params, "parameterName")) {

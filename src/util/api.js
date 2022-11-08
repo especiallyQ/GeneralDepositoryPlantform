@@ -85,9 +85,9 @@ export function saveDepoTemplate(data) {
 }
 
 // 存证管理-获取存证模板编辑信息
-export function getEditDepositoryTemplate() {
+export function getEditDepositoryTemplate(templateId) {
     return get({
-        url: `${url.ORG_LIST}/account/getSelectAccountList`,
+        url: `${url.ORG_LIST}/depository/getSelectAccountList/${templateId}`,
         method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''

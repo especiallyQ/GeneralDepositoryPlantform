@@ -1,106 +1,58 @@
 <template>
   <div>
     <el-dialog
-      title="新建存证模板"
+      title="编辑存证模板"
       :visible.sync="dialogFormVisible"
       center
       :close-on-click-modal="false"
       @close="close"
       width="498px"
     >
-      <el-form
-        :model="form"
-        :rules="rules"
-        ref="ruleForm"
-        label-width="100px"
-        class="selectForm"
-      >
-        <el-form-item label="存证模板名称" prop="depositoryTemplateName">
+      <el-form :model="form" label-width="100px" class="selectForm">
+        <el-form-item label="存证模板名称">
           <el-input
-            v-model.trim="form.depositoryTemplateName"
-            placeholder="请输入存证模板名称"
-            maxlength="20"
+            v-model="form.depositoryTemplateName"
+            :disabled="true"
           ></el-input>
         </el-form-item>
-      </el-form>
 
-      <el-form
-        :model="parameterParamsForm"
-        label-width="100px"
-        class="selectForm"
-      >
         <el-form-item
           label="存证参数"
           prop="parameter"
           :show-message="false"
-          v-for="(key, index) in parameterParamsForm.parameterParams1"
+          v-for="(key, index) in form.parameterParamsForm1"
           :key="index"
         >
           <el-input
-            v-model.trim="key.parameterName"
-            placeholder="参数名"
+            v-model="key.parameterName"
             class="el-input-width"
-            maxlength="20"
+            :disabled="true"
           ></el-input>
-          <el-select
+          <el-input
             v-model="key.parameterType"
-            placeholder="参数类型"
             class="el-input-width"
-            @change="changeFileDisabled"
-          >
-            <el-option
-              v-for="(item, index) in parameterOption"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled"
-            ></el-option>
-          </el-select>
-          <el-button
-            type="primary"
-            circle
-            icon="el-icon-plus"
-            @click="addParameter"
-            size="mini"
-            style="marginleft: 8px"
-          ></el-button>
+            style="marginleft: 10px"
+            :disabled="true"
+          ></el-input>
         </el-form-item>
 
         <el-form-item
           prop="parameter"
           :show-message="false"
-          v-for="(key, index) in parameterParamsForm.parameterParams2"
+          v-for="(key, index) in form.parameterParamsForm2"
           :key="index + 1"
-          :validate-on-rule-change="false"
         >
           <el-input
             v-model="key.parameterName"
-            placeholder="参数名"
             class="el-input-width"
+            :disabled="true"
           ></el-input>
-          <el-select
+          <el-input
             v-model="key.parameterType"
-            placeholder="参数类型"
             class="el-input-width"
-            @change="changeFileDisabled"
-          >
-            <el-option
-              v-for="(item, index) in parameterOption"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-              :disabled="item.disabled"
-            ></el-option>
-          </el-select>
-
-          <el-button
-            type="danger"
-            circle
-            icon="el-icon-minus"
-            @click="removeParameter(index)"
-            size="mini"
-            style="marginleft: 8px"
-          ></el-button>
+            style="marginleft: 10px"
+            :disabled="true"
+          ></el-input>
         </el-form-item>
 
         <el-form-item label="备注">
@@ -118,7 +70,7 @@
         <el-button @click="close">取消</el-button>
         <el-button
           type="primary"
-          @click="submitForm('ruleForm')"
+          @click="addDepositoryTemplate"
           :loading="loading"
           >确定</el-button
         >
@@ -131,7 +83,7 @@
 import { getEditDepositoryTemplate, editDepoTemplate } from "@/util/api";
 
 export default {
-  name: "createTemplateDialog",
+  name: "editTemplateDialog",
   props: {
     editTemplateDialogVisible: {
       type: Boolean,
@@ -147,80 +99,22 @@ export default {
     return {
       dialogFormVisible: this.editTemplateDialogVisible, //控制dialog是否显示
       loading: false, //loading图标
-      fileDisabled: false, //文件类型是否可选
       form: {
         depositoryTemplateName: null, //存证模板名称
         remark: null, //备注
-      },
-
-      //存证参数
-      parameterParamsForm: {
-        parameterParams1: [
-          {
-            parameterName: "", //参数名称
-            parameterType: "", //参数类型
-          },
-        ],
-        parameterParams2: [],
-      },
-      // 模板参数下拉框
-      parameterOption: [
-        {
-          label: "字符串",
-          value: "string",
-          disabled: false,
-        },
-        {
-          label: "整数",
-          value: "int",
-          disabled: false,
-        },
-        {
-          label: "浮点数",
-          value: "float",
-          disabled: false,
-        },
-        {
-          label: "文件",
-          value: "file",
-          disabled: false,
-        },
-      ],
-
-      // 新建模板存证表单验证规则
-      rules: {
-        depositoryTemplateName: [
-          {
-            required: true,
-            message: "请输入存证模板名称",
-            trigger: "blur",
-          },
-        ],
-      },
-      parameterRules: {
-        parameter: [{ required: true }],
+        parameterParamsForm1: [], //存证参数
+        parameterParamsForm2: [], //存证参数
       },
     };
   },
   watch: {
-    createTemplateDialogVisible() {
-      this.dialogFormVisible = this.createTemplateDialogVisible;
-    },
-    "parameterParamsForm.parameterParams2": {
-      handler() {
-        this.changeFileDisabled();
-      },
-      deep: true,
+    editTemplateDialogVisible() {
+      this.dialogFormVisible = this.editTemplateDialogVisible;
     },
   },
 
-  computed: {
-    params() {
-      return [
-        ...this.parameterParamsForm.parameterParams1,
-        ...this.parameterParamsForm.parameterParams2,
-      ];
-    },
+  mounted() {
+    this.open();
   },
 
   methods: {
@@ -230,11 +124,15 @@ export default {
     },
 
     open() {
-        // 获取模板数据
+      // 获取模板数据
       getEditDepositoryTemplate(this.editTemplateNameId)
-        .then((res) => {
+        .then(() => {
           if (res.data.code === 0) {
-           console.log(res);
+            const { depositoryTemplateName, remark, params } = res.data.data;
+            this.form.depositoryTemplateName = depositoryTemplateName;
+            this.form.remark = remark;
+            this.form.parameterParamsForm1 = params.splice(0, 1);
+            this.form.parameterParamsForm2 = params;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
@@ -252,77 +150,17 @@ export default {
         });
     },
 
-    // 点击+添加参数项
-    addParameter() {
-      this.parameterParamsForm.parameterParams2.push({
-        parameterName: "", //参数名称
-        parameterType: "", //参数类型
-      });
-    },
-    // 点击-移除参数项
-    removeParameter(index) {
-      this.parameterParamsForm.parameterParams2.splice(index, 1);
-    },
-
-    // 判断参数名是否有重复
-    checkParamName(arr, key) {
-      const parameterNames = arr.map((item) => item[key]);
-      const newParameterNames = Array.from(new Set(parameterNames));
-      return parameterNames.length === newParameterNames.length ? true : false;
-    },
-
-    //提交新建存证模板表单
-    submitForm(formName) {
-      // 新建存证模板校验规则
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          for (let i = 0; i < this.params.length; i++) {
-            if (!this.params[i].parameterName) {
-              this.$message({
-                type: "error",
-                message: "存在空值的参数名",
-              });
-              return;
-            } else if (!this.params[i].parameterType) {
-              this.$message({
-                type: "error",
-                message: `${this.params[i].parameterName}${this.$t(
-                  "参数未设置类型"
-                )}`,
-              });
-              return;
-            } else if (!this.checkParamName(this.params, "parameterName")) {
-              this.$message({
-                type: "error",
-                message: "存证模板参数名不能重复",
-              });
-              return;
-            }
-          }
-          this.addDepositoryTemplate();
-        } else {
-          return false;
-        }
-      });
-    },
-
     // 存证模板新建方法
     addDepositoryTemplate() {
-      const { depositoryTemplateName, remark } = this.form;
-      let data = {
-        depositoryTemplateName,
-        remark,
-        params: this.params,
-      };
+      const { remark } = this.form;
       this.loading = true;
-      saveDepoTemplate(data)
+      editDepoTemplate(remark)
         .then((res) => {
           if (res.data.code === 0) {
-            this.$emit("getSelectTemplateName", true);
             this.close();
             this.$message({
               type: "success",
-              message: "新建成功",
+              message: "编辑成功",
               duration: 2000,
             });
           } else {
@@ -341,20 +179,6 @@ export default {
             duration: 2000,
           });
         });
-    },
-
-    // 判断文件类型是否被选中
-    changeFileDisabled() {
-      for (let i = 0; i < this.params.length; i++) {
-        if (this.params[i].parameterType === "file") {
-          this.parameterOption[this.parameterOption.length - 1].disabled = true;
-          break;
-        } else {
-          this.parameterOption[
-            this.parameterOption.length - 1
-          ].disabled = false;
-        }
-      }
     },
   },
 };

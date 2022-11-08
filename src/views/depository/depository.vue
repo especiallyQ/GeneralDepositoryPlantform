@@ -35,7 +35,7 @@
               ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" size="small" @click="searchTemplateName"
+              <el-button type="primary" size="small" @click="getTemplateList"
                 >搜索</el-button
               >
             </el-form-item>
@@ -45,6 +45,7 @@
           <el-button
             type="primary"
             size="small"
+            v-if="role === '1' || role === '2'"
             @click="changeCreateTemplateDialog(true)"
             >新建存证模板</el-button
           >
@@ -66,19 +67,28 @@
               <el-button
                 type="text"
                 class="el-button-text"
+                :disabled="
+                  (role === '2' && user !== scope.row.creator) || role === '3'
+                "
                 @click="handleEdit(scope.row.id)"
                 >编辑</el-button
               >
               <el-button
                 type="text"
                 class="el-button-text"
+                :disabled="
+                  (role === '2' && user !== scope.row.creator) || role === '3'
+                "
                 @click="handleDelete(scope.$index, scope.row)"
                 >删除</el-button
               >
               <el-button
                 type="text"
                 class="el-button-text"
-                @click="handleEdit(scope.$index, scope.row)"
+                :disabled="
+                  (role === '2' && user !== scope.row.creator) || role === '3'
+                "
+                @click="viewDetails(scope.$index, scope.row)"
                 >查看详情</el-button
               >
             </template>
@@ -135,9 +145,11 @@ export default {
       form: {
         templateName: "", //搜索框内容
       },
-      creatorId: "", // 下拉框选中的创建者
+      creatorId: "", // 下拉框选中的创建者Id
       currentPage: 1, // 分页-当前页码
       pageSize: 10, // 分页-每页数据条目数
+      role: localStorage.getItem("rootId"), // 登录账号的类型(角色) 1超级管理员 2普通管理员 3普通用户
+      user: localStorage.getItem("user"),
 
       // 存证管理列表表头
       tableHeader: [
@@ -159,14 +171,7 @@ export default {
       ],
 
       // 存证管理列表数据
-      tableData: [
-        {
-          id: 1,
-          depositoryTemplateName: "lq",
-          creator: "sdas",
-          depositoryCount: 1235646,
-        },
-      ],
+      tableData: [],
       total: 0, //列表总条数
 
       createTemplateDialogVisible: false, //新建存证模板Dialog是否显示
@@ -178,6 +183,8 @@ export default {
     this.getTemplateCreator();
     this.getTemplateList();
   },
+
+  computed: {},
   methods: {
     // 获取全部存证模板创建者名称
     getTemplateCreator() {
@@ -231,19 +238,6 @@ export default {
         });
     },
 
-    // 搜索模板名称
-    searchTemplateName() {
-      if (!!this.form.templateName) {
-        this.getTemplateList();
-      } else {
-        this.$message({
-          type: "error",
-          message: "模板名称不能为空",
-          duration: 2000,
-        });
-      }
-    },
-
     // 切换每页显示条数
     handleSizeChange(val) {
       this.pageSize = val;
@@ -272,6 +266,7 @@ export default {
     // 删除存证列表
     handleDelete() {},
     // 存证列表查看详情
+    viewDetails() {},
   },
 };
 </script>
