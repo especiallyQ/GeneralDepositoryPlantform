@@ -31,7 +31,7 @@
           <el-input
             v-model="key.parameterType"
             class="el-input-width"
-            style="marginleft: 10px"
+            style="marginLeft: 10px"
             :disabled="true"
           ></el-input>
         </el-form-item>
@@ -50,7 +50,7 @@
           <el-input
             v-model="key.parameterType"
             class="el-input-width"
-            style="marginleft: 10px"
+            style="marginLeft: 10px"
             :disabled="true"
           ></el-input>
         </el-form-item>
@@ -70,7 +70,7 @@
         <el-button @click="close">取消</el-button>
         <el-button
           type="primary"
-          @click="addDepositoryTemplate"
+          @click="editDepositoryTemplate"
           :loading="loading"
           >确定</el-button
         >
@@ -104,6 +104,16 @@ export default {
         remark: null, //备注
         parameterParamsForm1: [], //存证参数
         parameterParamsForm2: [], //存证参数
+
+        // depositoryTemplateName: "模板一号", //存证模板名称
+        // remark: "备注备注备注备注备注备注备注备注备注备注备注备注备注备注", //备注
+        // parameterParamsForm1: [
+        //   { parameterName: "参数一", parameterType: "字符串" },
+        // ], //存证参数
+        // parameterParamsForm2: [
+        //   { parameterName: "参数二", parameterType: "整数" },
+        //   { parameterName: "参数三", parameterType: "文件" },
+        // ], //存证参数
       },
     };
   },
@@ -114,7 +124,7 @@ export default {
   },
 
   mounted() {
-    this.open();
+    // this.open();
   },
 
   methods: {
@@ -151,7 +161,7 @@ export default {
     },
 
     // 存证模板新建方法
-    addDepositoryTemplate() {
+    editDepositoryTemplate() {
       const { remark } = this.form;
       this.loading = true;
       editDepoTemplate(remark)

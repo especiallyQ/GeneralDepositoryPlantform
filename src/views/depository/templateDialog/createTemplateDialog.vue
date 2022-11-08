@@ -62,7 +62,7 @@
             icon="el-icon-plus"
             @click="addParameter"
             size="mini"
-            style="marginleft: 8px"
+            style="marginLeft: 8px"
           ></el-button>
         </el-form-item>
 
@@ -99,7 +99,7 @@
             icon="el-icon-minus"
             @click="removeParameter(index)"
             size="mini"
-            style="marginleft: 8px"
+            style="marginLeft: 8px"
           ></el-button>
         </el-form-item>
 
@@ -223,6 +223,7 @@ export default {
     // 关闭新建存证模板时触发
     close() {
       this.$emit("updateTemplateDialog", false);
+      this.$emit("getNewTemplateList");
     },
 
     // 点击+添加参数项

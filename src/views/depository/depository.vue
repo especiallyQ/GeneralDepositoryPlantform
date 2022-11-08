@@ -109,6 +109,7 @@
         v-if="createTemplateDialogVisible"
         :createTemplateDialogVisible.sync="createTemplateDialogVisible"
         @updateTemplateDialog="changeCreateTemplateDialog"
+        @getNewTemplateList="getNewTemplateList"
       ></CreateTemplateDialog>
       <EditTemplateDialog
         v-if="editTemplateDialogVisible"
@@ -236,6 +237,14 @@ export default {
             duration: 2000,
           });
         });
+    },
+    // 新建存证模板后获取最新存证列表
+    getNewTemplateList() {
+      this.currentPage = 1;
+      this.pageSize = 10;
+      this.creatorId = "";
+      this.form.templateName = "";
+      this.getTemplateList();
     },
 
     // 切换每页显示条数
