@@ -356,6 +356,9 @@ export default {
   align-items: center;
 }
 .sidebar-header {
+  width: 130px;
+  height: 26.4px;
+  overflow: hidden;
   color: #cfd7db;
   font-size: 20px;
   font-weight: bold;

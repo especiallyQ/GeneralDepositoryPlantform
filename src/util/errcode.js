@@ -27,6 +27,10 @@ let errCode = {
         en: "token expire",
         zh: "token过期"
     },
+    "302000": {
+        en: "user not logged in",
+        zh: "未登录的用户"
+    },
 }
 
 export default errCode;
