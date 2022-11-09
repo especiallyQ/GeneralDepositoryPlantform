@@ -225,7 +225,6 @@ export default {
     // 关闭新建存证模板时触发
     close() {
       this.$emit("updateTemplateDialog", false);
-      this.$emit("getNewTemplateList");
     },
 
     // 点击+添加参数项

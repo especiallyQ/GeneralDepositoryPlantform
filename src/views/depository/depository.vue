@@ -32,10 +32,11 @@
               <el-input
                 v-model="form.templateName"
                 placeholder="模板名称"
+                @keyup.enter.native="searchTemplateName"
               ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" size="small" @click="searchTemplateName"
+              <el-button type="primary" size="small" @click="searchTemplateName" 
                 >搜索</el-button
               >
             </el-form-item>
@@ -256,7 +257,6 @@ export default {
 
     // 新建存证模板后获取最新存证列表
     getNewTemplateList() {
-      console.log(this.pageSize);
       this.currentPage = 1;
       this.creatorId = "";
       this.form.templateName = "";
