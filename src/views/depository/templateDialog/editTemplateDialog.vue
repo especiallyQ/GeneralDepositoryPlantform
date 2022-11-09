@@ -8,7 +8,12 @@
       @close="close"
       width="498px"
     >
-      <el-form :model="form" label-width="100px" class="selectForm">
+      <el-form
+        :model="form"
+        label-width="100px"
+        class="selectForm"
+        v-loading="getLoading"
+      >
         <el-form-item label="存证模板名称">
           <el-input
             v-model="form.depositoryTemplateName"
@@ -64,17 +69,17 @@
             maxlength="60"
           ></el-input>
         </el-form-item>
-      </el-form>
 
-      <div class="dialog-footer">
-        <el-button @click="close">取消</el-button>
-        <el-button
-          type="primary"
-          @click="editDepositoryTemplate"
-          :loading="loading"
-          >确定</el-button
-        >
-      </div>
+        <div class="dialog-footer">
+          <el-button @click="close">取消</el-button>
+          <el-button
+            type="primary"
+            @click="editDepositoryTemplate"
+            :loading="loading"
+            >确定</el-button
+          >
+        </div>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -98,7 +103,8 @@ export default {
   data() {
     return {
       dialogFormVisible: this.editTemplateDialogVisible, //控制dialog是否显示
-      loading: false, //loading图标
+      getLoading: false, //获取数据loading图标
+      loading: false, //编辑按钮loading图标
       form: {
         depositoryTemplateName: null, //存证模板名称
         remark: null, //备注
@@ -124,6 +130,7 @@ export default {
     },
 
     open() {
+      this.getLoading = true;
       // 获取模板数据
       getEditDepositoryTemplate(this.editTemplateNameId)
         .then((res) => {
@@ -133,6 +140,7 @@ export default {
             this.form.remark = remark;
             this.form.parameterParamsForm1 = params.splice(0, 1);
             this.form.parameterParamsForm2 = params;
+            this.getLoading = false;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
