@@ -118,6 +118,8 @@ export default {
         // 主菜单国际化
         item.name = {
           userManagement: '用户管理',
+          systemConfiguration:'系统配置',
+
         }[item.nameKey];
         // 子菜单国际化
         if (item.children) {
@@ -126,6 +128,7 @@ export default {
               dataOverview: "数据概览",
               depositoryTitle: "存证管理",
               userManagement: '账号管理',
+              systemConfiguration:'系统配置',
             }[it.nameKey];
           });
         }
@@ -188,6 +191,7 @@ export default {
             main: false,
           depositoryTitle: true,
           userManagement: true,
+          systemConfiguration:true,
             data: true,
           }[item.nameKey] || false;
 

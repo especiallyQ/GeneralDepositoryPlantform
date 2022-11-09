@@ -27,6 +27,10 @@ let errCode = {
         en: "token expire",
         zh: "token过期"
     },
+    "400001": {
+        en: "duplicate config",
+        zh: "重复配置"
+    },
 }
 
 export default errCode;

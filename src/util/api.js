@@ -85,9 +85,42 @@ export function updateAccount(data) {
     })
 }
 
+//系统配置相关接口-----------------------------
+export function ContractList(data) {
+    return get({
+        url: `${url.ORG_LIST}/system/getContractList/${data}`,
+        method: 'get',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
 
+export function ChainList(data, list) {
+    const params = reviseParam(data, list);
+    return get({
+        url: `${url.ORG_LIST}/system/getChainList/` +
+            `${data.serverPassword}/${data.serverAccount}`,
+        method: 'get',
+        params: params.querys,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
 
-
+export function bindAccount(data) {
+    return post({
+        url: `${url.ORG_LIST}/system/bindAccount`,
+        method: 'post',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
 
 // 存证相关接口-----------------------------
 

@@ -6,6 +6,7 @@ const Main = () => import('@/views/index/main.vue')
 const Depository = () => import('@/views/depository/depository.vue')
 const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
 const userManagement = () => import('@/views/userManagement/index.vue');
+const systemConfiguration= () => import('@/views/systemConfiguration')
 
 Vue.use(Router);
 
@@ -58,6 +59,20 @@ const routes = [{
         },
         ]
     },
+    {
+        path: '/main',
+        name: 'systemConfiguration',
+        nameKey: 'systemConfiguration',
+        leaf: true,
+        iconCls: 'ext-icon-regulatory sidebar-icon',
+        component: Main,
+        children: [
+            {
+                path: '/systemConfiguration', component: systemConfiguration, name: 'systemConfiguration', nameKey: 'systemConfiguration', meta: { requireAuth: true }
+            }
+        ]
+    
+        },
 ];
 
 const router = new Router({
