@@ -27,9 +27,25 @@ let errCode = {
         en: "token expire",
         zh: "token过期"
     },
+    "202026": {
+        en: "account info already exists",
+        zh: "账号名重复"
+    },
     "302000": {
         en: "user not logged in",
         zh: "未登录的用户"
+    },
+    "400001": {
+        en: "duplicate config",
+        zh: "重复配置"
+    },
+    "400002": {
+        en: "params incorrect, can not get chain message",
+        zh: "输入参数错误，无法获得应用链信息"
+    },
+    "400003": {
+        en: "params incorrect, can not get chain message",
+        zh: "输入参数错误，无法获得存证合约信息"
     },
 }
 

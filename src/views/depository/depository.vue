@@ -308,5 +308,6 @@ export default {
 .el-button-text {
   background-color: transparent !important;
   border: 1px solid transparent !important;
+  font-size: 12px;
 }
 </style>

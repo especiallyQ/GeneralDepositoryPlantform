@@ -116,13 +116,18 @@ export default {
       let list = this.routesList;
       list.forEach((item) => {
         // 主菜单国际化
-        item.name = {}[item.nameKey];
+        item.name = {
+          userManagement: "用户管理",
+          systemConfiguration: "系统配置",
+        }[item.nameKey];
         // 子菜单国际化
         if (item.children) {
           item.children.forEach((it) => {
             it.name = {
               dataOverview: "数据概览",
               depositoryTitle: "存证管理",
+              userManagement: "账号管理",
+              systemConfiguration: "系统配置",
             }[it.nameKey];
           });
         }
@@ -183,24 +188,21 @@ export default {
           {
             home: false,
             main: false,
-            depositoryTitle: true,
             data: true,
+            userManagement: true,
+            depositoryTitle: true,
+            systemConfiguration: this.role === '1',
           }[item.nameKey] || false;
 
         // 子菜单权限
-        // if (item.children) {
-        //   item.children.forEach((it) => {
-        //     it.menuShow =
-        //       {
-        //         dataOverview: true,
-        //         chainOrgMgmt: true,
-        //         accountManagement: true,
-        //         message: true,
-        //         depositoryTitle: true,
-        //         backlog: this.role === "PU_Admin",
-        //       }[it.nameKey] || false;
-        //   });
-        // }
+        if (item.children) {
+          item.children.forEach((it) => {
+            it.menuShow =
+              {
+                userManagement: true,
+              }[it.nameKey] || false;
+          });
+        }
       });
       this.routesList = list;
 
@@ -252,6 +254,14 @@ export default {
 </script>
 
 <style scoped>
+.el-submenu__title * {
+  margin-left: -5px;
+  vertical-align: middle;
+}
+.el-icon-connection:before {
+  content: "\e736";
+  margin-left: 8px;
+}
 .el-menu-vertical-demo {
   padding-top: 16px;
   border: none;
