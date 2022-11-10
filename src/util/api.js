@@ -41,14 +41,92 @@ export function login(data, code, token) {
 
 // 账号相关接口-----------------------------
 
+//账号管理初始化 
+export function accountList(data, list) {
+    const params = reviseParam(data, list);
+    return get({
+        url: `${url.ORG_LIST}/account/accountList/${params.str}`,
+        method: 'get',
+        params: params.querys,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//新建账号
+export function createAccount(data) {
+    return post({
+        url: `${url.ORG_LIST}/account/createAccount`,
+        method: 'post',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
 
+//编辑账号
+export function updateAccount(data) {
+    return put({
+        url: `${url.ORG_LIST}/account/updateAccount`,
+        method: 'put',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+export function deleteAccountInfo(data) {
+    return deleted({
+        url: `${url.ORG_LIST}/account/deleteAccount/${data}`,
+        method: 'delete',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
 
+//系统配置相关接口-----------------------------
 
-
+//获取应用链列表下拉框
+export function ContractList(data) {
+    return get({
+        url: `${url.ORG_LIST}/system/getContractList/${data}`,
+        method: 'get',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//获取存证合约列表下拉框
+export function ChainList(data, list) {
+    const params = reviseParam(data, list);
+    return get({
+        url: `${url.ORG_LIST}/system/getChainList/` +
+            `${data.serverPassword}/${data.serverAccount}`,
+        method: 'get',
+        params: params.querys,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//配置系统
+export function bindAccount(data) {
+    return post({
+        url: `${url.ORG_LIST}/system/bindAccount`,
+        method: 'post',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
 
 
 // 存证相关接口-----------------------------
-
 
 // 存证管理-获取存证模板创建者名称
 export function getDepositoryTemplateCreator() {
@@ -158,7 +236,6 @@ export function resetPassword(data) {
 
 
 
-
 // 获取当前账号有链上身份的组织和订阅的应用链
 export function getOrgAndChain() {
     return get({
@@ -169,9 +246,6 @@ export function getOrgAndChain() {
         }
     })
 }
-
-
-
 
 
 // 数据概览-关键监控指标
@@ -365,15 +439,15 @@ export function batchModifyAccountInfo(data) {
 }
 
 // 删除账号
-export function deleteAccountInfo(data) {
-    return deleted({
-        url: `${url.ORG_LIST}/account/${data}`,
-        method: 'delete',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function deleteAccountInfo(data) {
+//     return deleted({
+//         url: `${url.ORG_LIST}/account/${data}`,
+//         method: 'delete',
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 // 批量删除账号
 export function batchDeleteAccountInfo(data) {
@@ -424,17 +498,17 @@ export function accountTypeList(data, list) {
 }
 
 // 获取账号列表
-export function accountList(data, list) {
-    const params = reviseParam(data, {});
-    return post({
-        url: `${url.ORG_LIST}/account/accountList/${params.str}`,
-        method: 'post',
-        data: list,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function accountList(data, list) {
+//     const params = reviseParam(data, {});
+//     return post({
+//         url: `${url.ORG_LIST}/account/accountList/${params.str}`,
+//         method: 'post',
+//         data: list,
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 // contract path list
 export function getContractPathList(data) {
@@ -1115,15 +1189,15 @@ export function getAlarmRuleList() {
 }
 
 // 获取账号列表(告警配置使用)
-export function getAccountList() {
-    return get({
-        url: `${url.ORG_LIST}/alarmrule/modifyAlarmRuleInit`,
-        method: 'get',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function getAccountList() {
+//     return get({
+//         url: `${url.ORG_LIST}/alarmrule/modifyAlarmRuleInit`,
+//         method: 'get',
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 // 编辑告警配置
 export function modifyAlarmRule(data) {

@@ -341,7 +341,6 @@ export function JSONSwitchFormData(JSONData) {
             }
         })
     }
-    
     switchFn(JSONData)
     return formData
 }
