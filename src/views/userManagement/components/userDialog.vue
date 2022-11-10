@@ -2,14 +2,14 @@
     <el-dialog title="新建账号" :visible.sync="createUserAccountDialogVisible" width="498px" align="center"
         :close-on-click-modal="false" @open="resetForm1('ruleForm')" :before-close="closeDialog">
         <el-form :model="accountForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="账号名" prop="name">
-                <el-input v-model="accountForm.name" ></el-input>
+            <el-form-item label="账号名" prop="accountName">
+                <el-input v-model="accountForm.accountName" ></el-input>
             </el-form-item>
             <el-form-item label="联系方式" prop="contact">
                 <el-input v-model="accountForm.contact" ></el-input>
             </el-form-item>
-            <el-form-item label="账号类型" prop="type">
-                <el-select v-model="accountForm.type" placeholder="请选择账号类型" style="width: 100%">
+            <el-form-item label="账号类型" prop="roleId">
+                <el-select v-model="accountForm.roleId" placeholder="请选择账号类型" style="width: 100%">
                     <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
@@ -24,6 +24,7 @@
 
 <script>
 import { JSONSwitchFormData } from "@/util/util.js";
+import{createAccount} from "@/util/api.js"
 export default {
     name: "userDialog",
     props: {
@@ -47,12 +48,12 @@ export default {
                 },
             ],
             accountForm: {
-                name: "",
+                accountName: "",
                 contact: "",
-                type: "",
+                roleId: "",
             },
             rules: {
-                name: [
+                accountName: [
                     {
                         required: true,
                         message: "请输入组织名称",
@@ -78,7 +79,7 @@ export default {
                         trigger: "blur",
                     },
                 ],
-                type: [
+                roleId: [
                     {
                         required: true,
                         message: "请选择账号类型",
@@ -99,9 +100,13 @@ export default {
                 if (valid) {
                     this.$emit("update:createUserAccountDialogVisible", false);
                     let formData = JSONSwitchFormData(this.accountForm);
-                    const res = await addChainOrg(formData);
+                    const res = await createAccount(formData);
                     if (res.data.code === 0) {
                         this.$parent.getAccountList()
+                        this.$message({
+                    type: "success",
+                    message: "新建成功!",
+                });
                     } else {
                         this.$message({
                             message: this.$chooseLang(res.data.code),

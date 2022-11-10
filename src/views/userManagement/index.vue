@@ -8,27 +8,29 @@
                     <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
-                <el-input placeholder="账号名" v-model="inputKeyWords" clearable class="search" @change="test">
+                <el-input placeholder="账号名" v-model="inputKeyWords" clearable class="search" >
                 </el-input>
                 <el-button class="searchButton" icon="el-icon-search" @click="getAccountList"></el-button>
                 <p class="p"></p>
-                <el-button type="primary" class="right" @click="newAccount" v-if="id == 1 || id == 2">新建账号</el-button>
+                <el-button type="primary" class="right" @click="newAccount" v-if="role == 1 || role == 2">新建账号</el-button>
             </div>
             <div class="content-center">
                 <template>
                     <el-table :data="accountListData" style="width: 100%">
-                        <el-table-column prop="accountName" label="账号名">
+                        <el-table-column prop="accountName" label="账号名" align="center">
                         </el-table-column>
-                        <el-table-column prop="contact" label="联系方式">
+                        <el-table-column prop="contact" label="联系方式" align="center">
                         </el-table-column>
-                        <el-table-column prop="roleZh" label="账号类型"> </el-table-column>
+                        <el-table-column prop="roleZh" label="账号类型" align="center"> </el-table-column>
                         <el-table-column label="操作" align="center" class="remarks">
                             <template slot-scope="{ row }">
-                                <el-button :disabled="isDisabled" type="text" style="color: red; font-size: 12px"
+                                <el-button 
+                                :disabled="isDeleteAccountDisabled(row)"
+                                    type="text" style="color: red; font-size: 12px"
                                     @click="delateAccount(row)">
                                     删除
                                 </el-button>
-                                <el-button :disabled="isDisabled" type="text" style="font-size: 12px" @click="reviseAccount(row)">
+                                <el-button :disabled="isReviseAccountDisabled()" type="text" style="font-size: 12px" @click="reviseAccount(row)">
                                     编辑</el-button>
                             </template>
                         </el-table-column>
@@ -47,7 +49,7 @@
         </userDialog>
         <el-dialog title="编辑账号" :visible.sync="reviseUserAccountDialogVisible" width="498px" align="center"
             :close-on-click-modal="false">
-            <el-form :model="accountForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+            <el-form :model="accountForm"  ref="ruleForm" label-width="100px" class="demo-ruleForm">
                 <el-form-item label="账号名称" prop="name">
                     <el-input v-model="accountForm.name" disabled></el-input>
                 </el-form-item>
@@ -79,8 +81,9 @@
 <script>
 import ContentHead from "@/components/contentHead.vue";
 import userDialog from "./components/userDialog.vue";
-import { accountList, updateAccount } from "@/util/api.js";
+import { accountList, updateAccount ,deleteAccountInfo} from "@/util/api.js";
 import { JSONSwitchFormData } from "@/util/util.js";
+
 
 export default {
     name: "userManagement",
@@ -90,7 +93,8 @@ export default {
             pageNumber: 1, //分页器的第几页
             pageSize: 10, //每一页展示的条数
             roleId: '',//用户权限id
-            id: localStorage.getItem('rootId'),
+            role: localStorage.getItem('rootId'),
+            userId:localStorage.getItem('userId'),
             total: 0, //总共的条数
             createUserAccountDialogVisible: false,//控制新建dialog是否显示
             reviseUserAccountDialogVisible: false,//控制修改dialog是否显示
@@ -132,25 +136,11 @@ export default {
         console.log(this.id);
     },
     computed: {
-        isDisabled() {
-            if (this.id == 1 || this.id == 2) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
     },
     methods: {
-        // getAccountForm(msg) {
-        //     console.log(msg,'1111111111');
-        // },
-        // test() {
-        //     console.log(1111);
-        // },
         //账号管理初始化
         async getAccountList() {
-            // console.log('被子组件调用了');
+            // console.log("test-data",this.pageNumber);
             const res = await accountList({
                 pageNumber: this.pageNumber,
                 pageSize: `${this.pageSize}?roleId=${this.selectValue}&accountName=${this.inputKeyWords}`,
@@ -212,18 +202,25 @@ export default {
                         confirmButtonText: "确定",
                         cancelButtonText: "取消",
                     }).then(async () => {
-                        console.log(row);
-                        const res = await deleteChainOrg(row.accountId);
+                        const res = await deleteAccountInfo(row.accountId);
                         if (res.data.code === 0) {
                             this.$message({
                                 type: "success",
                                 message: "删除成功!",
                             });
-                            this.getAccountList(
-                                this.accountListData.length > 1
+                            // if (this.accountListData.length === 1) {
+                            //     this.pageNumber -= 1
+                            // }
+                            this.pageNumber = this.accountListData.length > 1
                                     ? this.pageNumber
                                     : this.pageNumber - 1
-                            );
+                            
+                            this.getAccountList(
+                                // this.accountListData.length > 1
+                                //     ? this.pageNumber
+                                //     : this.pageNumber - 1
+                            )
+                            
                         }
                     }).catch(() => {
                     })
@@ -241,6 +238,15 @@ export default {
             this.pageNumber = paper;
             this.getAccountList();
         },
+        isDeleteAccountDisabled(row) {
+                return !((this.role == 1 || this.role == 2) && row.accountId != this.userId )
+            
+        },
+        isReviseAccountDisabled() {
+            return !(this.role ==1 || this.role==2)
+        },
+            
+        
     },
 };
 </script>

@@ -3,7 +3,7 @@
         <ContentHead headTitle='系统配置'></ContentHead>
         <div class="content-container">
             <el-form class="system-form" label-position="right" label-width="auto" :model="systemConfigurationForm"
-                :rules="rules" ref="ruleForm" >
+                :rules="rules" ref="ruleForm">
                 <el-form-item label="CSMP服务地址:" prop="serverPath">
                     <el-input v-model="systemConfigurationForm.serverPath"></el-input>
                 </el-form-item>
@@ -15,9 +15,9 @@
                 </el-form-item>
                 <el-form-item label="应用链ID:" prop="chainCode">
                     <el-select v-model="systemConfigurationForm.chainCode" placeholder="请选择" style="width:100%"
-                        @focus="getChainList">
+                        @focus="getChainList" @change="selectData">
                         <el-option v-for="item in chainCodeData" :key="item.chainCode" :label="item.chainCode"
-                            :value="item.chainCode">
+                            :value="{value:item.chainCode,label:item.chainId}">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -54,7 +54,8 @@ export default {
                 serverPath: '',//CSMP服务地址
                 serverAccount: '',//CSMP管理员账号
                 serverPassword: '',//CSMP管理员密码
-                chainCode: '',//应用链ID
+                chainCode: '',//应用链名称
+                chainId: '',//应用链ID
                 contractId: '',//存证合约
             },
             rules: {
@@ -77,6 +78,12 @@ export default {
         };
     },
     methods: {
+        selectData(data) {
+            const { value, label } = data;
+            this.systemConfigurationForm.chainCode = value;
+            this.systemConfigurationForm.chainId = label;
+            console.log(this.systemConfigurationForm.chainCode,this.systemConfigurationForm.chainId);
+        },
         //获取存证合约
         async getContractList() {
             // console.log(this.systemConfigurationForm.serverAccount);
@@ -95,13 +102,13 @@ export default {
         //获取应用链ID
         async getChainList() {
             const res = await ChainList({
-                // serverPath: this.systemConfigurationForm.serverPath,
                 serverAccount: `${this.systemConfigurationForm.serverAccount}?serverPath=${this.systemConfigurationForm.serverPath}`,
                 serverPassword: sm3(this.systemConfigurationForm.serverPassword)
             });
+            
             if (res.data.code === 0) {
                 this.chainCodeData = res.data.data;
-                // console.log(this.chainCodeData[0].chainCode);
+                console.log(this.chainCodeData);
             } else {
                 this.$message({
                     message: this.$chooseLang(res.data.code),
@@ -110,30 +117,32 @@ export default {
                 });
             }
         },
+        
 
         submitForm(formName) {
+            
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
                     let formData = JSONSwitchFormData({
                         ...this.systemConfigurationForm,
-                        serverPassword:sm3(this.systemConfigurationForm.serverPassword)
+                        serverPassword: sm3(this.systemConfigurationForm.serverPassword)
                     });
                     const res = await bindAccount(formData);
                     if (res.data.code === 0) {
-                    //     this.systemConfigurationForm = {
-                    //     serverPath: '',//CSMP服务地址
-                    //     ServiceAccount: '',//CSMP管理员账号
-                    //     serverPassword: '',//CSMP管理员密码
-                    //     chainCode: '',//应用链ID
-                    //     contractId: '',//存证合约
-                    // };
-                    // this.contractIdData = [];
-                    // this.chainCodeData = [];
+                        this.systemConfigurationForm = {
+                            serverPath: '',//CSMP服务地址
+                            ServiceAccount: '',//CSMP管理员账号
+                            serverPassword: '',//CSMP管理员密码
+                            chainCode: '',//应用链ID
+                            contractId: '',//存证合约
+                        };
+                        this.contractIdData = [];
+                        this.chainCodeData = [];
                         this.$message({
                             type: "success",
                             message: "编辑成功!",
                         });
-                        
+
                     } else {
                         this.$message({
                             message: this.$chooseLang(res.data.code),
@@ -141,7 +150,7 @@ export default {
                             duration: 2000,
                         });
                     }
-                    
+
                 } else {
                     console.log('error submit!!');
                     return false;

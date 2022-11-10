@@ -73,6 +73,18 @@ export function accountList(data, list) {
         }
     })
 }
+//新建账号
+export function createAccount(data) {
+    return post({
+        url: `${url.ORG_LIST}/account/createAccount`,
+        method: 'post',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
 //编辑账号
 export function updateAccount(data) {
     return put({
@@ -84,8 +96,19 @@ export function updateAccount(data) {
         }
     })
 }
+export function deleteAccountInfo(data) {
+    return deleted({
+        url: `${url.ORG_LIST}/account/deleteAccount/${data}`,
+        method: 'delete',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
 
 //系统配置相关接口-----------------------------
+
+//获取应用链列表下拉框
 export function ContractList(data) {
     return get({
         url: `${url.ORG_LIST}/system/getContractList/${data}`,
@@ -96,7 +119,7 @@ export function ContractList(data) {
         }
     })
 }
-
+//获取存证合约列表下拉框
 export function ChainList(data, list) {
     const params = reviseParam(data, list);
     return get({
@@ -109,7 +132,7 @@ export function ChainList(data, list) {
         }
     })
 }
-
+//配置系统
 export function bindAccount(data) {
     return post({
         url: `${url.ORG_LIST}/system/bindAccount`,
@@ -352,15 +375,15 @@ export function batchModifyAccountInfo(data) {
 }
 
 // 删除账号
-export function deleteAccountInfo(data) {
-    return deleted({
-        url: `${url.ORG_LIST}/account/${data}`,
-        method: 'delete',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function deleteAccountInfo(data) {
+//     return deleted({
+//         url: `${url.ORG_LIST}/account/${data}`,
+//         method: 'delete',
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 // 批量删除账号
 export function batchDeleteAccountInfo(data) {
