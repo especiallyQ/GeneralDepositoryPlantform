@@ -36,7 +36,7 @@
               ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" size="small" @click="searchTemplateName" 
+              <el-button type="primary" size="small" @click="searchTemplateName"
                 >搜索</el-button
               >
             </el-form-item>
@@ -81,12 +81,31 @@
               >
               <el-button
                 type="text"
+                style="color: red"
                 class="el-button-text"
                 :disabled="
                   (role === '2' && user !== scope.row.creator) || role === '3'
                 "
                 @click="handleDelete(scope.$index, scope.row)"
                 >删除</el-button
+              >
+              <el-button
+                type="text"
+                class="el-button-text"
+                :disabled="
+                  (role === '2' && user !== scope.row.creator) || role === '3'
+                "
+                @click="changeFreezeThaw(1, scope.row.id)"
+                >冻结</el-button
+              >
+              <el-button
+                type="text"
+                class="el-button-text"
+                :disabled="
+                  (role === '2' && user !== scope.row.creator) || role === '3'
+                "
+                @click="changeFreezeThaw(2, scope.row.id)"
+                >解冻</el-button
               >
               <el-button
                 type="text"
@@ -123,6 +142,20 @@
         :editTemplateNameId="editTemplateNameId"
         @updateTemplateDialog="changeEditTemplateDialog"
       ></EditTemplateDialog>
+      <el-dialog
+        title="提示"
+        :visible="freezeDialogVisible"
+        width="30%"
+        :before-close="handleClose"
+      >
+        <span>这是一段信息</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="dialogVisible = false"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -130,7 +163,12 @@
 <script>
 import _ from "lodash";
 import ContentHead from "@/components/contentHead";
-import { getDepositoryTemplateCreator, getTemplateListData } from "@/util/api";
+import {
+  getDepositoryTemplateCreator,
+  getTemplateListData,
+  freezeTemplate,
+  thawTemplate,
+} from "@/util/api";
 import CreateTemplateDialog from "@/views/depository/templateDialog/createTemplateDialog";
 import EditTemplateDialog from "@/views/depository/templateDialog/editTemplateDialog";
 export default {
@@ -181,9 +219,9 @@ export default {
       // 存证管理列表数据
       tableData: [],
       total: 0, //列表总条数
-
       createTemplateDialogVisible: false, //新建存证模板Dialog是否显示
       editTemplateDialogVisible: false, //编辑存证模板Dialog是否显示
+      freezeDialogVisible: 0, //冻结解冻模板Dialog是否显示
       editTemplateNameId: "", //被编辑存证列表的Id
     };
   },
@@ -290,6 +328,76 @@ export default {
     },
     // 删除存证列表
     handleDelete() {},
+
+    // 冻结解冻Dialog
+    changeFreezeThaw(status, id) {
+      this.freezeDialogVisible = status;
+      switch (status) {
+        case 1:
+          this.handleFreeze(id);
+          break;
+        case 2:
+          this.handleThaw(id);
+          break;
+      }
+    },
+
+    // 处理冻结存证模板
+    handleFreeze(id) {
+      freezeTemplate(id)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              message: "冻结成功",
+              type: "success",
+              duration: 2000,
+            });
+            this.getTemplateList();
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
+    },
+
+    //  处理解冻存证模板
+    handleThaw(id) {
+      thawTemplate(id)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              message: "解冻成功",
+              type: "success",
+              duration: 2000,
+            });
+            this.getTemplateList();
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
+    },
+
     // 存证列表查看详情
     viewDetails() {},
   },

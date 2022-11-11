@@ -173,6 +173,27 @@ export function getEditDepositoryTemplate(templateId) {
     })
 }
 
+// 存证信息-冻结存证模板
+export function freezeTemplate(templateId) {
+    return put({
+        url: `${url.ORG_LIST}/depository/updateDepositoryTemplate/${templateId}`,
+        method: "put",
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 存证信息-冻结存证模板
+export function thawTemplate(templateId) {
+    return put({
+        url: `${url.ORG_LIST}/depository/updateDepositoryTemplate/${templateId}`,
+        method: "put",
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
 
 // 存证信息-编辑存证模板
 export function editDepoTemplate(data) {
@@ -185,6 +206,8 @@ export function editDepoTemplate(data) {
         }
     })
 }
+
+
 
 
 
