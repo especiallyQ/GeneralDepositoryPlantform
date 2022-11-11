@@ -3,7 +3,7 @@
         <ContentHead headTitle='系统配置'></ContentHead>
         <div class="content-container">
             <el-form class="system-form" label-position="right" label-width="auto" :model="systemConfigurationForm"
-                :rules="rules" ref="ruleForm">
+                :rules="rules" ref="ruleForm" >
                 <el-form-item label="CSMP服务地址:" prop="serverPath">
                     <el-input v-model="systemConfigurationForm.serverPath"></el-input>
                 </el-form-item>
@@ -13,9 +13,9 @@
                 <el-form-item label="CSMP管理员密码:" prop="serverPassword">
                     <el-input v-model="systemConfigurationForm.serverPassword" type="password"></el-input>
                 </el-form-item>
-                <el-form-item label="应用链ID:" prop="chainCode">
+                <el-form-item label="应用链ID:" prop="chainCode" >
                     <el-select v-model="systemConfigurationForm.chainCode" placeholder="请选择" style="width:100%"
-                        @focus="getChainList" @change="selectData">
+                        @focus="getChainList" @change="selectData" >
                         <el-option v-for="item in chainCodeData" :key="item.chainCode" :label="item.chainCode"
                             :value="{value:item.chainCode,label:item.chainId}">
                         </el-option>
@@ -23,7 +23,7 @@
                 </el-form-item>
                 <el-form-item label="存证合约:" prop="contractId">
                     <el-select v-model="systemConfigurationForm.contractId" placeholder="请选择" style="width:100%"
-                        @focus="getContractList">
+                        @focus="getContractList" >
                         <el-option v-for="item in contractIdData" :key="item.contractId" :label="item.contractName"
                             :value="item.contractId">
                         </el-option>
@@ -108,7 +108,7 @@ export default {
             
             if (res.data.code === 0) {
                 this.chainCodeData = res.data.data;
-                console.log(this.chainCodeData);
+                // console.log(this.chainCodeData);
             } else {
                 this.$message({
                     message: this.$chooseLang(res.data.code),

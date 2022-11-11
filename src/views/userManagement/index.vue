@@ -4,19 +4,18 @@
         <div class="content-container">
             <div class="content-header">
                 <span class="left-text">账号类型</span>
-                <el-select v-model="selectValue" placeholder="请选择" @change="getAccountList">
+                <el-select v-model="selectValue" placeholder="请选择" @change="getAccountList" size="small">
                     <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
-                <el-input placeholder="账号名" v-model="inputKeyWords" clearable class="search" >
+                <el-input placeholder="账号名" v-model="inputKeyWords" clearable class="search" size="small">
                 </el-input>
-                <el-button class="searchButton" icon="el-icon-search" @click="getAccountList"></el-button>
-                <p class="p"></p>
-                <el-button type="primary" class="right" @click="newAccount" v-if="role == 1 || role == 2">新建账号</el-button>
+                <el-button class="searchButton" icon="el-icon-search" @click="getAccountList" size="small"></el-button>
+                <el-button type="primary" size="small" class="right" @click="newAccount" v-if="role == 1 || role == 2">新建账号</el-button>
             </div>
             <div class="content-center">
                 <template>
-                    <el-table :data="accountListData" style="width: 100%">
+                    <el-table :data="accountListData" style="width: 100%" v-loading="loading">
                         <el-table-column prop="accountName" label="账号名" align="center">
                         </el-table-column>
                         <el-table-column prop="contact" label="联系方式" align="center">
@@ -129,11 +128,11 @@ export default {
                     label: "普通用户",
                 },
             ],
+            loading:true,
         };
     },
     mounted() {
         this.getAccountList();
-        console.log(this.id);
     },
     computed: {
     },
@@ -152,6 +151,7 @@ export default {
                     this.accountListData = res.data.data
                 }
                 this.total = res.data.total;
+                this.loading = false;
             } else {
                 this.$message({
                     message: this.$chooseLang(res.data.code),
@@ -160,11 +160,12 @@ export default {
                 });
             }
         },
-
+        //点击新建账号显示dialog
         newAccount() {
             this.createUserAccountDialogVisible = true;
                 
         },
+        //点击编辑时渲染数据
         reviseAccount(row) {
             this.reviseUserAccountDialogVisible = true;
             this.accountForm.name = row.accountName;
@@ -172,6 +173,7 @@ export default {
             this.accountForm.type = row.roleZh;
             this.accountForm.id = row.accountId;
         },
+        //编辑账号
         async update() {
             this.reviseUserAccountDialogVisible = false;
             let formData = JSONSwitchFormData(this.accountForm);
@@ -182,7 +184,6 @@ export default {
                     message: "编辑成功!",
                 });
                 this.getAccountList();
-
             } else {
                 this.$message({
                     message: this.$chooseLang(res.data.code),
@@ -191,6 +192,7 @@ export default {
                 });
             }
         },
+        //删除账号
         delateAccount(row) {
             this.dialogVisible = true;
             this.$confirm(`确定删除账号${row.accountName}?`, {
@@ -208,18 +210,11 @@ export default {
                                 type: "success",
                                 message: "删除成功!",
                             });
-                            // if (this.accountListData.length === 1) {
-                            //     this.pageNumber -= 1
-                            // }
                             this.pageNumber = this.accountListData.length > 1
                                     ? this.pageNumber
                                     : this.pageNumber - 1
                             
-                            this.getAccountList(
-                                // this.accountListData.length > 1
-                                //     ? this.pageNumber
-                                //     : this.pageNumber - 1
-                            )
+                            this.getAccountList()
                             
                         }
                     }).catch(() => {
@@ -238,10 +233,12 @@ export default {
             this.pageNumber = paper;
             this.getAccountList();
         },
+        //删除操作权限设置
         isDeleteAccountDisabled(row) {
                 return !((this.role == 1 || this.role == 2) && row.accountId != this.userId )
             
         },
+        //编辑权限设置
         isReviseAccountDisabled() {
             return !(this.role ==1 || this.role==2)
         },
@@ -266,6 +263,7 @@ export default {
 
 .content-container .content-header {
     display: flex;
+    position: relative;
     height: 100px;
     align-items: center;
     margin-left: 20px;
@@ -273,8 +271,6 @@ export default {
 
 .content-container .content-header .left-text {
     font-size: 12px;
-    height: 32px;
-    line-height: 32px;
     margin-right: 10px;
 }
 
@@ -283,14 +279,14 @@ export default {
     background-color: #4093ff;
     border-top-left-radius: 0%;
     border-bottom-left-radius: 0%;
+    margin-left: -1px;
 }
 
-.content-container .content-header .p {
-    flex: auto;
-}
+
 
 .content-container .content-header .right {
-    margin-right: 20px;
+    position: absolute;
+    right: 20px;
 }
 
 .content-container .content-center {
