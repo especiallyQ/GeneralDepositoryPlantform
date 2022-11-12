@@ -55,7 +55,7 @@
       <div class="depository-list">
         <el-table
           :data="tableData"
-          v-loading="loading"
+          v-loading="listLoading"
           style="width: 100%"
           empty-text="暂无数据"
         >
@@ -93,18 +93,22 @@
                 type="text"
                 class="el-button-text"
                 :disabled="
-                  (role === '2' && user !== scope.row.creator) || role === '3'
+                  (role === '2' && user !== scope.row.creator) ||
+                  role === '3' ||
+                  scope.row.freeze !== 0
                 "
-                @click="changeFreezeThaw(1, scope.row.id)"
+                @click="changeFreezeThawDialog(0, scope.row)"
                 >冻结</el-button
               >
               <el-button
                 type="text"
                 class="el-button-text"
                 :disabled="
-                  (role === '2' && user !== scope.row.creator) || role === '3'
+                  (role === '2' && user !== scope.row.creator) ||
+                  role === '3' ||
+                  scope.row.freeze !== 1
                 "
-                @click="changeFreezeThaw(2, scope.row.id)"
+                @click="changeFreezeThawDialog(1, scope.row)"
                 >解冻</el-button
               >
               <el-button
@@ -130,6 +134,23 @@
         >
         </el-pagination>
       </div>
+      <el-dialog :visible="freezeDialogVisible" width="30%" :show-close="false">
+        <p class="freezeDialogTitle">
+          是否确认{{ freezeDialogStatus ? "解冻" : "冻结" }}存证模板
+          <span style="color: red">{{
+            freezeTemplate.depositoryTemplateName
+          }}</span>
+        </p>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="closeFreezeThawDialog">取 消</el-button>
+          <el-button
+            type="primary"
+            @click="handleFreezeThaw"
+            :loading="freezeThawDialogLoading"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
       <CreateTemplateDialog
         v-if="createTemplateDialogVisible"
         :createTemplateDialogVisible.sync="createTemplateDialogVisible"
@@ -142,20 +163,6 @@
         :editTemplateNameId="editTemplateNameId"
         @updateTemplateDialog="changeEditTemplateDialog"
       ></EditTemplateDialog>
-      <el-dialog
-        title="提示"
-        :visible="freezeDialogVisible"
-        width="30%"
-        :before-close="handleClose"
-      >
-        <span>这是一段信息</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogVisible = false"
-            >确 定</el-button
-          >
-        </span>
-      </el-dialog>
     </div>
   </div>
 </template>
@@ -196,7 +203,8 @@ export default {
       pageSize: 10, // 分页-每页数据条目数
       role: localStorage.getItem("rootId"), // 登录账号的类型(角色) 1超级管理员 2普通管理员 3普通用户
       user: localStorage.getItem("user"),
-      loading: false, //loading标识
+      listLoading: false, //存证模板列表Loading标识
+      freezeThawDialogLoading: false, //冻结解冻Dialog确定按钮Loading标识
       // 存证管理列表表头
       tableHeader: [
         {
@@ -217,17 +225,27 @@ export default {
       ],
 
       // 存证管理列表数据
-      tableData: [],
+      tableData: [
+        {
+          id: 0,
+          depositoryTemplateName: "aaa",
+          creator: "super",
+          depositoryCount: "0",
+          freeze: 0,
+        },
+      ],
       total: 0, //列表总条数
       createTemplateDialogVisible: false, //新建存证模板Dialog是否显示
       editTemplateDialogVisible: false, //编辑存证模板Dialog是否显示
-      freezeDialogVisible: 0, //冻结解冻模板Dialog是否显示
+      freezeDialogVisible: false, //冻结解冻模板Dialog是否显示
+      freezeDialogStatus: 0, //冻结解冻模板状态 0表示冻结 1表示解冻
+      freezeTemplate: "", //冻结解冻模板信息
       editTemplateNameId: "", //被编辑存证列表的Id
     };
   },
   mounted() {
-    this.getTemplateCreator();
-    this.getTemplateList();
+    // this.getTemplateCreator();
+    // this.getTemplateList();
   },
 
   computed: {},
@@ -257,7 +275,7 @@ export default {
 
     // 获取存证模板列表数据
     getTemplateList() {
-      this.loading = true;
+      this.listLoading = true;
       getTemplateListData(
         this.currentPage,
         this.pageSize,
@@ -268,9 +286,9 @@ export default {
           if (res.data.code === 0) {
             this.tableData = res.data.data;
             this.total = res.data.total;
-            this.loading = false;
+            this.listLoading = false;
           } else {
-            this.loading = false;
+            this.listLoading = false;
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
@@ -279,7 +297,7 @@ export default {
           }
         })
         .catch(() => {
-          this.loading = false;
+          this.listLoading = false;
           this.$message({
             message: "系统错误",
             type: "error",
@@ -329,15 +347,27 @@ export default {
     // 删除存证列表
     handleDelete() {},
 
-    // 冻结解冻Dialog
-    changeFreezeThaw(status, id) {
-      this.freezeDialogVisible = status;
-      switch (status) {
-        case 1:
-          this.handleFreeze(id);
+    // 显示冻结解冻Dialog
+    changeFreezeThawDialog(status, row) {
+      this.freezeDialogVisible = true;
+      this.freezeDialogStatus = status;
+      this.freezeTemplate = row;
+    },
+
+    // 关闭冻结解冻Dialog
+    closeFreezeThawDialog() {
+      this.freezeDialogVisible = false;
+      this.freezeThawDialogLoading = false;
+    },
+    // 发送冻结解冻存证模板请求
+    handleFreezeThaw() {
+      this.freezeThawDialogLoading = true;
+      switch (this.freezeDialogStatus) {
+        case 0:
+          this.handleFreeze(this.freezeTemplate.id);
           break;
-        case 2:
-          this.handleThaw(id);
+        case 1:
+          this.handleThaw(this.freezeTemplate.id);
           break;
       }
     },
@@ -353,12 +383,14 @@ export default {
               duration: 2000,
             });
             this.getTemplateList();
+            this.freezeThawDialogLoading = false;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
               duration: 2000,
             });
+            this.freezeThawDialogLoading = false;
           }
         })
         .catch(() => {
@@ -367,6 +399,7 @@ export default {
             type: "error",
             duration: 2000,
           });
+          this.freezeThawDialogLoading = false;
         });
     },
 
@@ -381,12 +414,14 @@ export default {
               duration: 2000,
             });
             this.getTemplateList();
+            this.freezeThawDialogLoading = false;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
               duration: 2000,
             });
+            this.freezeThawDialogLoading = false;
           }
         })
         .catch(() => {
@@ -395,6 +430,7 @@ export default {
             type: "error",
             duration: 2000,
           });
+          this.freezeThawDialogLoading = false;
         });
     },
 
@@ -417,5 +453,12 @@ export default {
   background-color: transparent !important;
   border: 1px solid transparent !important;
   font-size: 12px;
+}
+
+.freezeDialogTitle {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bolder;
+  letter-spacing: 0.5px;
 }
 </style>

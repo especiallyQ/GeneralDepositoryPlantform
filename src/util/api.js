@@ -184,7 +184,7 @@ export function freezeTemplate(templateId) {
     })
 }
 
-// 存证信息-冻结存证模板
+// 存证信息-解冻存证模板
 export function thawTemplate(templateId) {
     return put({
         url: `${url.ORG_LIST}/depository/updateDepositoryTemplate/${templateId}`,
