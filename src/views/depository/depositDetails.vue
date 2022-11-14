@@ -1,7 +1,7 @@
 <template>
   <div>
     <ContentHead headTitle="存证管理" headSubTitle="存证信息列表"></ContentHead>
-    <div class="module-wrapper">
+    <div class="module-wrapper" v-loading="DepositPageLoading">
       <div class="search-part">
         <div class="icon" :style="{ background: getColor() }">
           {{ firstCharacter }}
@@ -18,22 +18,29 @@
               </el-tag>
             </div>
           </div>
-          <el-descriptions size="medium" style="fontSize:25px">
-            <el-descriptions-item label="创建者"
-              >{{ templateMsg.creator }}</el-descriptions-item
-            >
-            <el-descriptions-item label="创建时间"
-              >{{ templateMsg.createTime }}</el-descriptions-item
-            >
-            <el-descriptions-item label="存证信息数量">{{ templateMsg.depositoryCount }}</el-descriptions-item>
-            <el-descriptions-item label="备注"
-              >{{ templateMsg.remark }}</el-descriptions-item
-            >
+          <el-descriptions size="medium" style="fontsize: 25px">
+            <el-descriptions-item label="创建者">{{
+              templateMsg.creator
+            }}</el-descriptions-item>
+            <el-descriptions-item label="创建时间">{{
+              templateMsg.createTime
+            }}</el-descriptions-item>
+            <el-descriptions-item label="存证信息数量">{{
+              templateMsg.depositoryCount
+            }}</el-descriptions-item>
+            <el-descriptions-item label="备注">{{
+              templateMsg.remark
+            }}</el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
       <div class="input-btn">
-        <el-button type="primary" size="small">录入存证内容</el-button>
+        <el-button
+          type="primary"
+          size="small"
+          @click="openSaveDepositDialog"
+          >录入存证内容</el-button
+        >
         <el-button type="primary" size="mini">批量录入</el-button>
       </div>
       <div class="depository-list">
@@ -88,17 +95,20 @@
       >
       </el-pagination>
     </div>
+    <SaveDepositDialog :visible.sync="enteringDepositDialogVisible"></SaveDepositDialog>
   </div>
 </template>
 
 <script>
 import ContentHead from "@/components/contentHead";
 import { getTemplateDetailsData, getTemplateDetailsListData } from "@/util/api";
+import SaveDepositDialog from "@/views/depository/templateDialog/saveDepositDialog.vue";
 import { rgb } from "@/util/util";
 export default {
   name: "DepositDetails",
   components: {
     ContentHead,
+    SaveDepositDialog,
   },
   data() {
     return {
@@ -107,9 +117,11 @@ export default {
       total: 0, //列表总条数
       currentPage: 1, // 分页-当前页码
       pageSize: 10, // 分页-每页数据条目数
+      DepositPageLoading: false, // 存证信息全局页面loading
       listLoading: false, //列表loading
       tableData: [], //存证信息列表数据
       newTableHeader: [], //存证信息列表表头
+      enteringDepositDialogVisible: false, //录入存证信息Dialog
     };
   },
   mounted() {
@@ -119,6 +131,7 @@ export default {
   methods: {
     // 获取模板上方详情信息
     getTemplateDetails() {
+      this.DepositPageLoading = true;
       const { rowId } = this.$route.params;
       getTemplateDetailsData(rowId)
         .then((res) => {
@@ -126,6 +139,7 @@ export default {
             this.templateMsg = res.data.data;
             this.firstCharacter =
               res.data.data.depositoryTemplateName.substring(0, 1);
+            this.DepositPageLoading = false;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
@@ -144,6 +158,7 @@ export default {
     },
     // 获取模板下方列表数据
     getDepositoryListMsg() {
+      this.listLoading = true;
       const { rowId } = this.$route.params;
       getTemplateDetailsListData(rowId, this.currentPage, this.pageSize)
         .then((res) => {
@@ -171,6 +186,7 @@ export default {
               }
             }
             this.total = res.data.data.total;
+            this.listLoading = false;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
@@ -202,6 +218,10 @@ export default {
     // 生成随机颜色
     getColor() {
       return rgb();
+    },
+    // 开启录入存证Dialog
+    openSaveDepositDialog() {
+      this.enteringDepositDialogVisible = true;
     },
   },
 
@@ -254,6 +274,7 @@ export default {
 
     .freeze-thaw {
       margin-left: 10px;
+      line-height: 22px;
     }
   }
 }
