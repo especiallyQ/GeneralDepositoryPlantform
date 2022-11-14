@@ -117,7 +117,7 @@
                 :disabled="
                   (role === '2' && user !== scope.row.creator) || role === '3'
                 "
-                @click="viewDetails(scope.$index, scope.row)"
+                @click="viewDetails(scope.row.id)"
                 >查看详情</el-button
               >
             </template>
@@ -134,7 +134,7 @@
         >
         </el-pagination>
       </div>
-      <el-dialog :visible="freezeDialogVisible" width="30%" :show-close="false">
+      <el-dialog :visible="freezeDialogVisible" width="30%" :show-close="false" v-if="freezeDialogVisible">
         <p class="freezeDialogTitle">
           是否确认{{ freezeDialogStatus ? "解冻" : "冻结" }}存证模板
           <span style="color: red">{{
@@ -225,15 +225,7 @@ export default {
       ],
 
       // 存证管理列表数据
-      tableData: [
-        {
-          id: 0,
-          depositoryTemplateName: "aaa",
-          creator: "super",
-          depositoryCount: "0",
-          freeze: 0,
-        },
-      ],
+      tableData: [],
       total: 0, //列表总条数
       createTemplateDialogVisible: false, //新建存证模板Dialog是否显示
       editTemplateDialogVisible: false, //编辑存证模板Dialog是否显示
@@ -244,8 +236,8 @@ export default {
     };
   },
   mounted() {
-    // this.getTemplateCreator();
-    // this.getTemplateList();
+    this.getTemplateCreator();
+    this.getTemplateList();
   },
 
   computed: {},
@@ -377,20 +369,19 @@ export default {
       freezeTemplate(id)
         .then((res) => {
           if (res.data.code === 0) {
+            this.getTemplateList();
+            this.closeFreezeThawDialog();
             this.$message({
               message: "冻结成功",
               type: "success",
               duration: 2000,
             });
-            this.getTemplateList();
-            this.freezeThawDialogLoading = false;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
               duration: 2000,
             });
-            this.freezeThawDialogLoading = false;
           }
         })
         .catch(() => {
@@ -399,7 +390,6 @@ export default {
             type: "error",
             duration: 2000,
           });
-          this.freezeThawDialogLoading = false;
         });
     },
 
@@ -408,20 +398,20 @@ export default {
       thawTemplate(id)
         .then((res) => {
           if (res.data.code === 0) {
+            this.getTemplateList();
+            this.closeFreezeThawDialog();
             this.$message({
               message: "解冻成功",
               type: "success",
               duration: 2000,
             });
-            this.getTemplateList();
-            this.freezeThawDialogLoading = false;
           } else {
+            this.closeFreezeThawDialog();
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
               duration: 2000,
             });
-            this.freezeThawDialogLoading = false;
           }
         })
         .catch(() => {
@@ -430,12 +420,14 @@ export default {
             type: "error",
             duration: 2000,
           });
-          this.freezeThawDialogLoading = false;
+          this.closeFreezeThawDialog();
         });
     },
 
     // 存证列表查看详情
-    viewDetails() {},
+    viewDetails(id) {
+      this.$router.push(`/depositDetails/${id}`);
+    },
   },
 };
 </script>

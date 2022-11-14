@@ -3,8 +3,9 @@ import Router from 'vue-router';
 
 const Home = () => import('@/views/home')
 const Main = () => import('@/views/index/main.vue')
-const Depository = () => import('@/views/depository/depository.vue')
 const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
+const Depository = () => import('@/views/depository/depository.vue')
+const DepositDetails = () => import('../views/depository/depositDetails.vue')
 const userManagement = () => import('@/views/userManagement/index.vue');
 const systemConfiguration = () => import('@/views/systemConfiguration')
 
@@ -55,7 +56,10 @@ const routes = [{
     children: [
         {
             path: '/depository', component: Depository, name: 'depositoryList', nameKey: 'depositoryTitle', meta: { requireAuth: true }
-        }
+        },
+        {
+            path: '/depositDetails/:rowId', component: DepositDetails, name: 'DepositDetails', nameKey: 'DepositDetails', meta: { requireAuth: true }
+        },
     ]
 
 },
@@ -76,7 +80,7 @@ const routes = [{
 ];
 
 const router = new Router({
-    mode: 'history',
+    // mode: 'history',
     routes
 });
 

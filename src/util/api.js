@@ -176,7 +176,7 @@ export function getEditDepositoryTemplate(templateId) {
 // 存证信息-冻结存证模板
 export function freezeTemplate(templateId) {
     return put({
-        url: `${url.ORG_LIST}/depository/updateDepositoryTemplate/${templateId}`,
+        url: `${url.ORG_LIST}/depository/freezeDepositoryTemplate/${templateId}`,
         method: "put",
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
@@ -187,8 +187,30 @@ export function freezeTemplate(templateId) {
 // 存证信息-解冻存证模板
 export function thawTemplate(templateId) {
     return put({
-        url: `${url.ORG_LIST}/depository/updateDepositoryTemplate/${templateId}`,
+        url: `${url.ORG_LIST}/depository/unFreezeDepositoryTemplate/${templateId}`,
         method: "put",
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 存证信息-获取模板上方详情信息
+export function getTemplateDetailsData(id) {
+    return get({
+        url: `${url.ORG_LIST}/depository/getDetails/${id}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 存证信息-获取模板下方列表数据
+export function getTemplateDetailsListData(depositoryTemplateId, pageNo, pageSize) {
+    return get({
+        url: `${url.ORG_LIST}/depository/getDepositoryList/${depositoryTemplateId}/${pageNo}/${pageSize}`,
+        method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
         }
@@ -206,6 +228,8 @@ export function editDepoTemplate(data) {
         }
     })
 }
+
+
 
 
 
