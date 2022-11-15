@@ -3,7 +3,7 @@
     <ContentHead headTitle="存证管理" headSubTitle="存证信息列表"></ContentHead>
     <div class="module-wrapper" v-loading="DepositPageLoading">
       <div class="search-part">
-        <div class="icon" :style="{ background: getColor() }">
+        <div class="icon" :style="{ background: getColor }">
           {{ firstCharacter }}
         </div>
         <div class="template-details">
@@ -38,7 +38,7 @@
         <el-button
           type="primary"
           size="small"
-          @click="openSaveDepositDialog"
+          @click="changeSaveDepositDialog(true)"
           >录入存证内容</el-button
         >
         <el-button type="primary" size="mini">批量录入</el-button>
@@ -71,13 +71,13 @@
               <el-button
                 type="text"
                 class="el-button-text"
-                @click="handleDelete(scope.$index, scope.row)"
+                @click="handleHis(scope.$index, scope.row)"
                 >历史版本</el-button
               >
               <el-button
                 type="text"
                 class="el-button-text"
-                @click="handleDelete(scope.$index, scope.row)"
+                @click="handleCheck(scope.row)"
                 >数据校验</el-button
               >
             </template>
@@ -95,13 +95,22 @@
       >
       </el-pagination>
     </div>
-    <SaveDepositDialog :visible.sync="enteringDepositDialogVisible"></SaveDepositDialog>
+    <SaveDepositDialog
+      v-if="enteringDepositDialogVisible"
+      :visible.sync="enteringDepositDialogVisible"
+      :templateMsg="templateMsg"
+      @closeSaveDetailsDialog="changeSaveDepositDialog"
+    ></SaveDepositDialog>
   </div>
 </template>
 
 <script>
 import ContentHead from "@/components/contentHead";
-import { getTemplateDetailsData, getTemplateDetailsListData } from "@/util/api";
+import {
+  getTemplateDetailsData,
+  getTemplateDetailsListData,
+  getDataCheckMsg,
+} from "@/util/api";
 import SaveDepositDialog from "@/views/depository/templateDialog/saveDepositDialog.vue";
 import { rgb } from "@/util/util";
 export default {
@@ -112,7 +121,7 @@ export default {
   },
   data() {
     return {
-      templateMsg: {},
+      templateMsg: {}, //当前模板详细信息
       firstCharacter: "", //   首个字符
       total: 0, //列表总条数
       currentPage: 1, // 分页-当前页码
@@ -125,17 +134,27 @@ export default {
     };
   },
   mounted() {
+    this.DepositPageLoading = true;
     this.getTemplateDetails();
     this.getDepositoryListMsg();
   },
   methods: {
     // 获取模板上方详情信息
     getTemplateDetails() {
-      this.DepositPageLoading = true;
       const { rowId } = this.$route.params;
       getTemplateDetailsData(rowId)
         .then((res) => {
           if (res.data.code === 0) {
+            this.newTableHeader = [];
+            for (let key of res.data.data.params) {
+              this.newTableHeader.push({
+                enName: key.parameterName,
+                name: key.parameterName,
+                props: key.parameterName,
+                align: "center",
+                width: "150px",
+              });
+            }
             this.templateMsg = res.data.data;
             this.firstCharacter =
               res.data.data.depositoryTemplateName.substring(0, 1);
@@ -158,32 +177,20 @@ export default {
     },
     // 获取模板下方列表数据
     getDepositoryListMsg() {
-      this.listLoading = true;
       const { rowId } = this.$route.params;
       getTemplateDetailsListData(rowId, this.currentPage, this.pageSize)
         .then((res) => {
+          console.log(res);
           if (res.data.code === 0) {
-            this.newTableHeader = [];
             this.tableData = [];
-            for (let key of res.data.data.depositoryList[0].depositoryParams) {
-              this.newTableHeader.push({
-                enName: key.parameterName,
-                name: key.parameterName,
-                props: key.parameterName,
-                align: "center",
-                width: "150px",
-              });
-            }
-
             for (let key of res.data.data.depositoryList) {
-              const { createTime, creator } = key;
-              for (let item of key.depositoryParams) {
-                this.tableData.push({
-                  createTime,
-                  creator,
-                  [item.parameterName]: [item.parameterContent],
-                });
-              }
+              const { createTime, creator, depositoryId } = key;
+              this.tableData.push({
+                depositoryId,
+                createTime,
+                creator,
+                ...JSON.parse(key.content),
+              });
             }
             this.total = res.data.data.total;
             this.listLoading = false;
@@ -208,20 +215,31 @@ export default {
     handleSizeChange(val) {
       this.pageSize = val;
       this.currentPage = 1;
+      this.listLoading = true;
       this.getDepositoryListMsg();
     },
+
     // 切换当前页码
     handleCurrentChange(val) {
       this.currentPage = val;
+      this.listLoading = true;
       this.getDepositoryListMsg();
     },
-    // 生成随机颜色
-    getColor() {
-      return rgb();
+
+    // 改变录入存证Dialog
+    changeSaveDepositDialog(flag, refresh = 0) {
+      this.enteringDepositDialogVisible = flag;
+      if (refresh) {
+        this.listLoading = true;
+        this.getDepositoryListMsg();
+        this.getTemplateDetails();
+      }
     },
-    // 开启录入存证Dialog
-    openSaveDepositDialog() {
-      this.enteringDepositDialogVisible = true;
+
+    // 数据校验按钮
+    handleCheck() {
+
+   
     },
   },
 
@@ -246,6 +264,10 @@ export default {
       ];
       return this.newTableHeader.concat(headerData);
     },
+    // 生成随机颜色
+    getColor() {
+      return rgb();
+    },
   },
 };
 </script>
@@ -257,7 +279,7 @@ export default {
   color: white;
   margin-right: 20px;
   text-align: center;
-  line-height: 40px;
+  line-height: 45px;
   font-size: 18px;
   font-weight: bolder;
 }

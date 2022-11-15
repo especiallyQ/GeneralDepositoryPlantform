@@ -217,6 +217,43 @@ export function getTemplateDetailsListData(depositoryTemplateId, pageNo, pageSiz
     })
 }
 
+// 存证信息-获取录入存证参数信息
+export function getInitAddDepository(templateId) {
+    return get({
+        url: `${url.ORG_LIST}/depository/initAddDepository/${templateId}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+
+// 存证信息-录入存证信息
+export function saveDepositoryContent(data) {
+    return post({
+        url: `${url.ORG_LIST}/depository/addDepository`,
+        method: 'post',
+        data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
+
+// 存证信息-获取数据校验信息
+export function getDataCheckMsg(id) {
+    return get({
+        url: `${url.ORG_LIST}/depository/initAddDepository/${id}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+
 // 存证信息-编辑存证模板
 export function editDepoTemplate(data) {
     return put({
@@ -1716,18 +1753,6 @@ export function getDepoTemplateById(templateId) {
     })
 }
 
-// 存证信息-保存存证信息数据
-export function saveDepositoryContent(data) {
-    return post({
-        url: `${url.ORG_LIST}/depository/addDepositoryContent`,
-        method: 'post',
-        data: data,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
-            'Content-Type': 'multipart/form-data'
-        }
-    })
-}
 
 // 存证信息-修改存证信息数据
 export function modifyDepositoryContent(data) {
