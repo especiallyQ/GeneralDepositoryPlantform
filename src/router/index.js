@@ -6,7 +6,7 @@ const Main = () => import('@/views/index/main.vue')
 const Depository = () => import('@/views/depository/depository.vue')
 const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
 const userManagement = () => import('@/views/userManagement/index.vue');
-const systemConfiguration= () => import('@/views/systemConfiguration')
+const systemConfiguration = () => import('@/views/systemConfiguration')
 
 Vue.use(Router);
 
@@ -34,10 +34,23 @@ const routes = [{
 },
 {
     path: '/main',
+    component: Main,
+    name: 'main',
+    nameKey: 'userManagement',
+    leaf: false,
+    menuShow: true,
+    iconCls: 'el-icon-connection sidebar-icon',
+    children: [{
+        path: '/userManagement', component: userManagement, name: 'userManagement', nameKey: 'userManagement', menuShow: true, meta: { requireAuth: false }
+    },
+    ]
+},
+{
+    path: '/main',
     name: 'depository',
     nameKey: 'depositoryTitle',
     leaf: true,
-    iconCls: 'ext-icon-regulatory sidebar-icon',
+    iconCls: 'ext-icon-baocun sidebar-icon',
     component: Main,
     children: [
         {
@@ -45,34 +58,21 @@ const routes = [{
         }
     ]
 
-    },
-    {
-        path:'/main',
-        component: Main,
-        name: 'main',
-        nameKey: 'userManagement',
-        leaf:false,
-        menuShow: true,
-        iconCls: 'el-icon-connection sidebar-icon',
-        children: [{
-            path: '/userManagement', component: userManagement, name: 'userManagement', nameKey: 'userManagement', menuShow: true,meta :{requireAuth: false}
-        },
-        ]
-    },
-    {
-        path: '/main',
-        name: 'systemConfiguration',
-        nameKey: 'systemConfiguration',
-        leaf: true,
-        iconCls: 'ext-icon-regulatory sidebar-icon',
-        component: Main,
-        children: [
-            {
-                path: '/systemConfiguration', component: systemConfiguration, name: 'systemConfiguration', nameKey: 'systemConfiguration', meta: { requireAuth: true }
-            }
-        ]
-    
-        },
+},
+{
+    path: '/main',
+    name: 'system',
+    nameKey: 'systemConfiguration',
+    leaf: true,
+    iconCls: 'ext-icon-regulatory sidebar-icon',
+    component: Main,
+    children: [
+        {
+            path: '/systemConfiguration', component: systemConfiguration, name: 'systemConfiguration', nameKey: 'systemConfiguration', meta: { requireAuth: true }
+        }
+    ]
+
+},
 ];
 
 const router = new Router({

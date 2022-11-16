@@ -3,7 +3,7 @@
         <ContentHead headTitle='系统配置'></ContentHead>
         <div class="content-container">
             <el-form class="system-form" label-position="right" label-width="auto" :model="systemConfigurationForm"
-                :rules="rules" ref="ruleForm" >
+                :rules="rules" ref="ruleForm">
                 <el-form-item label="CSMP服务地址:" prop="serverPath">
                     <el-input v-model="systemConfigurationForm.serverPath"></el-input>
                 </el-form-item>
@@ -13,17 +13,17 @@
                 <el-form-item label="CSMP管理员密码:" prop="serverPassword">
                     <el-input v-model="systemConfigurationForm.serverPassword" type="password"></el-input>
                 </el-form-item>
-                <el-form-item label="应用链ID:" prop="chainCode" >
+                <el-form-item label="应用链ID:" prop="chainCode">
                     <el-select v-model="systemConfigurationForm.chainCode" placeholder="请选择" style="width:100%"
-                        @focus="getChainList" @change="selectData" >
+                        @focus="getChainList" @change="selectData">
                         <el-option v-for="item in chainCodeData" :key="item.chainCode" :label="item.chainCode"
-                            :value="{value:item.chainCode,label:item.chainId}">
+                            :value="{ value: item.chainCode, label: item.chainId }">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="存证合约:" prop="contractId">
                     <el-select v-model="systemConfigurationForm.contractId" placeholder="请选择" style="width:100%"
-                        @focus="getContractList" >
+                        @focus="getContractList">
                         <el-option v-for="item in contractIdData" :key="item.contractId" :label="item.contractName"
                             :value="item.contractId">
                         </el-option>
@@ -82,7 +82,7 @@ export default {
             const { value, label } = data;
             this.systemConfigurationForm.chainCode = value;
             this.systemConfigurationForm.chainId = label;
-            console.log(this.systemConfigurationForm.chainCode,this.systemConfigurationForm.chainId);
+            console.log(this.systemConfigurationForm.chainCode, this.systemConfigurationForm.chainId);
         },
         //获取存证合约
         async getContractList() {
@@ -105,7 +105,7 @@ export default {
                 serverAccount: `${this.systemConfigurationForm.serverAccount}?serverPath=${this.systemConfigurationForm.serverPath}`,
                 serverPassword: sm3(this.systemConfigurationForm.serverPassword)
             });
-            
+
             if (res.data.code === 0) {
                 this.chainCodeData = res.data.data;
                 // console.log(this.chainCodeData);
@@ -117,10 +117,10 @@ export default {
                 });
             }
         },
-        
+
 
         submitForm(formName) {
-            
+
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
                     let formData = JSONSwitchFormData({
@@ -161,23 +161,21 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .content-container {
     position: relative;
-    width: 1298px;
-    height: 800px;
+    height: 680px;
     background-color: white;
     margin: 15px;
-}
+    .system-form {
+        position: absolute;
+        top: 10%;
+        right: 30%;
+        width: 600px;
 
-.content-container .system-form {
-    position: absolute;
-    top: 10%;
-    right: 30%;
-    width: 600px;
-}
-
-.content-container .system-form .form-btn {
-    float: right;
+        .form-btn {
+            float: right;
+        }
+    }
 }
 </style>

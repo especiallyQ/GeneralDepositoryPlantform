@@ -31,6 +31,10 @@ let errCode = {
         en: "account info already exists",
         zh: "账号名重复"
     },
+    "302000": {
+        en: "user not logged in",
+        zh: "未登录的用户"
+    },
     "400001": {
         en: "duplicate config",
         zh: "重复配置"

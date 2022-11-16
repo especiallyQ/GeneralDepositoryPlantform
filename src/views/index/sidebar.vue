@@ -117,9 +117,8 @@ export default {
       list.forEach((item) => {
         // 主菜单国际化
         item.name = {
-          userManagement: '用户管理',
-          systemConfiguration:'系统配置',
-
+          userManagement: "用户管理",
+          systemConfiguration: "系统配置",
         }[item.nameKey];
         // 子菜单国际化
         if (item.children) {
@@ -127,8 +126,8 @@ export default {
             it.name = {
               dataOverview: "数据概览",
               depositoryTitle: "存证管理",
-              userManagement: '账号管理',
-              systemConfiguration:'系统配置',
+              userManagement: "账号管理",
+              systemConfiguration: "系统配置",
             }[it.nameKey];
           });
         }
@@ -189,10 +188,10 @@ export default {
           {
             home: false,
             main: false,
-          depositoryTitle: true,
-          userManagement: true,
-          systemConfiguration:true,
             data: true,
+            userManagement: true,
+            depositoryTitle: true,
+            systemConfiguration: this.role === '1',
           }[item.nameKey] || false;
 
         // 子菜单权限
@@ -200,13 +199,7 @@ export default {
           item.children.forEach((it) => {
             it.menuShow =
               {
-                dataOverview: true,
-                chainOrgMgmt: true,
-                accountManagement: true,
-                message: true,
-              depositoryTitle: true,
-              userManagement: true,
-                backlog: this.role === "PU_Admin",
+                userManagement: true,
               }[it.nameKey] || false;
           });
         }
@@ -261,14 +254,13 @@ export default {
 </script>
 
 <style scoped>
-
 .el-submenu__title * {
-    margin-left: -5px;
-    vertical-align: middle;
+  margin-left: -5px;
+  vertical-align: middle;
 }
 .el-icon-connection:before {
-    content: "\e736";
-    margin-left: 8px;
+  content: "\e736";
+  margin-left: 8px;
 }
 .el-menu-vertical-demo {
   padding-top: 16px;
@@ -374,6 +366,9 @@ export default {
   align-items: center;
 }
 .sidebar-header {
+  width: 130px;
+  height: 26.4px;
+  overflow: hidden;
   color: #cfd7db;
   font-size: 20px;
   font-weight: bold;

@@ -29,7 +29,9 @@ import errcode from './util/errcode';
 import { chooseLang } from './util/errcode.js';
 
 Vue.use(router);
-Vue.use(ElementUI);
+Vue.use(ElementUI, {
+  size: 'medium'
+});
 Vue.use(VueDOMPurifyHTML);
 Vue.config.productionTip = false
 // Vue.prototype.getCookie = getCookie;

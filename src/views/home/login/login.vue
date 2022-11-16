@@ -30,6 +30,7 @@
           <el-input
             v-model="loginForm.password"
             placeholder="请输入密码"
+            :show-password="true"
             type="password"
             prefix-icon="ext-icon-lock"
           >
@@ -41,6 +42,7 @@
               style="width: 220px"
               v-model="loginForm.vercode"
               placeholder="请输入验证码"
+              maxlength="4"
               @keyup.enter.native="submit('loginForm')"
               prefix-icon="ext-icon-xitongguanli"
             >
@@ -50,7 +52,7 @@
                 style="width: 100%; height: 100%"
                 :src="codeUrl"
                 alt=""
-                @click="changeCode()"
+                @click="clickChangeCode"
               />
             </span>
           </div>
@@ -75,6 +77,7 @@ import { getPictureCheckCode, login } from "@/util/api";
 import url from "@/util/url";
 import { sm3 } from "sm-crypto";
 import router from "@/router";
+import _ from "lodash";
 export default {
   name: "Login",
   data() {
@@ -123,6 +126,11 @@ export default {
   },
 
   methods: {
+    // 点击验证码
+    clickChangeCode: _.throttle(function () {
+      this.changeCode();
+    }, 500),
+    
     // 获取验证码
     changeCode() {
       this.codeUrl = "";
