@@ -173,6 +173,18 @@ export function getEditDepositoryTemplate(templateId) {
     })
 }
 
+// 存证信息-编辑存证模板
+export function editDepoTemplate(data) {
+    return put({
+        url: `${url.ORG_LIST}/depository/updateDepositoryTemplate`,
+        method: 'put',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
 // 存证信息-冻结存证模板
 export function freezeTemplate(templateId) {
     return put({
@@ -243,9 +255,9 @@ export function saveDepositoryContent(data) {
 }
 
 // 存证信息-获取数据校验信息
-export function getDataCheckMsg(id) {
+export function getCheckDataMessage(depositoryId) {
     return get({
-        url: `${url.ORG_LIST}/depository/initAddDepository/${id}`,
+        url: `${url.ORG_LIST}/depository/initDepositoryParam/${depositoryId}`,
         method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
@@ -253,9 +265,21 @@ export function getDataCheckMsg(id) {
     })
 }
 
+// 存证信息-存证内容校验
+export function validateDepositoryContent(data) {
+    return post({
+        url: `${url.ORG_LIST}/depository/verifyDepository`,
+        method: 'post',
+        data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
 
-// 存证信息-编辑存证模板
-export function editDepoTemplate(data) {
+// 存证信息-编辑存证信息列表
+export function editDepoMsgList(data) {
     return put({
         url: `${url.ORG_LIST}/depository/updateDepositoryTemplate`,
         method: 'put',
@@ -265,6 +289,8 @@ export function editDepoTemplate(data) {
         }
     })
 }
+
+
 
 
 
@@ -1766,18 +1792,6 @@ export function modifyDepositoryContent(data) {
     })
 }
 
-// 存证信息-存证内容校验
-export function validateDepositoryContent(contentId, data) {
-    return post({
-        url: `${url.ORG_LIST}/depository/validateDepositoryContent/${contentId}`,
-        method: 'post',
-        data: data,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
-            'Content-Type': 'multipart/form-data'
-        }
-    })
-}
 
 // 存证信息-存证内容校验对比
 export function validateDepositoryContentDiff(data) {

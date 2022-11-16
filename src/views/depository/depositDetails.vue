@@ -35,15 +35,17 @@
         </div>
       </div>
       <div class="input-btn">
-        <el-button
-          type="primary"
-          size="small"
-          @click="changeSaveDepositDialog(true)"
+        <el-button type="primary" size="small" @click="openSaveDepositDialog(0)"
           >录入存证内容</el-button
         >
-        <el-button type="primary" size="mini">批量录入</el-button>
+        <el-button
+          type="primary"
+          size="mini"
+          @click="openSaveAllDepositDialog(0)"
+          >批量录入</el-button
+        >
       </div>
-      <div class="depository-list">
+      <div class="depository-list" v-if="!DepositPageLoading">
         <el-table
           :data="tableData"
           v-loading="listLoading"
@@ -65,7 +67,7 @@
               <el-button
                 type="text"
                 class="el-button-text"
-                @click="handleEdit(scope.$index, scope.row)"
+                @click="openSaveDepositDialog(1, scope.row)"
                 >编辑</el-button
               >
               <el-button
@@ -77,7 +79,7 @@
               <el-button
                 type="text"
                 class="el-button-text"
-                @click="handleCheck(scope.row)"
+                @click="openSaveDepositDialog(2, scope.row)"
                 >数据校验</el-button
               >
             </template>
@@ -99,19 +101,17 @@
       v-if="enteringDepositDialogVisible"
       :visible.sync="enteringDepositDialogVisible"
       :templateMsg="templateMsg"
-      @closeSaveDetailsDialog="changeSaveDepositDialog"
+      :dialogFlag="dialogFlag"
+      :depositoryId="depositoryId"
+      @closeSaveDetailsDialog="closeSaveDepositDialog"
     ></SaveDepositDialog>
   </div>
 </template>
 
 <script>
 import ContentHead from "@/components/contentHead";
-import {
-  getTemplateDetailsData,
-  getTemplateDetailsListData,
-  getDataCheckMsg,
-} from "@/util/api";
-import SaveDepositDialog from "@/views/depository/templateDialog/saveDepositDialog.vue";
+import { getTemplateDetailsData, getTemplateDetailsListData } from "@/util/api";
+import SaveDepositDialog from "@/views/depository/depositDetailsDialog/saveDepositDialog.vue";
 import { rgb } from "@/util/util";
 export default {
   name: "DepositDetails",
@@ -131,6 +131,8 @@ export default {
       tableData: [], //存证信息列表数据
       newTableHeader: [], //存证信息列表表头
       enteringDepositDialogVisible: false, //录入存证信息Dialog
+      dialogFlag: 0, //区分Dialog 0表示录入 1表示数据校验
+      depositoryId: null, //数据校验列表id
     };
   },
   mounted() {
@@ -175,12 +177,12 @@ export default {
           });
         });
     },
+
     // 获取模板下方列表数据
     getDepositoryListMsg() {
       const { rowId } = this.$route.params;
       getTemplateDetailsListData(rowId, this.currentPage, this.pageSize)
         .then((res) => {
-          console.log(res);
           if (res.data.code === 0) {
             this.tableData = [];
             for (let key of res.data.data.depositoryList) {
@@ -226,9 +228,21 @@ export default {
       this.getDepositoryListMsg();
     },
 
-    // 改变录入存证Dialog
-    changeSaveDepositDialog(flag, refresh = 0) {
-      this.enteringDepositDialogVisible = flag;
+    //   开启录入Dialog
+    // dialogFlag表示Dialog用途 0表示录入Dialog 1表示编辑存证信息 2表示数据校验Dialog
+    // row表示数据校验选中那一行的数据
+    openSaveDepositDialog(dialogFlag, row) {
+      this.enteringDepositDialogVisible = true;
+      this.dialogFlag = dialogFlag;
+      if (!!row) {
+        this.depositoryId = row.depositoryId;
+      }
+    },
+
+    //  关闭录入Dialog
+    // refresh表示是否刷新列表 0表示不刷新 1表示刷新
+    closeSaveDepositDialog(refresh = 0) {
+      this.enteringDepositDialogVisible = false;
       if (refresh) {
         this.listLoading = true;
         this.getDepositoryListMsg();
@@ -236,10 +250,18 @@ export default {
       }
     },
 
-    // 数据校验按钮
-    handleCheck() {
+    // 编辑
+    handleEdit() {
+      console.log("编辑");
+    },
 
-   
+    // 历史记录
+    handleHis() {
+      console.log("历史版本");
+    },
+    // 批量录入
+    openSaveAllDepositDialog() {
+      console.log("批量录入");
     },
   },
 

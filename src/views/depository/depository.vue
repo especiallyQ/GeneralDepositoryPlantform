@@ -134,7 +134,12 @@
         >
         </el-pagination>
       </div>
-      <el-dialog :visible="freezeDialogVisible" width="30%" :show-close="false" v-if="freezeDialogVisible">
+      <el-dialog
+        :visible="freezeDialogVisible"
+        width="30%"
+        :show-close="false"
+        v-if="freezeDialogVisible"
+      >
         <p class="freezeDialogTitle">
           是否确认{{ freezeDialogStatus ? "解冻" : "冻结" }}存证模板
           <span style="color: red">{{
@@ -156,6 +161,7 @@
         :createTemplateDialogVisible.sync="createTemplateDialogVisible"
         @updateTemplateDialog="changeCreateTemplateDialog"
         @getNewTemplateList="getNewTemplateList"
+        @getTemplateList="getTemplateList"
       ></CreateTemplateDialog>
       <EditTemplateDialog
         v-if="editTemplateDialogVisible"
@@ -176,8 +182,8 @@ import {
   freezeTemplate,
   thawTemplate,
 } from "@/util/api";
-import CreateTemplateDialog from "@/views/depository/templateDialog/createTemplateDialog";
-import EditTemplateDialog from "@/views/depository/templateDialog/editTemplateDialog";
+import CreateTemplateDialog from "@/views/depository/depositoryDialog/createTemplateDialog";
+import EditTemplateDialog from "@/views/depository/depositoryDialog/editTemplateDialog";
 export default {
   name: "depository",
   components: {
@@ -337,7 +343,9 @@ export default {
       this.editTemplateDialogVisible = true;
     },
     // 删除存证列表
-    handleDelete() {},
+    handleDelete() {
+      console.log("删除");
+    },
 
     // 显示冻结解冻Dialog
     changeFreezeThawDialog(status, row) {
@@ -377,6 +385,7 @@ export default {
               duration: 2000,
             });
           } else {
+            this.closeFreezeThawDialog();
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
@@ -385,6 +394,7 @@ export default {
           }
         })
         .catch(() => {
+          this.closeFreezeThawDialog();
           this.$message({
             message: "系统错误",
             type: "error",
@@ -415,6 +425,7 @@ export default {
           }
         })
         .catch(() => {
+          this.closeFreezeThawDialog();
           this.$message({
             message: "系统错误",
             type: "error",
