@@ -20,6 +20,7 @@
             v-model.trim="form.depositoryTemplateName"
             placeholder="请输入存证模板名称"
             maxlength="20"
+            :show-word-limit="true"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -112,6 +113,7 @@
             :rows="4"
             resize="none"
             maxlength="60"
+            :show-word-limit="true"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -297,8 +299,9 @@ export default {
               message: "新建成功",
               duration: 2000,
             });
+            this.$emit("getTemplateList");
           } else {
-            this.loading = false;
+            this.close();
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
@@ -307,6 +310,7 @@ export default {
           }
         })
         .catch(() => {
+          this.close();
           this.$message({
             message: "系统错误",
             type: "error",
