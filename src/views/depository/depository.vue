@@ -9,7 +9,7 @@
               <el-select
                 v-model="creatorId"
                 style="width: 140px"
-                @change="getTemplateList"
+                @change="changeSelectList"
               >
                 <el-option
                   v-for="item in options"
@@ -74,7 +74,9 @@
                 type="text"
                 class="el-button-text"
                 :disabled="
-                  (role === '2' && user !== scope.row.creator) || role === '3'
+                  (role === '2' && user !== scope.row.creator) ||
+                  role === '3' ||
+                  scope.row.freeze !== 0
                 "
                 @click="handleEdit(scope.row.id)"
                 >编辑</el-button
@@ -84,7 +86,8 @@
                 style="color: red"
                 class="el-button-text"
                 :disabled="
-                  (role === '2' && user !== scope.row.creator) || role === '3'
+                  // (role === '2' && user !== scope.row.creator) || role === '3'
+                  true
                 "
                 @click="handleDelete(scope.$index, scope.row)"
                 >删除</el-button
@@ -125,6 +128,7 @@
         </el-table>
         <el-pagination
           class="page"
+          :current-page="currentPage"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :page-sizes="[10, 20, 30, 50]"
@@ -304,8 +308,15 @@ export default {
         });
     },
 
+    // 根据创建者筛选存证列表
+    changeSelectList() {
+      this.currentPage = 1;
+      this.getTemplateList();
+    },
+
     //搜索模板名称
     searchTemplateName: _.debounce(function () {
+      this.currentPage = 1;
       this.getTemplateList();
     }, 400),
 

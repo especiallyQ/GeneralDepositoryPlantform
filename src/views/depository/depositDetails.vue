@@ -29,19 +29,24 @@
               templateMsg.depositoryCount
             }}</el-descriptions-item>
             <el-descriptions-item label="备注">{{
-              templateMsg.remark
+              templateMsg.remark || "无"
             }}</el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
       <div class="input-btn">
-        <el-button type="primary" size="small" @click="openSaveDepositDialog(0)"
+        <el-button
+          type="primary"
+          size="small"
+          @click="openSaveDepositDialog(0)"
+          :disabled="templateMsg.freeze === 1"
           >录入存证内容</el-button
         >
         <el-button
           type="primary"
           size="mini"
           @click="openSaveAllDepositDialog(0)"
+          :disabled="templateMsg.freeze === 1"
           >批量录入</el-button
         >
       </div>
@@ -68,6 +73,7 @@
                 type="text"
                 class="el-button-text"
                 @click="openSaveDepositDialog(1, scope.row)"
+                :disabled="templateMsg.freeze === 1"
                 >编辑</el-button
               >
               <el-button
@@ -88,6 +94,7 @@
       </div>
       <el-pagination
         class="page"
+        :current-page="currentPage"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :page-sizes="[10, 20, 30, 50]"
@@ -245,6 +252,7 @@ export default {
       this.enteringDepositDialogVisible = false;
       if (refresh) {
         this.listLoading = true;
+        this.currentPage = 1;
         this.getDepositoryListMsg();
         this.getTemplateDetails();
       }

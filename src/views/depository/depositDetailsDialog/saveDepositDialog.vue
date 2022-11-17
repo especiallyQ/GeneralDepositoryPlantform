@@ -247,7 +247,7 @@ export default {
             this.closeSaveDepositDialog(1);
           } else {
             this.$message({
-              message: this.$chooseLang(res.data.code),
+              message: res.data.message || this.$chooseLang(res.data.code),
               type: "error",
               duration: 2000,
             });
@@ -260,7 +260,7 @@ export default {
             type: "error",
             duration: 2000,
           });
-          this.loading = false;
+          this.closeSaveDepositDialog(0);
         });
     },
 
@@ -275,35 +275,36 @@ export default {
         }
       }
       formData.append("depositoryParams", JSON.stringify(this.parameter));
-      editDepoMsgList(formData)
-        .then((res) => {
-          if (res.data.code === 0) {
-            this.$message({
-              type: "success",
-              message: "编辑成功",
-              duration: 2000,
-            });
-            this.closeSaveDepositDialog(1);
-          } else {
-            this.$message({
-              message: this.$chooseLang(res.data.code),
-              type: "warning",
-              duration: 2000,
-            });
-            this.closeSaveDepositDialog(0);
-          }
-        })
-        .catch(() => {
-          this.$message({
-            message: "系统错误",
-            type: "error",
-            duration: 2000,
-          });
-          this.loading = false;
-        });
+      console.log('编辑功能开发中');
+      // editDepoMsgList(formData)
+      //   .then((res) => {
+      //     if (res.data.code === 0) {
+      //       this.$message({
+      //         type: "success",
+      //         message: "编辑成功",
+      //         duration: 2000,
+      //       });
+      //       this.closeSaveDepositDialog(1);
+      //     } else {
+      //       this.$message({
+      //         message: this.$chooseLang(res.data.code),
+      //         type: "error",
+      //         duration: 2000,
+      //       });
+      //       this.closeSaveDepositDialog(0);
+      //     }
+      //   })
+      //   .catch(() => {
+      //     this.$message({
+      //       message: "系统错误",
+      //       type: "error",
+      //       duration: 2000,
+      //     });
+      //     this.closeSaveDepositDialog(0);
+      //   });
     },
 
-    //提交数据校验
+    //数据校验
     submitCheckContent() {
       let formData = new FormData();
       formData.append("depositoryId", this.depositoryId);
@@ -338,7 +339,7 @@ export default {
             type: "error",
             duration: 2000,
           });
-          this.loading = false;
+          this.closeSaveDepositDialog(0);
         });
     },
 
