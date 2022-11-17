@@ -45,7 +45,36 @@ export function loginOut() {
     })
 }
 
+//存证模板获取下拉框数据
+export function getDepositoryList() {
+    return get({
+        url: `${url.ORG_LIST}/getDepositoryList`,
+        method: 'get',
+        // headers: {
+        //     AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        // }
+    })
+}
+//数据验证
+export function dataVerify(data) {
+    return post({
+        url: `${url.ORG_LIST}/dataVerify`,
+        method: 'post',
+        data: data,
+    })
+}
 
+//文件验证
+export function fileVerify(data) {
+    return post({
+        url: `${url.ORG_LIST}/fileVerify`,
+        method: 'post',
+        data: data,
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
 
 
 
@@ -1670,17 +1699,17 @@ export function getDepoTemplateByContract(contractId) {
 }
 
 // 存证信息-获取存证数据
-export function getDepositoryList(data, list) {
-    const params = reviseParam(data, list);
-    return get({
-        url: `${url.ORG_LIST}/depository/depositoryContentList/${params.str}`,
-        method: 'get',
-        params: params.querys,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function getDepositoryList(data, list) {
+//     const params = reviseParam(data, list);
+//     return get({
+//         url: `${url.ORG_LIST}/depository/depositoryContentList/${params.str}`,
+//         method: 'get',
+//         params: params.querys,
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 // 存证信息-获取存证历史版本数据
 export function getDepositoryHistoryList(data) {
