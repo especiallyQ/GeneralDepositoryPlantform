@@ -6,7 +6,7 @@ RUN sed -i 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.repos.d/openEuler.repo && \
     yum -y install nginx.x86_64 && \
     sed -i 's/gpgcheck=0/gpgcheck=1/g' /etc/yum.repos.d/openEuler.repo
 
-COPY docker/ /data/gdp-web/nginx
+COPY docker /data/gdp-web/nginx
 COPY dist /data/gdp-web/dist
 
 RUN mkdir -p /etc/nginx/conf.d && \
