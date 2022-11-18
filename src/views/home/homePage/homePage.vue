@@ -5,11 +5,11 @@
                 <el-tab-pane label="数据验证">
                     <div class="from-style">
                         <el-form label-position="right" label-width="80px" :model="verifyForm">
-                            <el-form-item label="存证模板" >
+                            <el-form-item label="存证模板">
                                 <el-select v-model="verifyForm.depositoryTemplateId" placeholder="请选择存证模板"
-                                    style="width: 100%" @focus="getDepositoryListData" >
-                                    <el-option v-for="item in DepositoryListData" :key="item.depositoryTemplateId" :label="item.depositoryTemplateName"
-                                        :value="item.depositoryTemplateId" >
+                                    style="width: 100%" @focus="getDepositoryListData">
+                                    <el-option v-for="item in DepositoryListData" :key="item.depositoryTemplateId"
+                                        :label="item.depositoryTemplateName" :value="item.depositoryTemplateId">
                                     </el-option>
                                 </el-select>
                             </el-form-item>
@@ -27,7 +27,7 @@
                             <el-button type="primary" class="rigth-btn" @click="inquire">查询</el-button>
                         </el-form>
                         <div class="table-footer" v-show="drawerVisible">
-                            <el-table :data="tableData" border style="width: 100%" 
+                            <el-table :data="tableData" border style="width: 100%"
                                 :header-cell-style="{ background: 'rgba(105,105,105,0.4)' }">
                                 <el-table-column prop="factHash" label="凭证信息" width="380" show-overflow-tooltip>
                                 </el-table-column>
@@ -42,7 +42,9 @@
                                     </template>
                                 </el-table-column>
                             </el-table>
-                            <ul><li></li></ul>
+                            <ul>
+                                <li></li>
+                            </ul>
                         </div>
                     </div>
                 </el-tab-pane>
@@ -52,16 +54,15 @@
                             <el-form-item label="存证模板">
                                 <el-select v-model="verifyFormFile.depositoryTemplateId" placeholder="请选择存证模板"
                                     style="width: 100%" @focus="getDepositoryListData">
-                                    <el-option v-for="item in DepositoryListData" :key="item.depositoryTemplateId" :label="item.depositoryTemplateName"
-                                        :value="item.depositoryTemplateId">
+                                    <el-option v-for="item in DepositoryListData" :key="item.depositoryTemplateId"
+                                        :label="item.depositoryTemplateName" :value="item.depositoryTemplateId">
                                     </el-option>
                                 </el-select>
                             </el-form-item>
                             <el-form-item label="文件凭证">
                                 <el-input v-model="verifyFormFile.factHash" style="width:578px"></el-input>
                                 <el-upload class="upload-file" action="" ref="upload" :limit="1" :file-list="fileList"
-                                    :http-request="() => {}"
-                                    :auto-upload="false" :before-upload="beforeUpload">
+                                    :http-request="() => { }" :auto-upload="false" :before-upload="beforeUpload">
                                     <el-button type="primary">点击上传</el-button>
                                 </el-upload>
                             </el-form-item>
@@ -76,16 +77,16 @@
                             <el-button type="primary" class="rigth-btn" @click="inquire">查询</el-button>
                         </el-form>
                         <div class="table-footer" v-show="drawerVisible">
-                            <el-table :data="tableData" border style="width: 100%" 
+                            <el-table :data="tableData" border style="width: 100%"
                                 :header-cell-style="{ background: 'rgba(105,105,105,0.4)' }">
-                                <el-table-column  label="凭证信息" width="380" show-overflow-tooltip>
+                                <el-table-column prop="factHash" label="凭证信息" width="380" show-overflow-tooltip>
                                 </el-table-column>
-                                <el-table-column  label="是否为最新版本" width="120">
+                                <el-table-column prop="latestVersion" label="是否为最新版本" width="120">
                                 </el-table-column>
-                                <el-table-column  label="提交时间" width="176">
+                                <el-table-column prop="createTime" label="提交时间" width="176">
                                 </el-table-column>
                                 <el-table-column label="操作" width="122" align="center">
-                                    <template >
+                                    <template>
                                         <el-button type="text" style="color:#75C2E9" @click="dialogVisible = true"> 查看详情
                                         </el-button>
                                     </template>
@@ -100,14 +101,14 @@
                     <span class="content-header">链上数据：</span>
                     <div class=" content-center">
                         <p>{</p>
-                            <ul>
-                                <li v-for="(item,index) in verifyDetails" :key="index">"{{item.depositoryParamName}}": "{{item.depositoryParamValue}}"</li>
-                            </ul>
+                        <ul>
+                            <li v-for="(item, index) in verifyDetails" :key="index">"{{ item.depositoryParamName }}":
+                                "{{ item.depositoryParamValue }}"</li>
+                        </ul>
                         <p>}</p>
                     </div>
                 </div>
                 <span slot="footer" class="dialog-footer">
-
                     <el-button type="primary" @click="dialogVisible = false">返回</el-button>
                 </span>
             </el-dialog>
@@ -115,7 +116,7 @@
     </div>
 </template>
 <script>
-import { getPictureCheckCode, getDepositoryList,dataVerify,fileVerify} from "@/util/api";
+import { getPictureCheckCode, getDepositoryList, dataVerify, fileVerify } from "@/util/api";
 import { JSONSwitchFormData } from "@/util/util.js";
 import url from "@/util/url";
 export default {
@@ -138,15 +139,16 @@ export default {
             },
             verifyCodeToken: '',//验证码Token
             tableData: [{
-                latestVersion:'',
+                latestVersion: '',
                 createTime: '',
-                factHash:'',
+                factHash: '',
             }],
             fileList: [],
-            file: null,
+            file: null,//
             DepositoryListData: [],
-            verifyDetails: [],
-            tabId:0,
+            verifyDetails: [],//数据验证详情数据
+            verifyDetailsFile:[],//文件验证详情数据
+            tabId: 0,//区别数据验证跟文件验证
 
         }
     },
@@ -158,7 +160,6 @@ export default {
             const res = await getDepositoryList()
             if (res.data.code === 0) {
                 this.DepositoryListData = res.data.data;
-                // console.log(this.DepositoryListData);
             } else {
                 this.$message({
                     message: '',
@@ -176,53 +177,49 @@ export default {
         },
         async inquire() {
             this.$refs.upload.submit();
-            
-            if (this.tabId==0) {
+            if (this.tabId == 0) {
                 let resData = {
-                ...this.verifyForm,
-                // file:this.file,
-                verifyCodeToken: this.verifyCodeToken
-            }
-            let fromData = JSONSwitchFormData(resData);
+                    ...this.verifyForm,
+                    verifyCodeToken: this.verifyCodeToken
+                }
+                let fromData = JSONSwitchFormData(resData);
                 const res = await dataVerify(fromData);
-            if (res.data.code === 0) {
-                this.verifyDetails = res.data.data.depositoryParamList;
-                this.tableData[0].createTime = res.data.data.createTime;
-                this.tableData[0].latestVersion = res.data.data.latestVersion;
-                this.tableData[0].factHash = this.verifyForm.factHash;
-                this.drawerVisible = true;
-            } else {
-                this.$message({
-                    message: '',
-                    type: "error",
-                    duration: 2000,
-                });
-            }
+                if (res.data.code === 0) {
+                    this.verifyDetails = res.data.data.depositoryParamList;
+                    this.tableData[0].createTime = res.data.data.createTime;
+                    this.tableData[0].latestVersion = res.data.data.latestVersion;
+                    this.tableData[0].factHash = this.verifyForm.factHash;
+                    this.drawerVisible = true;
+                } else {
+                    this.$message({
+                        message: '',
+                        type: "error",
+                        duration: 2000,
+                    });
+                }
             } else {
                 let respData = {
-                ...this.verifyFormFile,
-                file:this.file,
-                verifyCodeToken: this.verifyCodeToken
+                    ...this.verifyFormFile,
+                    file: this.file,
+                    verifyCodeToken: this.verifyCodeToken
                 }
                 let fromaData = JSONSwitchFormData(respData);
-            const res = await fileVerify(fromaData);
+                const res = await fileVerify(fromaData);
                 if (res.data.code === 0) {
-                console.log(res);
-                this.verifyDetails = res.data.data.depositoryParamList;
-                this.tableData[0].createTime = res.data.data.createTime;
-                this.tableData[0].latestVersion = res.data.data.latestVersion;
-                this.tableData[0].factHash = this.verifyForm.factHash;
-                this.drawerVisible = true;
-            } else {
-                this.$message({
-                    message: '',
-                    type: "error",
-                    duration: 2000,
-                });
+                    console.log(res);
+                    this.verifyDetailsFile = res.data.data.depositoryParamList;
+                    this.tableData[0].createTime = res.data.data.createTime;
+                    this.tableData[0].latestVersion = res.data.data.latestVersion;
+                    this.tableData[0].factHash = this.verifyForm.factHash;
+                    this.drawerVisible = true;
+                } else {
+                    this.$message({
+                        message: '',
+                        type: "error",
+                        duration: 2000,
+                    });
+                }
             }
-            }
-            
-
         },
         clickChangeCode: _.throttle(function () {
             this.changeCode();
@@ -357,7 +354,7 @@ export default {
 }
 
 .from-style .table-footer /deep/ .el-table,
-/deep/ .el-table__row {
+.from-style /deep/ .el-table__row {
     background-color: rgba(255, 255, 255, 0.2);
     color: white;
 }
@@ -366,7 +363,7 @@ export default {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/deep/ .el-table--enable-row-hover .el-table__body tr:hover>td {
+.from-style /deep/ .el-table--enable-row-hover .el-table__body tr:hover>td {
     background-color: transparent !important;
 }
 
