@@ -51,6 +51,10 @@ let errCode = {
         en: "params incorrect, can not get chain message",
         zh: "该存证模板已冻结，请解冻后操作"
     },
+    "400005": {
+        en: "file is null",
+        zh: "请上传文件"
+    },
     "700001":{
         en: "",
         zh: "当前文件与链上存证文件不同"

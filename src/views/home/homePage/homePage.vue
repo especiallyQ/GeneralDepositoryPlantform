@@ -42,9 +42,6 @@
                                     </template>
                                 </el-table-column>
                             </el-table>
-                            <ul>
-                                <li></li>
-                            </ul>
                         </div>
                     </div>
                 </el-tab-pane>
@@ -60,9 +57,9 @@
                                 </el-select>
                             </el-form-item>
                             <el-form-item label="文件凭证">
-                                <el-input v-model="verifyFormFile.factHash" style="width:578px"></el-input>
+                                <el-input v-model="verifyFormFile.fileHash" style="width:578px" disabled></el-input>
                                 <el-upload class="upload-file" action="" ref="upload" :limit="1" :file-list="fileList"
-                                    :http-request="() => { }" :auto-upload="false" :before-upload="beforeUpload">
+                                        :auto-upload="false" :before-upload="beforeUpload">
                                     <el-button type="primary">点击上传</el-button>
                                 </el-upload>
                             </el-form-item>
@@ -76,10 +73,10 @@
                             </el-form-item>
                             <el-button type="primary" class="rigth-btn" @click="inquire">查询</el-button>
                         </el-form>
-                        <div class="table-footer" v-show="drawerVisible">
-                            <el-table :data="tableData" border style="width: 100%"
+                        <div class="table-footer" v-show="fileVisible">
+                            <el-table :data="tableFileData" border style="width: 100%"
                                 :header-cell-style="{ background: 'rgba(105,105,105,0.4)' }">
-                                <el-table-column prop="factHash" label="凭证信息" width="380" show-overflow-tooltip>
+                                <el-table-column prop="fileHash" label="凭证信息" width="380" show-overflow-tooltip>
                                 </el-table-column>
                                 <el-table-column prop="latestVersion" label="是否为最新版本" width="120">
                                 </el-table-column>
@@ -101,8 +98,8 @@
                     <span class="content-header">链上数据：</span>
                     <div class=" content-center">
                         <p>{</p>
-                        <ul>
-                            <li v-for="(item, index) in verifyDetails" :key="index">"{{ item.depositoryParamName }}":
+                        <ul >
+                            <li v-for="(item, index) in tabId==0?verifyDetails:verifyDetailsFile" :key="index">"{{ item.depositoryParamName }}":
                                 "{{ item.depositoryParamValue }}"</li>
                         </ul>
                         <p>}</p>
@@ -126,6 +123,7 @@ export default {
             dialogVisible: false,
             loading: false,
             drawerVisible: false,
+            fileVisible:false,
             codeUrl: url.codeUrl,
             verifyForm: {
                 depositoryTemplateId: '',//存证模板数据
@@ -134,7 +132,7 @@ export default {
             },
             verifyFormFile: {
                 depositoryTemplateId: '',//存证模板数据
-                factHash: '',//数据凭证数据
+                fileHash: '',//数据凭证数据
                 verifyCode: '',//验证码
             },
             verifyCodeToken: '',//验证码Token
@@ -142,6 +140,11 @@ export default {
                 latestVersion: '',
                 createTime: '',
                 factHash: '',
+            }],
+            tableFileData: [{
+                latestVersion: '',
+                createTime: '',
+                fileHash: '',
             }],
             fileList: [],
             file: null,//
@@ -190,9 +193,13 @@ export default {
                     this.tableData[0].latestVersion = res.data.data.latestVersion;
                     this.tableData[0].factHash = this.verifyForm.factHash;
                     this.drawerVisible = true;
+                    this.$message({
+                        message: '查询成功',
+                        type: "success",
+                    });
                 } else {
                     this.$message({
-                        message: '',
+                        message: this.$chooseLang(res.data.code),
                         type: "error",
                         duration: 2000,
                     });
@@ -206,15 +213,21 @@ export default {
                 let fromaData = JSONSwitchFormData(respData);
                 const res = await fileVerify(fromaData);
                 if (res.data.code === 0) {
-                    console.log(res);
-                    this.verifyDetailsFile = res.data.data.depositoryParamList;
-                    this.tableData[0].createTime = res.data.data.createTime;
-                    this.tableData[0].latestVersion = res.data.data.latestVersion;
-                    this.tableData[0].factHash = this.verifyForm.factHash;
-                    this.drawerVisible = true;
-                } else {
                     this.$message({
-                        message: '',
+                        message: '查询成功',
+                        type: "success",
+                    });
+                    this.verifyDetailsFile = res.data.data.depositoryParamList;
+                    this.tableFileData[0].createTime = res.data.data.createTime;
+                    this.tableFileData[0].latestVersion = res.data.data.latestVersion;
+                    this.tableFileData[0].fileHash = res.data.data.fileHash;
+                    this.verifyFormFile.fileHash =res.data.data.fileHash;
+                    this.fileVisible = true;
+                } else {
+                    this.fileVisible = false;
+                    this.verifyFormFile.fileHash = '';
+                    this.$message({
+                        message: this.$chooseLang(res.data.code),
                         type: "error",
                         duration: 2000,
                     });

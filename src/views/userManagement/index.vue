@@ -4,13 +4,13 @@
         <div class="content-container">
             <div class="content-header">
                 <span class="left-text">账号类型</span>
-                <el-select v-model="selectValue" placeholder="请选择" @change="getAccountList" size="small">
+                <el-select v-model="selectValue" placeholder="请选择" @change="selectPage" size="small">
                     <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
                 <el-input placeholder="账号名" v-model="inputKeyWords" clearable class="search" size="small">
                 </el-input>
-                <el-button class="searchButton" icon="el-icon-search" @click="getAccountList" size="small"></el-button>
+                <el-button class="searchButton" icon="el-icon-search" @click="selectPage" size="small"></el-button>
                 <el-button type="primary" size="small" class="right" @click="newAccount" v-if="role == 1 || role == 2">
                     新建账号</el-button>
             </div>
@@ -40,7 +40,7 @@
                 </template>
             </div>
             <div class="content-footer">
-                <el-pagination @size-change="handleSizeChange" @current-change="searchName" :current-page="pageNumber"
+                <el-pagination @size-change="handleSizeChange" @current-change="changePage" :current-page="pageNumber"
                     :page-sizes="[10, 20, 30, 50]" :page-size="pageSize"
                     layout="total, sizes, prev, pager, next, jumper" :total="total">
                 </el-pagination>
@@ -126,7 +126,6 @@ export default {
             loading: true,
             rules: {
                 contact: [{
-
                     message: "请输入联系方式",
                     trigger: "blur",
                 },
@@ -154,9 +153,13 @@ export default {
                 }
             });
         },
+        selectPage() {
+            this.pageNumber = 1;
+            this.getAccountList()
+        },
+        
         //账号管理初始化
         async getAccountList() {
-            // console.log("test-data",this.pageNumber);
             const res = await accountList({
                 pageNumber: this.pageNumber,
                 pageSize: `${this.pageSize}?roleId=${this.selectValue}&accountName=${this.inputKeyWords}`,
@@ -267,7 +270,7 @@ export default {
             this.pageSize = pageSize;
             this.getAccountList();
         },
-        searchName(paper = 1) {
+        changePage(paper = 1) {
             this.pageNumber = paper;
             this.getAccountList();
         },
