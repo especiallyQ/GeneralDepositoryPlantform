@@ -1,0 +1,455 @@
+<template>
+  <div>
+    <el-dialog
+      :title="title"
+      :visible.sync="dialogFormVisible"
+      :close-on-click-modal="false"
+      @close="closeSaveDepositDialog(0)"
+      @open="getSaveDepositoryMsg"
+      center
+      width="498px"
+    >
+      <el-form
+        :model="form"
+        ref="ruleForm"
+        label-width="100px"
+        class="selectForm"
+        :rules="rules"
+        v-loading="getParameterLoading"
+      >
+        <el-form-item label="存证模板名称" v-if="dialogFlag !== 2">
+          <el-input
+            :placeholder="templateMsg.depositoryTemplateName"
+            :disabled="dialogFlag !== 2"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item
+          v-for="item in parameter"
+          :key="item.parameterName"
+          :label="item.parameterName"
+          :prop="item.parameterName"
+        >
+          <el-input
+            v-model="form[item.parameterName]"
+            v-if="item.parameterType !== 'file'"
+            :disabled="dialogFlag === 2"
+          ></el-input>
+          <el-upload
+            v-else
+            class="upload-demo"
+            ref="upload"
+            action=""
+            :auto-upload="false"
+            :limit="1"
+            :file-list="fileList"
+            :on-remove="
+              () => {
+                handleRemove(item.parameterName);
+              }
+            "
+            :on-change="
+              (file, fileList) => {
+                handleChange(file, fileList, item.parameterName);
+              }
+            "
+          >
+            <el-button slot="trigger" size="small" type="primary"
+              >选取文件</el-button
+            >
+            <div slot="tip" class="el-upload__tip"></div>
+          </el-upload>
+        </el-form-item>
+        <div class="dialog-footer">
+          <el-button @click="closeSaveDepositDialog(0)">取消</el-button>
+          <el-button
+            @click="submitDialog('ruleForm')"
+            type="primary"
+            :loading="loading"
+            >{{ dialogFlag === 2 ? "校验" : "确定" }}</el-button
+          >
+        </div>
+      </el-form>
+    </el-dialog>
+  </div>
+</template>
+  
+  <script>
+import {
+  saveDepositoryContent,
+  getInitAddDepository,
+  getCheckDataMessage,
+  validateDepositoryContent,
+  editDepoMsgList,
+} from "@/util/api";
+export default {
+  props: {
+    // 控制Dialog是否显示
+    visible: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+    // 当前存证模板详细信息
+    templateMsg: {
+      type: Object,
+    },
+    // Dialog用途 0表示录入 1表示存证信息 2表示数据校验
+    dialogFlag: {
+      type: Number,
+      required: true,
+    },
+    // 数据校验行Id
+    depositoryId: {
+      type: Number,
+    },
+  },
+  data() {
+    return {
+      dialogFormVisible: this.visible, //控制dialog是否显示
+      loading: false, //确定按钮loading
+      getParameterLoading: false, // 获取表单数据loading
+      parameter: [],
+      rules: {}, //验证规则
+      form: {
+        //表单数据
+      },
+      fileList: [],
+    };
+  },
+
+  watch: {
+    visible() {
+      this.dialogFormVisible = this.visible;
+    },
+    form: {
+      handler() {
+        for (let key of this.parameter) {
+          key.parameterValue = this.form[key.parameterName];
+        }
+      },
+      deep: true,
+    },
+  },
+
+  methods: {
+    // 移除文件
+    handleRemove(parameterName) {
+      this.form[parameterName] = null;
+    },
+
+    // 改变文件状态
+    handleChange(file, fileList, parameterName) {
+      if (fileList.length >= 2) {
+        return;
+      }
+      for (let key of this.parameter) {
+        if (key.parameterType === "file") {
+          this.$refs.ruleForm.clearValidate(key.parameterName);
+        }
+      }
+      this.$set(this.form, parameterName, file);
+    },
+
+    // 关闭Dialog时
+    closeSaveDepositDialog(flag) {
+      this.$emit("closeSaveDetailsDialog", flag);
+    },
+
+    // 获取Dialog初始化数据
+    getDialogParameterData() {
+      if (!this.dialogFlag) {
+        this.getSaveDepositoryMsg();
+        return;
+      }
+      this.getDepositoryMsg();
+    },
+
+    // 获取录入存证按钮信息
+    getSaveDepositoryMsg() {
+      this.getParameterLoading = true;
+      getInitAddDepository(this.templateMsg.id)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.parameter = res.data.data;
+            this.createRules();
+            this.getParameterLoading = false;
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
+    },
+
+    //获取存证信息列表数据
+    getDepositoryMsg() {
+      this.getParameterLoading = true;
+      getCheckDataMessage(this.depositoryId)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.parameter = res.data.data;
+            for (let key of this.parameter) {
+              if (key.parameterType === "file") {
+                this.$set(this.form, key.parameterName, null);
+              } else {
+                this.$set(this.form, key.parameterName, key.parameterValue);
+              }
+              this.createRules();
+              this.getParameterLoading = false;
+            }
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
+    },
+
+    // 录入存证信息
+    setDepositoryContent() {
+      const { id } = this.templateMsg;
+      let formData = new FormData();
+      for (let key of this.parameter) {
+        if (key.parameterType === "file") {
+          formData.append("file", key.parameterValue.raw);
+          key.parameterValue = "";
+        }
+      }
+      formData.append("depositoryParams", JSON.stringify(this.parameter));
+      formData.append("templateId", id);
+      saveDepositoryContent(formData)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: "success",
+              message: "新建成功",
+              duration: 2000,
+            });
+            this.closeSaveDepositDialog(1);
+          } else {
+            this.$message({
+              message: res.data.message || this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+            this.closeSaveDepositDialog(0);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+          this.closeSaveDepositDialog(0);
+        });
+    },
+
+    // 编辑存证信息
+    editDepositoryContent() {
+      let formData = new FormData();
+      formData.append("depositoryId", this.depositoryId);
+      for (let key of this.parameter) {
+        if (key.parameterType === "file") {
+          formData.append("file", key.parameterValue.raw);
+          key.parameterValue = "";
+        }
+      }
+      formData.append("depositoryParams", JSON.stringify(this.parameter));
+      console.log('编辑功能开发中');
+      // editDepoMsgList(formData)
+      //   .then((res) => {
+      //     if (res.data.code === 0) {
+      //       this.$message({
+      //         type: "success",
+      //         message: "编辑成功",
+      //         duration: 2000,
+      //       });
+      //       this.closeSaveDepositDialog(1);
+      //     } else {
+      //       this.$message({
+      //         message: this.$chooseLang(res.data.code),
+      //         type: "error",
+      //         duration: 2000,
+      //       });
+      //       this.closeSaveDepositDialog(0);
+      //     }
+      //   })
+      //   .catch(() => {
+      //     this.$message({
+      //       message: "系统错误",
+      //       type: "error",
+      //       duration: 2000,
+      //     });
+      //     this.closeSaveDepositDialog(0);
+      //   });
+    },
+
+    //数据校验
+    submitCheckContent() {
+      let formData = new FormData();
+      formData.append("depositoryId", this.depositoryId);
+      for (let key of this.parameter) {
+        if (key.parameterType === "file") {
+          formData.append("file", key.parameterValue.raw);
+          key.parameterValue = "";
+        }
+      }
+      formData.append("depositoryParams", JSON.stringify(this.parameter));
+      validateDepositoryContent(formData)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: "success",
+              message: "存证校验成功",
+              duration: 2000,
+            });
+            this.closeSaveDepositDialog(0);
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "warning",
+              duration: 2000,
+            });
+            this.closeSaveDepositDialog(0);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+          this.closeSaveDepositDialog(0);
+        });
+    },
+
+    // 提交Dialog
+    submitDialog(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.loading = true;
+          switch (this.dialogFlag) {
+            case 0: //录入
+              this.setDepositoryContent();
+              break;
+            case 1: //编辑
+              this.editDepositoryContent();
+              break;
+            case 2: //校验
+              this.submitCheckContent();
+              break;
+          }
+        } else {
+          return false;
+        }
+      });
+    },
+
+    // 创建验证规则
+    createRules() {
+      for (let key of this.parameter) {
+        switch (key.parameterType) {
+          case "string":
+            this.rules[key.parameterName] = [
+              {
+                required: true,
+                message: `请输入${key.parameterName}`,
+                trigger: "blur",
+              },
+            ];
+            break;
+          case "int":
+            this.rules[key.parameterName] = [
+              {
+                required: true,
+                message: `请输入${key.parameterName}`,
+                trigger: "blur",
+              },
+              {
+                pattern: /^[0-9]*$/,
+                message: `${key.parameterName}必须是整数`,
+                trigger: "blur",
+              },
+            ];
+            break;
+          case "float":
+            this.rules[key.parameterName] = [
+              {
+                required: true,
+                message: `请输入${key.parameterName}`,
+                trigger: "blur",
+              },
+              {
+                pattern: /^[0-9]+([.][0-9]{1,})?$/,
+                message: `${key.parameterName}必须是浮点数`,
+                trigger: "blur",
+              },
+            ];
+            break;
+          case "file":
+            this.rules[key.parameterName] = [
+              {
+                required: true,
+                message: `${key.parameterName}文件存证不能为空`,
+                trigger: ["blur", "change", "submit"],
+              },
+            ];
+            break;
+        }
+      }
+    },
+  },
+
+  mounted() {
+    this.getDialogParameterData();
+  },
+
+  computed: {
+    title() {
+      let title;
+      switch (this.dialogFlag) {
+        case 0:
+          title = "录入存证信息";
+          break;
+        case 1:
+          title = "编辑存证信息";
+          break;
+        case 2:
+          title = "数据校验";
+          break;
+      }
+      return title;
+    },
+  },
+};
+</script>
+  
+  <style scoped>
+.dialog-footer {
+  text-align: right;
+}
+.selectForm >>> .el-form-item__label {
+  font-size: 12px;
+  font-family: "Courier New", Courier, monospace;
+}
+</style>

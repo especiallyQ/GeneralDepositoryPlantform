@@ -67,6 +67,7 @@
             :rows="4"
             resize="none"
             maxlength="60"
+            :show-word-limit="true"
           ></el-input>
         </el-form-item>
 
@@ -158,7 +159,7 @@ export default {
         });
     },
 
-    // 存证模板新建方法
+    // 编辑存证模板方法
     editDepositoryTemplate() {
       const { remark } = this.form;
       let data = {
@@ -176,7 +177,7 @@ export default {
               duration: 2000,
             });
           } else {
-            this.loading = false;
+            this.close();
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
@@ -185,6 +186,7 @@ export default {
           }
         })
         .catch(() => {
+          this.close();
           this.$message({
             message: "系统错误",
             type: "error",

@@ -47,6 +47,18 @@ let errCode = {
         en: "params incorrect, can not get chain message",
         zh: "输入参数错误，无法获得存证合约信息"
     },
+    "400004": {
+        en: "params incorrect, can not get chain message",
+        zh: "该存证模板已冻结，请解冻后操作"
+    },
+    "700001":{
+        en: "",
+        zh: "当前文件与链上存证文件不同"
+    },
+    "700002":{
+        en: "",
+        zh: "当前文件与链上存证文件重复"
+    }
 }
 
 export default errCode;

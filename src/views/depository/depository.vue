@@ -9,7 +9,7 @@
               <el-select
                 v-model="creatorId"
                 style="width: 140px"
-                @change="getTemplateList"
+                @change="changeSelectList"
               >
                 <el-option
                   v-for="item in options"
@@ -36,7 +36,7 @@
               ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" size="small" @click="searchTemplateName" 
+              <el-button type="primary" size="small" @click="searchTemplateName"
                 >搜索</el-button
               >
             </el-form-item>
@@ -55,7 +55,7 @@
       <div class="depository-list">
         <el-table
           :data="tableData"
-          v-loading="loading"
+          v-loading="listLoading"
           style="width: 100%"
           empty-text="暂无数据"
         >
@@ -74,16 +74,20 @@
                 type="text"
                 class="el-button-text"
                 :disabled="
-                  (role === '2' && user !== scope.row.creator) || role === '3'
+                  (role === '2' && user !== scope.row.creator) ||
+                  role === '3' ||
+                  scope.row.freeze !== 0
                 "
                 @click="handleEdit(scope.row.id)"
                 >编辑</el-button
               >
               <el-button
                 type="text"
+                style="color: red"
                 class="el-button-text"
                 :disabled="
-                  (role === '2' && user !== scope.row.creator) || role === '3'
+                  // (role === '2' && user !== scope.row.creator) || role === '3'
+                  true
                 "
                 @click="handleDelete(scope.$index, scope.row)"
                 >删除</el-button
@@ -92,9 +96,31 @@
                 type="text"
                 class="el-button-text"
                 :disabled="
+                  (role === '2' && user !== scope.row.creator) ||
+                  role === '3' ||
+                  scope.row.freeze !== 0
+                "
+                @click="changeFreezeThawDialog(0, scope.row)"
+                >冻结</el-button
+              >
+              <el-button
+                type="text"
+                class="el-button-text"
+                :disabled="
+                  (role === '2' && user !== scope.row.creator) ||
+                  role === '3' ||
+                  scope.row.freeze !== 1
+                "
+                @click="changeFreezeThawDialog(1, scope.row)"
+                >解冻</el-button
+              >
+              <el-button
+                type="text"
+                class="el-button-text"
+                :disabled="
                   (role === '2' && user !== scope.row.creator) || role === '3'
                 "
-                @click="viewDetails(scope.$index, scope.row)"
+                @click="viewDetails(scope.row.id)"
                 >查看详情</el-button
               >
             </template>
@@ -102,6 +128,7 @@
         </el-table>
         <el-pagination
           class="page"
+          :current-page="currentPage"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :page-sizes="[10, 20, 30, 50]"
@@ -111,11 +138,34 @@
         >
         </el-pagination>
       </div>
+      <el-dialog
+        :visible="freezeDialogVisible"
+        width="30%"
+        :show-close="false"
+        v-if="freezeDialogVisible"
+      >
+        <p class="freezeDialogTitle">
+          是否确认{{ freezeDialogStatus ? "解冻" : "冻结" }}存证模板
+          <span style="color: red">{{
+            freezeTemplate.depositoryTemplateName
+          }}</span>
+        </p>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="closeFreezeThawDialog">取 消</el-button>
+          <el-button
+            type="primary"
+            @click="handleFreezeThaw"
+            :loading="freezeThawDialogLoading"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
       <CreateTemplateDialog
         v-if="createTemplateDialogVisible"
         :createTemplateDialogVisible.sync="createTemplateDialogVisible"
         @updateTemplateDialog="changeCreateTemplateDialog"
         @getNewTemplateList="getNewTemplateList"
+        @getTemplateList="getTemplateList"
       ></CreateTemplateDialog>
       <EditTemplateDialog
         v-if="editTemplateDialogVisible"
@@ -130,9 +180,14 @@
 <script>
 import _ from "lodash";
 import ContentHead from "@/components/contentHead";
-import { getDepositoryTemplateCreator, getTemplateListData } from "@/util/api";
-import CreateTemplateDialog from "@/views/depository/templateDialog/createTemplateDialog";
-import EditTemplateDialog from "@/views/depository/templateDialog/editTemplateDialog";
+import {
+  getDepositoryTemplateCreator,
+  getTemplateListData,
+  freezeTemplate,
+  thawTemplate,
+} from "@/util/api";
+import CreateTemplateDialog from "@/views/depository/depositoryDialog/createTemplateDialog";
+import EditTemplateDialog from "@/views/depository/depositoryDialog/editTemplateDialog";
 export default {
   name: "depository",
   components: {
@@ -158,7 +213,8 @@ export default {
       pageSize: 10, // 分页-每页数据条目数
       role: localStorage.getItem("rootId"), // 登录账号的类型(角色) 1超级管理员 2普通管理员 3普通用户
       user: localStorage.getItem("user"),
-      loading: false, //loading标识
+      listLoading: false, //存证模板列表Loading标识
+      freezeThawDialogLoading: false, //冻结解冻Dialog确定按钮Loading标识
       // 存证管理列表表头
       tableHeader: [
         {
@@ -181,9 +237,11 @@ export default {
       // 存证管理列表数据
       tableData: [],
       total: 0, //列表总条数
-
       createTemplateDialogVisible: false, //新建存证模板Dialog是否显示
       editTemplateDialogVisible: false, //编辑存证模板Dialog是否显示
+      freezeDialogVisible: false, //冻结解冻模板Dialog是否显示
+      freezeDialogStatus: 0, //冻结解冻模板状态 0表示冻结 1表示解冻
+      freezeTemplate: "", //冻结解冻模板信息
       editTemplateNameId: "", //被编辑存证列表的Id
     };
   },
@@ -219,7 +277,7 @@ export default {
 
     // 获取存证模板列表数据
     getTemplateList() {
-      this.loading = true;
+      this.listLoading = true;
       getTemplateListData(
         this.currentPage,
         this.pageSize,
@@ -230,9 +288,9 @@ export default {
           if (res.data.code === 0) {
             this.tableData = res.data.data;
             this.total = res.data.total;
-            this.loading = false;
+            this.listLoading = false;
           } else {
-            this.loading = false;
+            this.listLoading = false;
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
@@ -241,7 +299,7 @@ export default {
           }
         })
         .catch(() => {
-          this.loading = false;
+          this.listLoading = false;
           this.$message({
             message: "系统错误",
             type: "error",
@@ -250,8 +308,15 @@ export default {
         });
     },
 
+    // 根据创建者筛选存证列表
+    changeSelectList() {
+      this.currentPage = 1;
+      this.getTemplateList();
+    },
+
     //搜索模板名称
     searchTemplateName: _.debounce(function () {
+      this.currentPage = 1;
       this.getTemplateList();
     }, 400),
 
@@ -289,9 +354,102 @@ export default {
       this.editTemplateDialogVisible = true;
     },
     // 删除存证列表
-    handleDelete() {},
+    handleDelete() {
+      console.log("删除");
+    },
+
+    // 显示冻结解冻Dialog
+    changeFreezeThawDialog(status, row) {
+      this.freezeDialogVisible = true;
+      this.freezeDialogStatus = status;
+      this.freezeTemplate = row;
+    },
+
+    // 关闭冻结解冻Dialog
+    closeFreezeThawDialog() {
+      this.freezeDialogVisible = false;
+      this.freezeThawDialogLoading = false;
+    },
+    // 发送冻结解冻存证模板请求
+    handleFreezeThaw() {
+      this.freezeThawDialogLoading = true;
+      switch (this.freezeDialogStatus) {
+        case 0:
+          this.handleFreeze(this.freezeTemplate.id);
+          break;
+        case 1:
+          this.handleThaw(this.freezeTemplate.id);
+          break;
+      }
+    },
+
+    // 处理冻结存证模板
+    handleFreeze(id) {
+      freezeTemplate(id)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.getTemplateList();
+            this.closeFreezeThawDialog();
+            this.$message({
+              message: "冻结成功",
+              type: "success",
+              duration: 2000,
+            });
+          } else {
+            this.closeFreezeThawDialog();
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.closeFreezeThawDialog();
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
+    },
+
+    //  处理解冻存证模板
+    handleThaw(id) {
+      thawTemplate(id)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.getTemplateList();
+            this.closeFreezeThawDialog();
+            this.$message({
+              message: "解冻成功",
+              type: "success",
+              duration: 2000,
+            });
+          } else {
+            this.closeFreezeThawDialog();
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.closeFreezeThawDialog();
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+          this.closeFreezeThawDialog();
+        });
+    },
+
     // 存证列表查看详情
-    viewDetails() {},
+    viewDetails(id) {
+      this.$router.push(`/depositDetails/${id}`);
+    },
   },
 };
 </script>
@@ -309,5 +467,12 @@ export default {
   background-color: transparent !important;
   border: 1px solid transparent !important;
   font-size: 12px;
+}
+
+.freezeDialogTitle {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bolder;
+  letter-spacing: 0.5px;
 }
 </style>
