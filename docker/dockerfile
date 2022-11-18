@@ -16,11 +16,11 @@ WORKDIR /data/gdp-web/
 EXPOSE 5000
 
 ENV uri='$uri' \
-    CMSP_WEB_REQUEST_PREFIX="/mgr" \
-    CMSP_NODE_MANAGER_PROTOCOL="http" \
-    CMSP_NODE_MANAGER_IP="127.0.0.1" \
-    CMSP_NODE_MANAGER_PORT="5001" \
-    CMSP_NODE_MANAGER_CONTEXT_PATH="/CMSP-Node-Manager"
+    GDP_WEB_REQUEST_PREFIX="/GDP-web" \
+    GDP_NODE_MANAGER_PROTOCOL="http" \
+    GDP_NODE_MANAGER_IP="127.0.0.1" \
+    GDP_NODE_MANAGER_PORT="5010" \
+    GDP_NODE_MANAGER_CONTEXT_PATH="/GDP-service"
 
 # start nginx commond
 ENTRYPOINT envsubst < /data/gdp-web/nginx/gdp-web.conf > /etc/nginx/conf.d/gdp-web.conf && nginx -c /etc/nginx/nginx.conf -g 'daemon off;'
