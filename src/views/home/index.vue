@@ -4,6 +4,7 @@
     <div class="gdp-header">
       <div class="gdp-title">通用存证平台</div>
       <ul @click="changeTemplate">
+        <li id="HomePage">首页</li>
         <li id="Login">登录</li>
       </ul>
     </div>
@@ -14,11 +15,12 @@
 <script>
 import { random } from "@/util/util";
 import Login from "@/views/home/login/login.vue";
+import HomePage from '@/views/home/homePage/homePage.vue';
 export default {
   name: "Home",
 
   components: {
-    Login,
+    Login,HomePage
   },
 
   data() {
@@ -35,7 +37,7 @@ export default {
       maxStars: 2000, // 星星数量
 
       // 组件名称
-      comName: "",
+      comName: "HomePage",
     };
   },
 

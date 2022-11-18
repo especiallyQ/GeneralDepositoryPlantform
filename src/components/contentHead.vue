@@ -7,13 +7,7 @@
       <span :class="{ 'font-color-9da2ab': headSubTitle }">{{ title }}</span>
       <span v-show="headSubTitle" class="font-color-ccd2dc">/</span>
       <span>{{ headSubTitle }}</span>
-      <el-tooltip
-        effect="dark"
-        placement="bottom-start"
-        v-if="headTooltip"
-        offset="0"
-        :open-delay="1000"
-      >
+      <el-tooltip effect="dark" placement="bottom-start" v-if="headTooltip" offset="0" :open-delay="1000">
         <div slot="content">{{ headTooltip }}</div>
         <i class="el-icon-info font-15"></i>
       </el-tooltip>
@@ -23,7 +17,7 @@
         <div class="sign-out-wrapper">
           <div class="change-password" @click="changePassword">修改密码</div>
           <div class="change-password" @click="lookVersion">查看版本</div>
-          <div class="sign-out" @click="signOut">退出</div>
+          <div class="sign-out" @click="signOut">退出登录</div>
         </div>
         <a class="browse-user" slot="reference">
           <i class="ext-icon-user-icon"></i>
@@ -31,10 +25,24 @@
         </a>
       </el-popover>
     </div>
+    <el-dialog
+            title="修改密码"
+            :visible.sync="changePasswordDialogVisible"
+            width="30%"
+            :center="true"
+            :close-on-click-modal="false"
+            class="dialog-wrapper"
+            @close="CloseDialog"
+            >
+            <change-password-dialog @success="success" ref="child">
+            </change-password-dialog>
+        </el-dialog>
   </div>
 </template>
 
 <script>
+import { loginOut } from '@/util/api'
+import changePasswordDialog from './changePasswordDialog';
 export default {
   name: "conetntHead",
   props: {
@@ -43,11 +51,16 @@ export default {
     headTitle: { type: String },
     headTooltip: { type: String },
   },
+  components: {
+        changePasswordDialog
+    },
 
   data() {
     return {
       title: this.headTitle,
       accountName: "-",
+      changePasswordDialogVisible:false,
+      
     };
   },
 
@@ -72,14 +85,38 @@ export default {
       }
     },
     // 修改密码
-    changePassword() {},
+    changePassword() {
+      this.changePasswordDialogVisible = true;
+        
+  },
     // 查看版本
-    lookVersion() {},
+    lookVersion() { },
     // 退出登录
-    signOut() {
+    async signOut() {
       localStorage.clear();
+      await this.quit();
       this.$router.push("/home");
     },
+    //调用退出接口
+    async quit() {
+      const res = await loginOut();
+      if (res.data.code === 0) {
+      } else {
+        this.$message({
+          message: this.$chooseLang(res.data.code),
+          type: "error",
+          duration: 2000,
+        });
+      }
+    },
+    success: function (val) {
+            this.changePasswordDialogVisible = false;
+    },
+    //关闭修改密码dialog时清空数据
+    CloseDialog() {
+          this.$refs.child.closeDialog()
+    },
+
   },
 };
 </script>
@@ -138,6 +175,7 @@ export default {
 .browse-user::hover {
   color: rgb(55, 238, 242);
 }
+
 .browse-user {
   text-align: center;
   text-decoration: none;

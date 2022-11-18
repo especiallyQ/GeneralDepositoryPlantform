@@ -4,19 +4,19 @@
         <div class="content-container">
             <div class="content-header">
                 <span class="left-text">账号类型</span>
-                <el-select  v-model="selectValue" placeholder="请选择" @change="getAccountList">
+                <el-select v-model="selectValue" placeholder="请选择" @change="getAccountList" size="small">
                     <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
-                <el-input   placeholder="账号名" v-model="inputKeyWords" clearable class="search" >
+                <el-input placeholder="账号名" v-model="inputKeyWords" clearable class="search" size="small">
                 </el-input>
-                <el-button class="searchButton" icon="el-icon-search" @click="getAccountList"></el-button>
-                <p class="p"></p>
-                <el-button type="primary" class="right" @click="newAccount" v-if="role == 1 || role == 2">新建账号</el-button>
+                <el-button class="searchButton" icon="el-icon-search" @click="getAccountList" size="small"></el-button>
+                <el-button type="primary" size="small" class="right" @click="newAccount" v-if="role == 1 || role == 2">
+                    新建账号</el-button>
             </div>
             <div class="content-center">
                 <template>
-                    <el-table :data="accountListData" style="width: 100%">
+                    <el-table :data="accountListData" style="width: 100%" v-loading="loading">
                         <el-table-column prop="accountName" label="账号名" align="center">
                         </el-table-column>
                         <el-table-column prop="contact" label="联系方式" align="center">
@@ -24,14 +24,16 @@
                         <el-table-column prop="roleZh" label="账号类型" align="center"> </el-table-column>
                         <el-table-column label="操作" align="center" class="remarks">
                             <template slot-scope="{ row }">
-                                <el-button 
-                                :disabled="isDeleteAccountDisabled(row)"
-                                    type="text" style="color: red; font-size: 12px"
-                                    @click="delateAccount(row)">
+                                <el-button :disabled="isDeleteAccountDisabled(row)" type="text"
+                                    style="color: red; font-size: 12px" @click="delateAccount(row)">
                                     删除
                                 </el-button>
-                                <el-button :disabled="isReviseAccountDisabled()" type="text" style="font-size: 12px" @click="reviseAccount(row)">
+                                <el-button :disabled="isReviseAccountDisabled()" type="text" style="font-size: 12px"
+                                    @click="reviseAccount(row)">
                                     编辑</el-button>
+                                <el-button :disabled="isResetAccountDisabled(row)" type="text" style="font-size: 12px" @click="getResetAccountPassword(row)">
+                                    重置密码</el-button>
+
                             </template>
                         </el-table-column>
                     </el-table>
@@ -44,12 +46,11 @@
                 </el-pagination>
             </div>
         </div>
-        <userDialog :createUserAccountDialogVisible.sync="createUserAccountDialogVisible"
-        >
+        <userDialog :createUserAccountDialogVisible.sync="createUserAccountDialogVisible">
         </userDialog>
         <el-dialog title="编辑账号" :visible.sync="reviseUserAccountDialogVisible" width="498px" align="center"
             :close-on-click-modal="false">
-            <el-form :model="accountForm"  ref="ruleForm" label-width="100px" class="demo-ruleForm">
+            <el-form :model="accountForm" ref="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
                 <el-form-item label="账号名称" prop="name">
                     <el-input v-model="accountForm.name" disabled></el-input>
                 </el-form-item>
@@ -62,26 +63,19 @@
                         <el-option label="普通用户" value="2"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item>
+                <el-form-item class="dialog-footer">
                     <el-button @click="reviseUserAccountDialogVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="update">确 定</el-button>
+                    <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>
-        <!-- <el-dialog :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
-            <span>是否确定删除该账号</span>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="handleClose">确 定</el-button>
-            </span>
-        </el-dialog> -->
     </div>
 </template>
 
 <script>
 import ContentHead from "@/components/contentHead.vue";
 import userDialog from "./components/userDialog.vue";
-import { accountList, updateAccount ,deleteAccountInfo} from "@/util/api.js";
+import { accountList, updateAccount, deleteAccountInfo, resetAccountPassword } from "@/util/api.js";
 import { JSONSwitchFormData } from "@/util/util.js";
 
 
@@ -94,7 +88,7 @@ export default {
             pageSize: 10, //每一页展示的条数
             roleId: '',//用户权限id
             role: localStorage.getItem('rootId'),
-            userId:localStorage.getItem('userId'),
+            userId: localStorage.getItem('userId'),
             total: 0, //总共的条数
             createUserAccountDialogVisible: false,//控制新建dialog是否显示
             reviseUserAccountDialogVisible: false,//控制修改dialog是否显示
@@ -129,15 +123,37 @@ export default {
                     label: "普通用户",
                 },
             ],
+            loading: true,
+            rules: {
+                contact: [{
+
+                    message: "请输入联系方式",
+                    trigger: "blur",
+                },
+                {
+                    pattern:
+                        /^1(3|4|5|7|8)[0-9]{9}|([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/,
+                    message: "联系方式格式不对",
+                    trigger: "blur",
+                },]
+            },
         };
     },
     mounted() {
         this.getAccountList();
-        console.log(this.id);
     },
     computed: {
     },
     methods: {
+        submitForm(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.update();
+                } else {
+                    return false;
+                }
+            });
+        },
         //账号管理初始化
         async getAccountList() {
             // console.log("test-data",this.pageNumber);
@@ -152,6 +168,7 @@ export default {
                     this.accountListData = res.data.data
                 }
                 this.total = res.data.total;
+                this.loading = false;
             } else {
                 this.$message({
                     message: this.$chooseLang(res.data.code),
@@ -160,11 +177,11 @@ export default {
                 });
             }
         },
-
+        //点击新建账号显示dialog
         newAccount() {
             this.createUserAccountDialogVisible = true;
-                
         },
+        //点击编辑时渲染数据
         reviseAccount(row) {
             this.reviseUserAccountDialogVisible = true;
             this.accountForm.name = row.accountName;
@@ -172,6 +189,7 @@ export default {
             this.accountForm.type = row.roleZh;
             this.accountForm.id = row.accountId;
         },
+        //编辑账号
         async update() {
             this.reviseUserAccountDialogVisible = false;
             let formData = JSONSwitchFormData(this.accountForm);
@@ -182,7 +200,6 @@ export default {
                     message: "编辑成功!",
                 });
                 this.getAccountList();
-
             } else {
                 this.$message({
                     message: this.$chooseLang(res.data.code),
@@ -191,6 +208,7 @@ export default {
                 });
             }
         },
+        //删除账号
         delateAccount(row) {
             this.dialogVisible = true;
             this.$confirm(`确定删除账号${row.accountName}?`, {
@@ -208,19 +226,10 @@ export default {
                                 type: "success",
                                 message: "删除成功!",
                             });
-                            // if (this.accountListData.length === 1) {
-                            //     this.pageNumber -= 1
-                            // }
                             this.pageNumber = this.accountListData.length > 1
-                                    ? this.pageNumber
-                                    : this.pageNumber - 1
-                            
-                            this.getAccountList(
-                                // this.accountListData.length > 1
-                                //     ? this.pageNumber
-                                //     : this.pageNumber - 1
-                            )
-                            
+                                ? this.pageNumber
+                                : this.pageNumber - 1
+                            this.getAccountList()
                         }
                     }).catch(() => {
                     })
@@ -228,7 +237,31 @@ export default {
                 .catch(() => {
                 });
         },
-
+        //重置账号密码
+        getResetAccountPassword(row) {
+            this.dialogVisible = true;
+            this.$confirm(`是否重置账号${row.accountName}的密码?`, {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+            })
+                .then(() => {
+                    this.$confirm(`确定重置账号${row.accountName}的密码?`, {
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                    }).then(async () => {
+                        const res = await resetAccountPassword(row.accountId);
+                        if (res.data.code === 0) {
+                            this.$message({
+                                type: "success",
+                                message: "重置成功!",
+                            });
+                        }
+                    }).catch(() => {
+                    })
+                })
+                .catch(() => {
+                });
+        },
         //底部页码跳转
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
@@ -238,23 +271,26 @@ export default {
             this.pageNumber = paper;
             this.getAccountList();
         },
+        //删除操作权限设置
         isDeleteAccountDisabled(row) {
-                return !((this.role == 1 || this.role == 2) && row.accountId != this.userId )
-            
+            return !((this.role == 1 || this.role == 2) && row.accountId != this.userId)
         },
+        //编辑权限设置
         isReviseAccountDisabled() {
-            return !(this.role ==1 || this.role==2)
+            return !(this.role == 1 || this.role == 2)
         },
-            
-        
+        //重置密码操作权限设置
+        isResetAccountDisabled(row) {
+            return !((this.role == 1 || this.role == 2) )
+        },
+
+
     },
 };
 </script>
 
 <style scoped>
 .content-container {
-    width: 1298px;
-    height: 800px;
     background-color: white;
     margin: 10px;
 }
@@ -264,8 +300,13 @@ export default {
     margin-left: 10px;
 }
 
+.dialog-footer {
+    margin-left: 195px;
+}
+
 .content-container .content-header {
     display: flex;
+    position: relative;
     height: 100px;
     align-items: center;
     margin-left: 20px;
@@ -273,8 +314,6 @@ export default {
 
 .content-container .content-header .left-text {
     font-size: 12px;
-    height: 32px;
-    line-height: 32px;
     margin-right: 10px;
 }
 
@@ -283,18 +322,18 @@ export default {
     background-color: #4093ff;
     border-top-left-radius: 0%;
     border-bottom-left-radius: 0%;
+    margin-left: -1px;
 }
 
-.content-container .content-header .p {
-    flex: auto;
-}
+
 
 .content-container .content-header .right {
-    margin-right: 20px;
+    position: absolute;
+    right: 20px;
 }
 
 .content-container .content-center {
-    margin:0 25px 0 25px;
+    margin: 0 25px 0 25px;
 }
 
 .content-container .content-footer {
@@ -307,7 +346,6 @@ export default {
 
 .el-button.is-disabled {
     background-color: transparent !important;
-    border-color:transparent !important;
+    border-color: transparent !important;
 }
-
 </style>

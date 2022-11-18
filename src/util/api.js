@@ -34,6 +34,47 @@ export function login(data, code, token) {
         }
     })
 }
+//退出
+export function loginOut() {
+    return get({
+        url: `${url.ORG_LIST}/account/logout`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+//存证模板获取下拉框数据
+export function getDepositoryList() {
+    return get({
+        url: `${url.ORG_LIST}/getDepositoryList`,
+        method: 'get',
+        // headers: {
+        //     AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        // }
+    })
+}
+//数据验证
+export function dataVerify(data) {
+    return post({
+        url: `${url.ORG_LIST}/dataVerify`,
+        method: 'post',
+        data: data,
+    })
+}
+
+//文件验证
+export function fileVerify(data) {
+    return post({
+        url: `${url.ORG_LIST}/fileVerify`,
+        method: 'post',
+        data: data,
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
 
 
 
@@ -76,10 +117,34 @@ export function updateAccount(data) {
         }
     })
 }
+//删除账号
 export function deleteAccountInfo(data) {
     return deleted({
         url: `${url.ORG_LIST}/account/deleteAccount/${data}`,
         method: 'delete',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+//修改密码
+export function resetPassword(data) {
+    return put({
+        url: `${url.ORG_LIST}/account/updatePassword/` + `${data.oldAccountPwd}/${data.newAccountPwd}`,
+        method: 'put',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//重置密码
+export function resetAccountPassword(data) {
+    return put({
+        url: `${url.ORG_LIST}/account/resetPassword/${data}`,
+        method: 'put',
+        data: data,
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
         }
@@ -321,28 +386,28 @@ export function editDepoMsgList(data) {
 
 
 // 退出
-export function loginOut() {
-    return get({
-        url: `${url.ORG_LIST}/account/logout`,
-        method: 'get',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function loginOut() {
+//     return get({
+//         url: `${url.ORG_LIST}/account/logout`,
+//         method: 'get',
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 
 // 修改密码
-export function resetPassword(data) {
-    return put({
-        url: `${url.ORG_LIST}/account/passwordUpdate`,
-        method: 'put',
-        data: data,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function resetPassword(data) {
+//     return put({
+//         url: `${url.ORG_LIST}/account/passwordUpdate`,
+//         method: 'put',
+//         data: data,
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 
 
@@ -571,16 +636,16 @@ export function batchDeleteAccountInfo(data) {
 }
 
 // 重置密码
-export function resetAccountPassword(data) {
-    return put({
-        url: `${url.ORG_LIST}/account/passwordReset/${data}`,
-        method: 'put',
-        data: data,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function resetAccountPassword(data) {
+//     return put({
+//         url: `${url.ORG_LIST}/account/passwordReset/${data}`,
+//         method: 'put',
+//         data: data,
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 // 批量重置密码
 export function batchResetAccountPassword(data) {
@@ -1744,17 +1809,17 @@ export function getDepoTemplateByContract(contractId) {
 }
 
 // 存证信息-获取存证数据
-export function getDepositoryList(data, list) {
-    const params = reviseParam(data, list);
-    return get({
-        url: `${url.ORG_LIST}/depository/depositoryContentList/${params.str}`,
-        method: 'get',
-        params: params.querys,
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
+// export function getDepositoryList(data, list) {
+//     const params = reviseParam(data, list);
+//     return get({
+//         url: `${url.ORG_LIST}/depository/depositoryContentList/${params.str}`,
+//         method: 'get',
+//         params: params.querys,
+//         headers: {
+//             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+//         }
+//     })
+// }
 
 // 存证信息-获取存证历史版本数据
 export function getDepositoryHistoryList(data) {

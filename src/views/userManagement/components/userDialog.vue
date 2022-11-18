@@ -3,10 +3,10 @@
         :close-on-click-modal="false" @open="resetForm1('ruleForm')" :before-close="closeDialog">
         <el-form :model="accountForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
             <el-form-item label="账号名" prop="accountName">
-                <el-input v-model="accountForm.accountName" ></el-input>
+                <el-input v-model="accountForm.accountName"></el-input>
             </el-form-item>
             <el-form-item label="联系方式" prop="contact">
-                <el-input v-model="accountForm.contact" ></el-input>
+                <el-input v-model="accountForm.contact"></el-input>
             </el-form-item>
             <el-form-item label="账号类型" prop="roleId">
                 <el-select v-model="accountForm.roleId" placeholder="请选择账号类型" style="width: 100%">
@@ -14,7 +14,7 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item>
+            <el-form-item class="dialog-footer">
                 <el-button @click="resetForm('ruleForm')">取 消 </el-button>
                 <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
             </el-form-item>
@@ -24,7 +24,7 @@
 
 <script>
 import { JSONSwitchFormData } from "@/util/util.js";
-import{createAccount} from "@/util/api.js"
+import { createAccount } from "@/util/api.js";
 export default {
     name: "userDialog",
     props: {
@@ -68,7 +68,6 @@ export default {
                 ],
                 contact: [
                     {
-
                         message: "请输入联系方式",
                         trigger: "blur",
                     },
@@ -90,23 +89,19 @@ export default {
         };
     },
     methods: {
-        // test() {
-        //     this.$emit("update:createUserAccountDialogVisible", false);
-        //     console.log(this.accountForm);
-        // },
         submitForm(formName) {
-            console.log(this.accountForm);
+            // console.log(this.accountForm);
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
                     this.$emit("update:createUserAccountDialogVisible", false);
                     let formData = JSONSwitchFormData(this.accountForm);
                     const res = await createAccount(formData);
                     if (res.data.code === 0) {
-                        this.$parent.getAccountList()
+                        this.$parent.getAccountList();
                         this.$message({
-                    type: "success",
-                    message: "新建成功!",
-                });
+                            type: "success",
+                            message: "新建成功!",
+                        });
                     } else {
                         this.$message({
                             message: this.$chooseLang(res.data.code),
@@ -127,12 +122,13 @@ export default {
         },
         closeDialog() {
             this.$emit("update:createUserAccountDialogVisible", false);
-        }
+        },
     },
 };
-
 </script>
 
-<style>
-
+<style scoped>
+.demo-ruleForm .dialog-footer {
+    margin-left: 195px;
+}
 </style>

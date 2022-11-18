@@ -65,7 +65,7 @@ const routes = [{
 },
 {
     path: '/main',
-    name: 'systemConfiguration',
+    name: 'system',
     nameKey: 'systemConfiguration',
     leaf: true,
     iconCls: 'ext-icon-regulatory sidebar-icon',
