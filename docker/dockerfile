@@ -16,7 +16,7 @@ WORKDIR /data/gdp-web/
 EXPOSE 5000
 
 ENV uri='$uri' \
-    GDP_WEB_REQUEST_PREFIX="/GDP-web" \
+    GDP_WEB_REQUEST_PREFIX="/GDP-service" \
     GDP_SERVICE_PROTOCOL="http" \
     GDP_SERVICE_IP="127.0.0.1" \
     GDP_SERVICE_PORT="5010" \
