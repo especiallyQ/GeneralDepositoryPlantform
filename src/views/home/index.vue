@@ -4,8 +4,10 @@
     <div class="gdp-header">
       <div class="gdp-title">通用存证平台</div>
       <ul @click="changeTemplate">
-        <li id="HomePage">首页</li>
-        <li id="Login">登录</li>
+        <li id="HomePage" :class="comName == 'HomePage' ? 'action' : ''">
+          首页
+        </li>
+        <li id="Login" :class="comName == 'Login' ? 'action' : ''">登录</li>
       </ul>
     </div>
     <component :is="comName"></component>
@@ -15,12 +17,13 @@
 <script>
 import { random } from "@/util/util";
 import Login from "@/views/home/login/login.vue";
-import HomePage from '@/views/home/homePage/homePage.vue';
+import HomePage from "@/views/home/homePage/homePage.vue";
 export default {
   name: "Home",
 
   components: {
-    Login,HomePage
+    Login,
+    HomePage,
   },
 
   data() {
@@ -35,7 +38,6 @@ export default {
       hue: 217,
       stars: [], // 星星数据集
       maxStars: 2000, // 星星数量
-
       // 组件名称
       comName: "HomePage",
     };
@@ -52,7 +54,6 @@ export default {
     changeTemplate(e) {
       this.comName = e.target.id;
     },
-
     // 画布初始化
     initCanvas() {
       this.canvas1 = document.getElementById("canvas");
@@ -185,6 +186,9 @@ export default {
       margin-right: 30px;
       font-weight: bold;
       color: #fff;
+      .action {
+        color: skyblue;
+      }
 
       li {
         height: 100%;

@@ -59,7 +59,7 @@
                             <el-form-item label="文件凭证">
                                 <el-input v-model="verifyFormFile.fileHash" style="width:578px" disabled></el-input>
                                 <el-upload class="upload-file" action="" ref="upload" :limit="1" :file-list="fileList"
-                                        :auto-upload="false" :before-upload="beforeUpload">
+                                        :auto-upload="false" :before-upload="beforeUpload" :on-exceed="handleExceed">
                                     <el-button type="primary">点击上传</el-button>
                                 </el-upload>
                             </el-form-item>
@@ -121,7 +121,6 @@ export default {
     data() {
         return {
             dialogVisible: false,
-            loading: false,
             drawerVisible: false,
             fileVisible:false,
             codeUrl: url.codeUrl,
@@ -173,6 +172,9 @@ export default {
         },
         beforeUpload(file) {
             this.file = file
+        },
+        handleExceed(files, fileList) {
+        this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
         },
         handleClick(tab, event) {
             this.tabId = tab.index;

@@ -140,6 +140,7 @@ export default {
           if (res.data.code === 0) {
             this.codeUrl = `data:image/png;base64,${res.data.data.base64Image}`;
             this.authToken = res.data.data.token;
+            // localStorage.setItem("token",this.authToken)
           } else {
             this.codeUrl = "";
             this.authToken = "";

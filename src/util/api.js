@@ -14,6 +14,7 @@ export function checkToken() {
     })
 }
 
+
 // 获取验证码
 export function getPictureCheckCode() {
     return get({
