@@ -1,0 +1,26 @@
+FROM openeuler/openeuler:20.03-lts-sp3
+
+RUN sed -i 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.repos.d/openEuler.repo && \
+    yum -y update && \
+    yum -y install gettext && \
+    yum -y install nginx.x86_64 && \
+    sed -i 's/gpgcheck=0/gpgcheck=1/g' /etc/yum.repos.d/openEuler.repo
+
+COPY docker /data/gdp-web/nginx
+COPY dist /data/gdp-web/dist
+
+RUN mkdir -p /etc/nginx/conf.d && \
+    cp -f /data/gdp-web/nginx/nginx.conf /etc/nginx/nginx.conf
+
+WORKDIR /data/gdp-web/
+EXPOSE 5000
+
+ENV uri='$uri' \
+    GDP_WEB_REQUEST_PREFIX="/GDP-service" \
+    GDP_SERVICE_PROTOCOL="http" \
+    GDP_SERVICE_IP="127.0.0.1" \
+    GDP_SERVICE_PORT="5010" \
+    GDP_SERVICE_CONTEXT_PATH="/GDP-service"
+
+# start nginx commond
+ENTRYPOINT envsubst < /data/gdp-web/nginx/gdp-web.conf > /etc/nginx/conf.d/gdp-web.conf && nginx -c /etc/nginx/nginx.conf -g 'daemon off;'
