@@ -138,28 +138,6 @@
         >
         </el-pagination>
       </div>
-      <el-dialog
-        :visible="freezeDialogVisible"
-        width="30%"
-        :show-close="false"
-        v-if="freezeDialogVisible"
-      >
-        <p class="freezeDialogTitle">
-          是否确认{{ freezeDialogStatus ? "解冻" : "冻结" }}存证模板
-          <span style="color: red">{{
-            freezeTemplate.depositoryTemplateName
-          }}</span>
-        </p>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="closeFreezeThawDialog">取 消</el-button>
-          <el-button
-            type="primary"
-            @click="handleFreezeThaw"
-            :loading="freezeThawDialogLoading"
-            >确 定</el-button
-          >
-        </span>
-      </el-dialog>
       <CreateTemplateDialog
         v-if="createTemplateDialogVisible"
         :createTemplateDialogVisible.sync="createTemplateDialogVisible"
@@ -214,7 +192,6 @@ export default {
       role: localStorage.getItem("rootId"), // 登录账号的类型(角色) 1超级管理员 2普通管理员 3普通用户
       user: localStorage.getItem("user"),
       listLoading: false, //存证模板列表Loading标识
-      freezeThawDialogLoading: false, //冻结解冻Dialog确定按钮Loading标识
       // 存证管理列表表头
       tableHeader: [
         {
@@ -239,9 +216,6 @@ export default {
       total: 0, //列表总条数
       createTemplateDialogVisible: false, //新建存证模板Dialog是否显示
       editTemplateDialogVisible: false, //编辑存证模板Dialog是否显示
-      freezeDialogVisible: false, //冻结解冻模板Dialog是否显示
-      freezeDialogStatus: 0, //冻结解冻模板状态 0表示冻结 1表示解冻
-      freezeTemplate: "", //冻结解冻模板信息
       editTemplateNameId: "", //被编辑存证列表的Id
     };
   },
@@ -360,27 +334,46 @@ export default {
 
     // 显示冻结解冻Dialog
     changeFreezeThawDialog(status, row) {
-      this.freezeDialogVisible = true;
-      this.freezeDialogStatus = status;
-      this.freezeTemplate = row;
+      const h = this.$createElement;
+      this.$msgbox({
+        title: "提示",
+        message: h("p", null, [
+          h("span", null, `是否确认${status ? "解冻" : "冻结"}存证模板 `),
+          h("strong", { style: "color: red" }, row.depositoryTemplateName),
+        ]),
+        closeOnClickModal: false,
+        showCancelButton: true,
+        showClose: false,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+        beforeClose: (action, instance, done) => {
+          if (action === "confirm") {
+            instance.confirmButtonLoading = true;
+            instance.confirmButtonText = "执行中...";
+            switch (status) {
+              case 0:
+                this.handleFreeze(row.id);
+                break;
+              case 1:
+                this.handleThaw(row.id);
+                break;
+            }
+            done();
+            instance.confirmButtonLoading = false;
+          } else {
+            done();
+          }
+        },
+      }).catch(() => {
+        return false;
+      });
     },
 
     // 关闭冻结解冻Dialog
     closeFreezeThawDialog() {
       this.freezeDialogVisible = false;
       this.freezeThawDialogLoading = false;
-    },
-    // 发送冻结解冻存证模板请求
-    handleFreezeThaw() {
-      this.freezeThawDialogLoading = true;
-      switch (this.freezeDialogStatus) {
-        case 0:
-          this.handleFreeze(this.freezeTemplate.id);
-          break;
-        case 1:
-          this.handleThaw(this.freezeTemplate.id);
-          break;
-      }
     },
 
     // 处理冻结存证模板

@@ -5,7 +5,7 @@ const Home = () => import('@/views/home')
 const Main = () => import('@/views/index/main.vue')
 const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
 const Depository = () => import('@/views/depository/depository.vue')
-const DepositDetails = () => import('../views/depository/depositDetails.vue')
+const DepositDetails = () => import('@/views/depository/depositDetails.vue')
 const userManagement = () => import('@/views/userManagement/index.vue');
 const systemConfiguration = () => import('@/views/systemConfiguration')
 
