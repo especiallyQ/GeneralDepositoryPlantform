@@ -275,7 +275,12 @@ export default {
         }
       }
       formData.append("depositoryParams", JSON.stringify(this.parameter));
-      console.log('编辑功能开发中');
+      this.$message({
+            message: "编辑功能开发中",
+            type: "info",
+            duration: 2000,
+          });
+      this.closeSaveDepositDialog(1);
       // editDepoMsgList(formData)
       //   .then((res) => {
       //     if (res.data.code === 0) {
