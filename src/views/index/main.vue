@@ -1,5 +1,10 @@
 <template>
-  <div class="main-wrapper">
+  <div
+    class="main-wrapper"
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-background="rgba(0, 0, 0, 0.8)"
+  >
     <div
       class="menu-wrapper header"
       :class="{ 'menu-show': menuShow, 'menu-hide': menuHide }"
@@ -33,6 +38,7 @@ export default {
     return {
       menuShow: true,
       menuHide: false,
+      loading: true,
     };
   },
   computed: {
@@ -49,6 +55,7 @@ export default {
       checkToken()
         .then((res) => {
           if (res.data.code === 0) {
+            this.loading = false;
             if (this.$route.path && this.$route.path !== "/main") {
               router.push(this.$route.path);
             } else if (this.$route.path == "/main") {
@@ -65,6 +72,7 @@ export default {
               duration: 2000,
             });
             router.push("/home");
+            this.loading = false;
           }
         })
         .catch((err) => {
@@ -73,6 +81,7 @@ export default {
             type: "error",
             duration: 2000,
           });
+          this.loading = false;
           router.push("/home");
         });
     },

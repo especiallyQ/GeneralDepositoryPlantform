@@ -76,7 +76,7 @@
           :validate-on-rule-change="false"
         >
           <el-input
-            v-model="key.parameterName"
+            v-model.trim="key.parameterName"
             placeholder="参数名"
             class="el-input-width"
             style="marginRight: 8px"
