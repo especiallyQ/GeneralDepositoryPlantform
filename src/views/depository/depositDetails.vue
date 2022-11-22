@@ -40,6 +40,7 @@
           size="small"
           @click="openSaveDepositDialog(0)"
           :disabled="templateMsg.freeze === 1"
+          v-if="setBtnShow"
           >录入存证内容</el-button
         >
         <el-button
@@ -47,6 +48,7 @@
           size="mini"
           @click="openSaveAllDepositDialog(0)"
           :disabled="templateMsg.freeze === 1"
+          v-if="setBtnShow"
           >批量录入</el-button
         >
       </div>
@@ -140,6 +142,7 @@ export default {
       enteringDepositDialogVisible: false, //录入存证信息Dialog
       dialogFlag: 0, //区分Dialog 0表示录入 1表示数据校验
       depositoryId: null, //数据校验列表id
+      setBtnShow: false, //录入按钮是否可见
     };
   },
   mounted() {
@@ -168,15 +171,18 @@ export default {
             this.firstCharacter =
               res.data.data.depositoryTemplateName.substring(0, 1);
             this.DepositPageLoading = false;
+            this.setBtnShow = true;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
               duration: 2000,
             });
+            this.setBtnShow = true;
           }
         })
         .catch(() => {
+          this.setBtnShow = true;
           this.$message({
             message: "系统错误",
             type: "error",
@@ -333,6 +339,7 @@ export default {
 
 .input-btn {
   width: 100%;
+  height: 82px;
   display: flex;
   justify-content: end;
   box-sizing: border-box;

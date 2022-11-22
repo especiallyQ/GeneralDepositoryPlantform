@@ -346,6 +346,7 @@ export default {
         showClose: false,
         confirmButtonText: "确定",
         cancelButtonText: "取消",
+        lockScroll: false,
         type: "warning",
         beforeClose: (action, instance, done) => {
           if (action === "confirm") {
@@ -353,14 +354,12 @@ export default {
             instance.confirmButtonText = "执行中...";
             switch (status) {
               case 0:
-                this.handleFreeze(row.id);
+                this.handleFreeze(row.id, instance, done);
                 break;
               case 1:
-                this.handleThaw(row.id);
+                this.handleThaw(row.id, instance, done);
                 break;
             }
-            done();
-            instance.confirmButtonLoading = false;
           } else {
             done();
           }
@@ -370,26 +369,22 @@ export default {
       });
     },
 
-    // 关闭冻结解冻Dialog
-    closeFreezeThawDialog() {
-      this.freezeDialogVisible = false;
-      this.freezeThawDialogLoading = false;
-    },
-
     // 处理冻结存证模板
-    handleFreeze(id) {
+    handleFreeze(id, instance, done) {
       freezeTemplate(id)
         .then((res) => {
           if (res.data.code === 0) {
             this.getTemplateList();
-            this.closeFreezeThawDialog();
+            done();
+            instance.confirmButtonLoading = false;
             this.$message({
               message: "冻结成功",
               type: "success",
               duration: 2000,
             });
           } else {
-            this.closeFreezeThawDialog();
+            done();
+            instance.confirmButtonLoading = false;
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
@@ -398,7 +393,8 @@ export default {
           }
         })
         .catch(() => {
-          this.closeFreezeThawDialog();
+          done();
+          instance.confirmButtonLoading = false;
           this.$message({
             message: "系统错误",
             type: "error",
@@ -408,19 +404,21 @@ export default {
     },
 
     //  处理解冻存证模板
-    handleThaw(id) {
+    handleThaw(id, instance, done) {
       thawTemplate(id)
         .then((res) => {
           if (res.data.code === 0) {
             this.getTemplateList();
-            this.closeFreezeThawDialog();
+            done();
+            instance.confirmButtonLoading = false;
             this.$message({
               message: "解冻成功",
               type: "success",
               duration: 2000,
             });
           } else {
-            this.closeFreezeThawDialog();
+            done();
+            instance.confirmButtonLoading = false;
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
@@ -429,13 +427,13 @@ export default {
           }
         })
         .catch(() => {
-          this.closeFreezeThawDialog();
+          done();
+          instance.confirmButtonLoading = false;
           this.$message({
             message: "系统错误",
             type: "error",
             duration: 2000,
           });
-          this.closeFreezeThawDialog();
         });
     },
 
