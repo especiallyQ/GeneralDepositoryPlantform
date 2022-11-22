@@ -69,7 +69,7 @@
             show-overflow-tooltip
           >
           </el-table-column>
-          <el-table-column label="操作" align="center" min-width="175px">
+          <el-table-column label="操作" align="center" min-width="220px">
             <template slot-scope="scope">
               <el-button
                 type="text"
@@ -89,6 +89,12 @@
                 class="el-button-text"
                 @click="openSaveDepositDialog(2, scope.row)"
                 >数据校验</el-button
+              >
+              <el-button
+                type="text"
+                class="el-button-text"
+                @click="copyDepositMsg(scope.row)"
+                >获取凭证</el-button
               >
             </template>
           </el-table-column>
@@ -199,11 +205,12 @@ export default {
           if (res.data.code === 0) {
             this.tableData = [];
             for (let key of res.data.data.depositoryList) {
-              const { createTime, creator, depositoryId } = key;
+              const { createTime, creator, depositoryId, factHash } = key;
               this.tableData.push({
                 depositoryId,
                 createTime,
                 creator,
+                factHash,
                 ...JSON.parse(key.content),
               });
             }
@@ -273,9 +280,27 @@ export default {
     handleHis() {
       console.log("历史版本");
     },
+    
     // 批量录入
     openSaveAllDepositDialog() {
       console.log("批量录入");
+    },
+
+    // 获取凭证
+    copyDepositMsg(row) {
+      this.$copyText(row.factHash).then(()=>{
+      this.$message({
+            message: "已将存证凭证复制到剪贴板",
+            type: "success",
+            duration: 2000,
+          });
+      }).catch(()=>{
+          this.$message({
+            message: "获取存证凭证失败",
+            type: "error",
+            duration: 2000,
+          });
+      })
     },
   },
 
