@@ -4,8 +4,9 @@
             <el-tabs type="border-card" class="data-bcg" @tab-click="handleClick">
                 <el-tab-pane label="数据验证">
                     <div class="from-style">
-                        <el-form label-position="right" label-width="80px" :model="verifyForm">
-                            <el-form-item label="存证模板">
+                        <el-form label-position="right" label-width="80px" :model="verifyForm" ref="verifyForm"
+                            :rules="rules" hide-required-asterisk>
+                            <el-form-item label="存证模板" prop="depositoryTemplateId">
                                 <el-select v-model="verifyForm.depositoryTemplateId" placeholder="请选择存证模板"
                                     style="width: 100%" @focus="getDepositoryListData">
                                     <el-option v-for="item in DepositoryListData" :key="item.depositoryTemplateId"
@@ -13,10 +14,10 @@
                                     </el-option>
                                 </el-select>
                             </el-form-item>
-                            <el-form-item label="数据凭证">
+                            <el-form-item label="数据凭证" prop="factHash">
                                 <el-input v-model="verifyForm.factHash"></el-input>
                             </el-form-item>
-                            <el-form-item label="验证码">
+                            <el-form-item label="验证码" prop="verifyCode">
                                 <el-input v-model="verifyForm.verifyCode" placeholder="请输入验证码" maxlength="4"
                                     style="width:600px"></el-input>
                                 <span class="vercode">
@@ -24,7 +25,7 @@
                                         @click="clickChangeCode" />
                                 </span>
                             </el-form-item>
-                            <el-button type="primary" class="rigth-btn" @click="inquire">查询</el-button>
+                            <el-button type="primary" class="rigth-btn" @click="submit('verifyForm')" :loading="logining">查询</el-button>
                         </el-form>
                         <div class="table-footer" v-show="drawerVisible">
                             <el-table :data="tableData" border style="width: 100%"
@@ -47,8 +48,8 @@
                 </el-tab-pane>
                 <el-tab-pane label="文件验证">
                     <div class="from-style">
-                        <el-form label-position="right" label-width="80px" :model="verifyFormFile">
-                            <el-form-item label="存证模板">
+                        <el-form label-position="right" label-width="80px" :model="verifyFormFile" :rules="rules" ref="verifyFormFile"  hide-required-asterisk> 
+                            <el-form-item label="存证模板" prop="depositoryTemplateId">
                                 <el-select v-model="verifyFormFile.depositoryTemplateId" placeholder="请选择存证模板"
                                     style="width: 100%" @focus="getDepositoryListData">
                                     <el-option v-for="item in DepositoryListData" :key="item.depositoryTemplateId"
@@ -59,11 +60,11 @@
                             <el-form-item label="文件凭证">
                                 <el-input v-model="verifyFormFile.fileHash" style="width:578px" disabled></el-input>
                                 <el-upload class="upload-file" action="" ref="upload" :limit="1" :file-list="fileList"
-                                        :auto-upload="false" :before-upload="beforeUpload" :on-exceed="handleExceed">
+                                    :auto-upload="false" :before-upload="beforeUpload" :on-exceed="handleExceed">
                                     <el-button type="primary">点击上传</el-button>
                                 </el-upload>
                             </el-form-item>
-                            <el-form-item label="验证码">
+                            <el-form-item label="验证码" prop="verifyCode">
                                 <el-input v-model="verifyFormFile.verifyCode" placeholder="请输入验证码" maxlength="4"
                                     style="width:600px"></el-input>
                                 <span class="vercode">
@@ -71,7 +72,7 @@
                                         @click="clickChangeCode" />
                                 </span>
                             </el-form-item>
-                            <el-button type="primary" class="rigth-btn" @click="inquire">查询</el-button>
+                            <el-button type="primary" class="rigth-btn" @click="submit1('verifyFormFile')" :loading="logining1">查询</el-button>
                         </el-form>
                         <div class="table-footer" v-show="fileVisible">
                             <el-table :data="tableFileData" border style="width: 100%"
@@ -98,9 +99,12 @@
                     <span class="content-header">链上数据：</span>
                     <div class=" content-center">
                         <p>{</p>
-                        <ul >
-                            <li v-for="(item, index) in tabId==0?verifyDetails:verifyDetailsFile" :key="index">"{{ item.depositoryParamName }}":
-                                "{{ item.depositoryParamValue }}"</li>
+                        <ul>
+                            <li v-for="(item, index) in tabId == 0 ? verifyDetails : verifyDetailsFile" :key="index">"
+                            {{
+                                    index
+                            }}":
+                                "{{ item }}"</li>
                         </ul>
                         <p>}</p>
                     </div>
@@ -120,9 +124,11 @@ export default {
     name: "HomePage",
     data() {
         return {
-            dialogVisible: false,
-            drawerVisible: false,
-            fileVisible:false,
+            logining: false,
+            logining1: false,
+            dialogVisible: false,//控制查看详情dialog是否显示
+            drawerVisible: false,//控制数据验证table是否显示
+            fileVisible: false,//控制文件验证table是否显示
             codeUrl: url.codeUrl,
             verifyForm: {
                 depositoryTemplateId: '',//存证模板数据
@@ -135,22 +141,54 @@ export default {
                 verifyCode: '',//验证码
             },
             verifyCodeToken: '',//验证码Token
+            //数据验证成功数据
             tableData: [{
                 latestVersion: '',
                 createTime: '',
                 factHash: '',
             }],
+            //文件验证成功数据
             tableFileData: [{
                 latestVersion: '',
                 createTime: '',
                 fileHash: '',
             }],
             fileList: [],
-            file: null,//
-            DepositoryListData: [],
+            file: null,//存放文件
+            DepositoryListData: [],//查看详情时数据
             verifyDetails: [],//数据验证详情数据
-            verifyDetailsFile:[],//文件验证详情数据
+            verifyDetailsFile: [],//文件验证详情数据
             tabId: 0,//区别数据验证跟文件验证
+            rules: {
+                depositoryTemplateId: [
+                    {
+                        required: true,
+                        message: "选择存证模板",
+                        trigger: "change",
+                    },
+                ],
+                factHash: [
+                    {
+                        required: true,
+                        message: "请输入数据凭证",
+                        trigger: "blur",
+                    },
+                ],
+                // fileHash: [
+                //     {
+                //         required: true, 
+                //         message: "请上传文件",
+                //         trigger: "change",
+                //     }
+                // ],
+                verifyCode: [
+                    {
+                        required: true,
+                        message: "请输入验证码",
+                        trigger: "blur",
+                    },
+                ],
+            },
 
         }
     },
@@ -174,11 +212,31 @@ export default {
             this.file = file
         },
         handleExceed(files, fileList) {
-        this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+            this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
         },
         handleClick(tab, event) {
             this.tabId = tab.index;
             this.changeCode();
+        },
+        submit(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.logining = true;
+                    this.inquire();
+                } else {
+                    return false;
+                }
+            });
+        },
+        submit1(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.logining1 = true;
+                    this.inquire();
+                } else {
+                    return false;
+                }
+            });
         },
         async inquire() {
             this.$refs.upload.submit();
@@ -191,15 +249,20 @@ export default {
                 const res = await dataVerify(fromData);
                 if (res.data.code === 0) {
                     this.verifyDetails = res.data.data.depositoryParamList;
+                    console.log(this.verifyDetails);
                     this.tableData[0].createTime = res.data.data.createTime;
                     this.tableData[0].latestVersion = res.data.data.latestVersion;
                     this.tableData[0].factHash = this.verifyForm.factHash;
                     this.drawerVisible = true;
+                    this.logining = false;
+
                     this.$message({
                         message: '查询成功',
                         type: "success",
                     });
                 } else {
+                    this.drawerVisible = false;
+                    this.logining = false;
                     this.$message({
                         message: this.$chooseLang(res.data.code),
                         type: "error",
@@ -219,13 +282,18 @@ export default {
                         message: '查询成功',
                         type: "success",
                     });
+                    this.logining1 = false;
+                    this.file = null;
                     this.verifyDetailsFile = res.data.data.depositoryParamList;
                     this.tableFileData[0].createTime = res.data.data.createTime;
                     this.tableFileData[0].latestVersion = res.data.data.latestVersion;
                     this.tableFileData[0].fileHash = res.data.data.fileHash;
-                    this.verifyFormFile.fileHash =res.data.data.fileHash;
+                    this.verifyFormFile.fileHash = res.data.data.fileHash;
                     this.fileVisible = true;
+                    this.logining1 = false;
                 } else {
+                    this.logining1 = false;
+                    this.file = null;
                     this.fileVisible = false;
                     this.verifyFormFile.fileHash = '';
                     this.$message({
@@ -304,7 +372,7 @@ export default {
 
 .tabs .dialog-content {
     height: 300px;
-    border-top: 1px solid red;
+    border-top: 1px solid  #000;
     border-bottom: 1px solid #000;
 }
 

@@ -137,7 +137,7 @@ export default {
                     },
                     {
                         pattern:
-                            /^1(3|4|5|7|8)[0-9]{9}|([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/,
+                        /(^[\w.\-]+@(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]{2,3}$)|(^1[3|4|5|8]\d{9}$)/,
                         message: "联系方式格式不对",
                         trigger: "blur",
                     },
@@ -338,10 +338,14 @@ export default {
 
 .content-container .content-header .searchButton {
     color: #ffffff;
+    border: 0px;
+    height: 32px;
     background-color: #4093ff;
     border-top-left-radius: 0%;
     border-bottom-left-radius: 0%;
-    margin-left: -1px;
+    margin-left: -5px;
+    z-index: 100;
+    margin-top: 0px;
 }
 
 .content-container .content-header .right {
