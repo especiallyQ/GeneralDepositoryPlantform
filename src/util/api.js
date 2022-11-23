@@ -14,6 +14,7 @@ export function checkToken() {
     })
 }
 
+
 // 获取验证码
 export function getPictureCheckCode() {
     return get({
@@ -153,7 +154,7 @@ export function resetAccountPassword(data) {
 
 //系统配置相关接口-----------------------------
 
-//获取应用链列表下拉框
+//获取存证合约列表下拉框
 export function ContractList(data) {
     return get({
         url: `${url.ORG_LIST}/system/getContractList/${data}`,
@@ -164,12 +165,13 @@ export function ContractList(data) {
         }
     })
 }
-//获取存证合约列表下拉框
+
+//获取应用链列表下拉框
 export function ChainList(data, list) {
     const params = reviseParam(data, list);
     return get({
         url: `${url.ORG_LIST}/system/getChainList/` +
-            `${data.serverPassword}/${data.serverAccount}`,
+            `${data.serverAccount}`,
         method: 'get',
         params: params.querys,
         headers: {

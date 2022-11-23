@@ -40,7 +40,7 @@ const routes = [{
     nameKey: 'userManagement',
     leaf: false,
     menuShow: true,
-    iconCls: 'el-icon-connection sidebar-icon',
+    iconCls: 'cmsp-icon-yonghuliang sidebar-icon',
     children: [{
         path: '/userManagement', component: userManagement, name: 'userManagement', nameKey: 'userManagement', menuShow: true, meta: { requireAuth: false }
     },
@@ -68,7 +68,7 @@ const routes = [{
     name: 'system',
     nameKey: 'systemConfiguration',
     leaf: true,
-    iconCls: 'ext-icon-regulatory sidebar-icon',
+    iconCls: 'ext-icon-monitor  sidebar-icon',
     component: Main,
     children: [
         {
