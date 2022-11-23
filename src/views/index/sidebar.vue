@@ -127,6 +127,7 @@ export default {
               dataOverview: "数据概览",
               depositoryTitle: "存证管理",
               userManagement: "账号管理",
+              ApprovalManagement: "审批管理",
               systemConfiguration: "系统配置",
             }[it.nameKey];
           });
@@ -191,7 +192,8 @@ export default {
             data: true,
             userManagement: true,
             depositoryTitle: true,
-            systemConfiguration: this.role === '1',
+            ApprovalManagement: this.role === "1" || this.role === "2",
+            systemConfiguration: this.role === "1",
           }[item.nameKey] || false;
 
         // 子菜单权限

@@ -6,6 +6,7 @@ const Main = () => import('@/views/index/main.vue')
 const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
 const Depository = () => import('@/views/depository/depository.vue')
 const DepositDetails = () => import('@/views/depository/depositDetails.vue')
+const ApprovalManagement = () => import('@/views/approvalManagement/approvalManagement.vue')
 const userManagement = () => import('@/views/userManagement/index.vue');
 const systemConfiguration = () => import('@/views/systemConfiguration')
 
@@ -59,6 +60,20 @@ const routes = [{
         },
         {
             path: '/depositDetails/:rowId', component: DepositDetails, name: 'DepositDetails', nameKey: 'DepositDetails', meta: { requireAuth: true }
+        },
+    ]
+
+},
+{
+    path: '/main',
+    name: 'approval',
+    nameKey: 'ApprovalManagement',
+    leaf: true,
+    iconCls: 'cmsp-icon-qukuailian4 sidebar-icon',
+    component: Main,
+    children: [
+        {
+            path: '/approvalManagement', component: ApprovalManagement, name: 'ApprovalManagement', nameKey: 'ApprovalManagement', meta: { requireAuth: true }
         },
     ]
 
