@@ -15,7 +15,7 @@ let errCode = {
         en: "invalid checkCode",
         zh: "无效的校验码"
     },
-    "202002":{
+    "202002": {
         en: "The account or password is incorrect",
         zh: "账号或密码错误"
     },
@@ -51,11 +51,14 @@ let errCode = {
         en: "params incorrect, can not get chain message",
         zh: "该存证模板已冻结，请解冻后操作"
     },
-    "700001":{
+    "400005": {
+        zh: "存证模板名称已经存在"
+    },
+    "700001": {
         en: "",
         zh: "当前文件与链上存证文件不同"
     },
-    "700002":{
+    "700002": {
         en: "",
         zh: "当前文件与链上存证文件重复"
     }
