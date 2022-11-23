@@ -27,12 +27,15 @@ import { message } from '@/util/message.js';
 /* 错误码 */
 import errcode from './util/errcode';
 import { chooseLang } from './util/errcode.js';
+/* 剪贴板 */
+import VueClipboard from 'vue-clipboard2';
 
 Vue.use(router);
 Vue.use(ElementUI, {
   size: 'medium'
 });
 Vue.use(VueDOMPurifyHTML);
+Vue.use(VueClipboard);
 Vue.config.productionTip = false
 // Vue.prototype.getCookie = getCookie;
 // Vue.prototype.setCookie = setCookie;
