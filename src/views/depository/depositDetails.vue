@@ -40,6 +40,7 @@
           size="small"
           @click="openSaveDepositDialog(0)"
           :disabled="templateMsg.freeze === 1"
+          v-if="setBtnShow"
           >录入存证内容</el-button
         >
         <el-button
@@ -47,6 +48,7 @@
           size="mini"
           @click="openSaveAllDepositDialog(0)"
           :disabled="templateMsg.freeze === 1"
+          v-if="setBtnShow"
           >批量录入</el-button
         >
       </div>
@@ -67,7 +69,7 @@
             show-overflow-tooltip
           >
           </el-table-column>
-          <el-table-column label="操作" align="center" min-width="175px">
+          <el-table-column label="操作" align="center" min-width="220px">
             <template slot-scope="scope">
               <el-button
                 type="text"
@@ -87,6 +89,12 @@
                 class="el-button-text"
                 @click="openSaveDepositDialog(2, scope.row)"
                 >数据校验</el-button
+              >
+              <el-button
+                type="text"
+                class="el-button-text"
+                @click="copyDepositMsg(scope.row)"
+                >获取凭证</el-button
               >
             </template>
           </el-table-column>
@@ -140,6 +148,7 @@ export default {
       enteringDepositDialogVisible: false, //录入存证信息Dialog
       dialogFlag: 0, //区分Dialog 0表示录入 1表示数据校验
       depositoryId: null, //数据校验列表id
+      setBtnShow: false, //录入按钮是否可见
     };
   },
   mounted() {
@@ -168,15 +177,18 @@ export default {
             this.firstCharacter =
               res.data.data.depositoryTemplateName.substring(0, 1);
             this.DepositPageLoading = false;
+            this.setBtnShow = true;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
               duration: 2000,
             });
+            this.setBtnShow = true;
           }
         })
         .catch(() => {
+          this.setBtnShow = true;
           this.$message({
             message: "系统错误",
             type: "error",
@@ -193,11 +205,12 @@ export default {
           if (res.data.code === 0) {
             this.tableData = [];
             for (let key of res.data.data.depositoryList) {
-              const { createTime, creator, depositoryId } = key;
+              const { createTime, creator, depositoryId, factHash } = key;
               this.tableData.push({
                 depositoryId,
                 createTime,
                 creator,
+                factHash,
                 ...JSON.parse(key.content),
               });
             }
@@ -267,9 +280,27 @@ export default {
     handleHis() {
       console.log("历史版本");
     },
+    
     // 批量录入
     openSaveAllDepositDialog() {
       console.log("批量录入");
+    },
+
+    // 获取凭证
+    copyDepositMsg(row) {
+      this.$copyText(row.factHash).then(()=>{
+      this.$message({
+            message: "已将存证凭证复制到剪贴板",
+            type: "success",
+            duration: 2000,
+          });
+      }).catch(()=>{
+          this.$message({
+            message: "获取存证凭证失败",
+            type: "error",
+            duration: 2000,
+          });
+      })
     },
   },
 
@@ -333,6 +364,7 @@ export default {
 
 .input-btn {
   width: 100%;
+  height: 82px;
   display: flex;
   justify-content: end;
   box-sizing: border-box;
