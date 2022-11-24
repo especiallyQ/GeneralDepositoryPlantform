@@ -1,7 +1,7 @@
 <template>
     <div class="account-container">
         <ContentHead headTitle="用户管理" headSubTitle="账号管理"></ContentHead>
-        <div class="content-container">
+        <div class="content-container module-wrapper">
             <div class="content-header">
                 <span class="left-text">账号类型</span>
                 <el-select v-model="selectValue" placeholder="请选择" @change="selectPage" size="small">
@@ -311,7 +311,7 @@ export default {
 <style scoped>
 .content-container {
     background-color: white;
-    margin: 10px;
+    /* margin: 10px; */
 }
 
 .content-container .content-header .search {
