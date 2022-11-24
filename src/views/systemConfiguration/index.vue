@@ -1,16 +1,16 @@
 <template>
     <div>
         <ContentHead headTitle="系统配置"></ContentHead>
-        <div class="content-container">
+        <div class="content-container module-wrapper">
             <el-form class="system-form" label-position="right" label-width="auto" :model="systemConfigurationForm"
                 :rules="rules" ref="ruleForm">
-                <el-form-item label="CSMP服务地址:" prop="serverPath">
+                <el-form-item label="CMSP服务地址:" prop="serverPath">
                     <el-input v-model="systemConfigurationForm.serverPath"></el-input>
                 </el-form-item>
-                <el-form-item label="CSMP管理员账号:" prop="serverAccount">
+                <el-form-item label="CMSP管理员账号:" prop="serverAccount">
                     <el-input v-model="systemConfigurationForm.serverAccount"></el-input>
                 </el-form-item>
-                <el-form-item label="CSMP管理员密码:" prop="serverPassword">
+                <el-form-item label="CMSP管理员密码:" prop="serverPassword">
                     <el-input v-model="systemConfigurationForm.serverPassword" type="password"></el-input>
                 </el-form-item>
                 <el-form-item label="应用链名称:" prop="chainCode">
@@ -51,22 +51,22 @@ export default {
             chainCodeData: [], //应用链ID下拉框数据
             //系统配置表单数据
             systemConfigurationForm: {
-                serverPath: "", //CSMP服务地址
-                serverAccount: "", //CSMP管理员账号
-                serverPassword: "", //CSMP管理员密码
+                serverPath: "", //CMSP服务地址
+                serverAccount: "", //CMSP管理员账号
+                serverPassword: "", //CMSP管理员密码
                 chainCode: "", //应用链名称
                 chainId: "", //应用链ID
                 contractId: "", //存证合约
             },
             rules: {
                 serverPath: [
-                    { required: true, message: "请输入CSMP服务地址", trigger: "blur" },
+                    { required: true, message: "请输入CMSP服务地址", trigger: "blur" },
                 ],
                 serverAccount: [
-                    { required: true, message: "请输入CSMP管理员账号", trigger: "blur" },
+                    { required: true, message: "请输入CMSP管理员账号", trigger: "blur" },
                 ],
                 serverPassword: [
-                    { required: true, message: "请输入CSMP管理员密码", trigger: "blur" },
+                    { required: true, message: "请输入CMSP管理员密码", trigger: "blur" },
                 ],
                 chainCode: [
                     { required: true, message: "请输入应用链ID", trigger: "change" },
@@ -188,7 +188,6 @@ export default {
     position: relative;
     height: 680px;
     background-color: white;
-    margin: 15px;
 
     .system-form {
         position: absolute;

@@ -62,8 +62,8 @@
                   :style="{
                     color: term.path == activeRoute ? '#37eef2' : '',
                     'border-left':
-                      term.path == activeRoute ? '3px solid #37eef2' : '',
-                    'padding-left': term.path == activeRoute ? '50px' : '58px',
+                      term.path == activeRoute ? '' : '',
+                    'padding-left': term.path == activeRoute ? '53px' : '53px',
                     'background-color':
                       term.path == activeRoute ? '#1e293e' : '#0c1220',
                   }"
