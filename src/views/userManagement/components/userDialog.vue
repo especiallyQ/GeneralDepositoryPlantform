@@ -56,7 +56,7 @@ export default {
                 accountName: [
                     {
                         required: true,
-                        message: "请输入组织名称",
+                        message: "请输入账号名",
                         trigger: "blur",
                     },
                     {
@@ -73,7 +73,7 @@ export default {
                     },
                     {
                         pattern:
-                            /^1(3|4|5|7|8)[0-9]{9}|([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/,
+                            /(^[\w.\-]+@(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]{2,3}$)|(^1[3|4|5|8]\d{9}$)/,
                         message: "联系方式格式不对",
                         trigger: "blur",
                     },
@@ -82,7 +82,7 @@ export default {
                     {
                         required: true,
                         message: "请选择账号类型",
-                        trigger: "blur",
+                        trigger: "change",
                     },
                 ],
             },

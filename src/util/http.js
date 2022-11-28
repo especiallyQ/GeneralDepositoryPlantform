@@ -9,6 +9,19 @@ axiosIns.defaults.responseType = 'json';
 axiosIns.defaults.withCredentials = true;
 
 // http response interceptor
+// axiosIns.interceptors.request.use(
+//     config => {
+//         const token = localStorage.getItem("token")
+//         if (token) {
+//             config.headers["token"] = token
+//         }
+
+//         return config
+//     },
+//     err => {
+//         return Promise.reject(err.msg || err.message)
+//     }
+// )
 axiosIns.interceptors.response.use(
     response => {
         if (response.data && response.data.code === 302000) {

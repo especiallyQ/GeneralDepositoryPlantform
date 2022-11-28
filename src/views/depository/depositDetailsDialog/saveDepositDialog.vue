@@ -268,6 +268,7 @@ export default {
     editDepositoryContent() {
       let formData = new FormData();
       formData.append("depositoryId", this.depositoryId);
+      formData.append("templateId", this.templateMsg.id);
       for (let key of this.parameter) {
         if (key.parameterType === "file") {
           formData.append("file", key.parameterValue.raw);
@@ -275,38 +276,32 @@ export default {
         }
       }
       formData.append("depositoryParams", JSON.stringify(this.parameter));
-      this.$message({
-            message: "编辑功能开发中",
-            type: "info",
+      editDepoMsgList(formData)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: "success",
+              message: "编辑成功",
+              duration: 2000,
+            });
+            this.closeSaveDepositDialog(1);
+          } else {
+            this.$message({
+              message: res.data.message || this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+            this.closeSaveDepositDialog(0);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
             duration: 2000,
           });
-      this.closeSaveDepositDialog(1);
-      // editDepoMsgList(formData)
-      //   .then((res) => {
-      //     if (res.data.code === 0) {
-      //       this.$message({
-      //         type: "success",
-      //         message: "编辑成功",
-      //         duration: 2000,
-      //       });
-      //       this.closeSaveDepositDialog(1);
-      //     } else {
-      //       this.$message({
-      //         message: this.$chooseLang(res.data.code),
-      //         type: "error",
-      //         duration: 2000,
-      //       });
-      //       this.closeSaveDepositDialog(0);
-      //     }
-      //   })
-      //   .catch(() => {
-      //     this.$message({
-      //       message: "系统错误",
-      //       type: "error",
-      //       duration: 2000,
-      //     });
-      //     this.closeSaveDepositDialog(0);
-      //   });
+          this.closeSaveDepositDialog(0);
+        });
     },
 
     //数据校验

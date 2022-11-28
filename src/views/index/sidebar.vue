@@ -49,8 +49,8 @@
                     :style="{ color: activeIndex == index ? '#37eef2' : '' }"
                   >
                   </i>
-                  <span :class="{ 'font-color-37eef2': activeIndex == index }">
-                    {{ item.name }}
+                  <span :class="{ 'font-color-37eef2': activeIndex == index }"
+                    >{{ item.name }}
                   </span>
                 </div>
               </template>
@@ -62,8 +62,8 @@
                   :style="{
                     color: term.path == activeRoute ? '#37eef2' : '',
                     'border-left':
-                      term.path == activeRoute ? '3px solid #37eef2' : '',
-                    'padding-left': term.path == activeRoute ? '55px' : '58px',
+                      term.path == activeRoute ? '' : '',
+                    'padding-left': term.path == activeRoute ? '53px' : '53px',
                     'background-color':
                       term.path == activeRoute ? '#1e293e' : '#0c1220',
                   }"
@@ -257,12 +257,10 @@ export default {
 
 <style scoped>
 .el-submenu__title * {
-  margin-left: -5px;
   vertical-align: middle;
 }
 .el-icon-connection:before {
   content: "\e736";
-  margin-left: 8px;
 }
 .el-menu-vertical-demo {
   padding-top: 16px;

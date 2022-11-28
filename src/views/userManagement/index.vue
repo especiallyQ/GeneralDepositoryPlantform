@@ -1,16 +1,16 @@
 <template>
     <div class="account-container">
         <ContentHead headTitle="用户管理" headSubTitle="账号管理"></ContentHead>
-        <div class="content-container">
+        <div class="content-container module-wrapper">
             <div class="content-header">
                 <span class="left-text">账号类型</span>
-                <el-select v-model="selectValue" placeholder="请选择" @change="getAccountList" size="small">
+                <el-select v-model="selectValue" placeholder="请选择" @change="selectPage" size="small">
                     <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
                 <el-input placeholder="账号名" v-model="inputKeyWords" clearable class="search" size="small">
                 </el-input>
-                <el-button class="searchButton" icon="el-icon-search" @click="getAccountList" size="small"></el-button>
+                <el-button class="searchButton" icon="el-icon-search" @click="selectPage" size="small"></el-button>
                 <el-button type="primary" size="small" class="right" @click="newAccount" v-if="role == 1 || role == 2">
                     新建账号</el-button>
             </div>
@@ -21,7 +21,8 @@
                         </el-table-column>
                         <el-table-column prop="contact" label="联系方式" align="center">
                         </el-table-column>
-                        <el-table-column prop="roleZh" label="账号类型" align="center"> </el-table-column>
+                        <el-table-column prop="roleZh" label="账号类型" align="center">
+                        </el-table-column>
                         <el-table-column label="操作" align="center" class="remarks">
                             <template slot-scope="{ row }">
                                 <el-button :disabled="isDeleteAccountDisabled(row)" type="text"
@@ -31,16 +32,16 @@
                                 <el-button :disabled="isReviseAccountDisabled()" type="text" style="font-size: 12px"
                                     @click="reviseAccount(row)">
                                     编辑</el-button>
-                                <el-button :disabled="isResetAccountDisabled(row)" type="text" style="font-size: 12px" @click="getResetAccountPassword(row)">
+                                <el-button :disabled="isResetAccountDisabled(row)" type="text" style="font-size: 12px"
+                                    @click="getResetAccountPassword(row)">
                                     重置密码</el-button>
-
                             </template>
                         </el-table-column>
                     </el-table>
                 </template>
             </div>
             <div class="content-footer">
-                <el-pagination @size-change="handleSizeChange" @current-change="searchName" :current-page="pageNumber"
+                <el-pagination @size-change="handleSizeChange" @current-change="changePage" :current-page="pageNumber"
                     :page-sizes="[10, 20, 30, 50]" :page-size="pageSize"
                     layout="total, sizes, prev, pager, next, jumper" :total="total">
                 </el-pagination>
@@ -75,9 +76,13 @@
 <script>
 import ContentHead from "@/components/contentHead.vue";
 import userDialog from "./components/userDialog.vue";
-import { accountList, updateAccount, deleteAccountInfo, resetAccountPassword } from "@/util/api.js";
+import {
+    accountList,
+    updateAccount,
+    deleteAccountInfo,
+    resetAccountPassword,
+} from "@/util/api.js";
 import { JSONSwitchFormData } from "@/util/util.js";
-
 
 export default {
     name: "userManagement",
@@ -86,29 +91,29 @@ export default {
         return {
             pageNumber: 1, //分页器的第几页
             pageSize: 10, //每一页展示的条数
-            roleId: '',//用户权限id
-            role: localStorage.getItem('rootId'),
-            userId: localStorage.getItem('userId'),
+            roleId: "", //用户权限id
+            role: localStorage.getItem("rootId"),
+            userId: localStorage.getItem("userId"),
             total: 0, //总共的条数
-            createUserAccountDialogVisible: false,//控制新建dialog是否显示
-            reviseUserAccountDialogVisible: false,//控制修改dialog是否显示
-            dialogVisible: false,//控制删除dialog是否显示
+            createUserAccountDialogVisible: false, //控制新建dialog是否显示
+            reviseUserAccountDialogVisible: false, //控制修改dialog是否显示
+            dialogVisible: false, //控制删除dialog是否显示
             //存放表单数据
             accountForm: {
                 name: "",
                 contact: "",
                 type: "",
-                id: '',
+                id: "",
             },
             // accountId: '',
-            accountListData: [],//账号管理页面初始化数据
-            selectValue: "",//账号管理选择框结果
-            inputKeyWords: "",//存放搜索数据
+            accountListData: [], //账号管理页面初始化数据
+            selectValue: "", //账号管理选择框结果
+            inputKeyWords: "", //存放搜索数据
             //存放选择框数据
             roleOptions: [
                 {
-                    value: '',
-                    label: '全部',
+                    value: "",
+                    label: "全部",
                 },
                 {
                     value: 1,
@@ -125,25 +130,25 @@ export default {
             ],
             loading: true,
             rules: {
-                contact: [{
-
-                    message: "请输入联系方式",
-                    trigger: "blur",
-                },
-                {
-                    pattern:
-                        /^1(3|4|5|7|8)[0-9]{9}|([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/,
-                    message: "联系方式格式不对",
-                    trigger: "blur",
-                },]
+                contact: [
+                    {
+                        message: "请输入联系方式",
+                        trigger: "blur",
+                    },
+                    {
+                        pattern:
+                        /(^[\w.\-]+@(?:[a-z0-9]+(?:-[a-z0-9]+)*\.)+[a-z]{2,3}$)|(^1[3|4|5|8]\d{9}$)/,
+                        message: "联系方式格式不对",
+                        trigger: "blur",
+                    },
+                ],
             },
         };
     },
     mounted() {
         this.getAccountList();
     },
-    computed: {
-    },
+    computed: {},
     methods: {
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
@@ -154,18 +159,24 @@ export default {
                 }
             });
         },
+        selectPage() {
+            this.pageNumber = 1;
+            this.getAccountList();
+        },
+
         //账号管理初始化
         async getAccountList() {
-            // console.log("test-data",this.pageNumber);
             const res = await accountList({
                 pageNumber: this.pageNumber,
                 pageSize: `${this.pageSize}?roleId=${this.selectValue}&accountName=${this.inputKeyWords}`,
             });
             if (res.data.code === 0) {
-                if (Object.prototype.toString.call(res.data.data) == '[object Object]') {
+                if (
+                    Object.prototype.toString.call(res.data.data) == "[object Object]"
+                ) {
                     this.accountListData = [res.data.data];
                 } else {
-                    this.accountListData = res.data.data
+                    this.accountListData = res.data.data;
                 }
                 this.total = res.data.total;
                 this.loading = false;
@@ -219,23 +230,30 @@ export default {
                     this.$confirm(`确定删除${row.accountName}?`, {
                         confirmButtonText: "确定",
                         cancelButtonText: "取消",
-                    }).then(async () => {
-                        const res = await deleteAccountInfo(row.accountId);
-                        if (res.data.code === 0) {
-                            this.$message({
-                                type: "success",
-                                message: "删除成功!",
-                            });
-                            this.pageNumber = this.accountListData.length > 1
-                                ? this.pageNumber
-                                : this.pageNumber - 1
-                            this.getAccountList()
-                        }
-                    }).catch(() => {
                     })
+                        .then(async () => {
+                            const res = await deleteAccountInfo(row.accountId);
+                            if (res.data.code === 0) {
+                                this.$message({
+                                    type: "success",
+                                    message: "删除成功!",
+                                });
+                                this.pageNumber =
+                                    this.accountListData.length > 1
+                                        ? this.pageNumber
+                                        : this.pageNumber - 1;
+                                this.getAccountList();
+                            } else {
+                                this.$message({
+                                    message:
+                                        "系统中存在由当前账号创建的未冻结的存证模板，请先冻结存证模板，再进行删除账号操作",
+                                    type: "error",
+                                });
+                            }
+                        })
+                        .catch(() => { });
                 })
-                .catch(() => {
-                });
+                .catch(() => { });
         },
         //重置账号密码
         getResetAccountPassword(row) {
@@ -248,43 +266,44 @@ export default {
                     this.$confirm(`确定重置账号${row.accountName}的密码?`, {
                         confirmButtonText: "确定",
                         cancelButtonText: "取消",
-                    }).then(async () => {
-                        const res = await resetAccountPassword(row.accountId);
-                        if (res.data.code === 0) {
-                            this.$message({
-                                type: "success",
-                                message: "重置成功!",
-                            });
-                        }
-                    }).catch(() => {
                     })
+                        .then(async () => {
+                            const res = await resetAccountPassword(row.accountId);
+                            if (res.data.code === 0) {
+                                this.$message({
+                                    type: "success",
+                                    message: "重置成功!",
+                                });
+                            }
+                        })
+                        .catch(() => { });
                 })
-                .catch(() => {
-                });
+                .catch(() => { });
         },
         //底部页码跳转
         handleSizeChange(pageSize) {
             this.pageSize = pageSize;
             this.getAccountList();
         },
-        searchName(paper = 1) {
+        changePage(paper = 1) {
             this.pageNumber = paper;
             this.getAccountList();
         },
         //删除操作权限设置
         isDeleteAccountDisabled(row) {
-            return !((this.role == 1 || this.role == 2) && row.accountId != this.userId)
+            return !(
+                (this.role == 1 || this.role == 2) &&
+                row.accountId != this.userId
+            );
         },
         //编辑权限设置
         isReviseAccountDisabled() {
-            return !(this.role == 1 || this.role == 2)
+            return !(this.role == 1 || this.role == 2);
         },
         //重置密码操作权限设置
         isResetAccountDisabled(row) {
-            return !((this.role == 1 || this.role == 2) )
+            return !(this.role == 1 || this.role == 2);
         },
-
-
     },
 };
 </script>
@@ -292,7 +311,7 @@ export default {
 <style scoped>
 .content-container {
     background-color: white;
-    margin: 10px;
+    /* margin: 10px; */
 }
 
 .content-container .content-header .search {
@@ -319,13 +338,15 @@ export default {
 
 .content-container .content-header .searchButton {
     color: #ffffff;
+    border: 0px;
+    height: 32px;
     background-color: #4093ff;
     border-top-left-radius: 0%;
     border-bottom-left-radius: 0%;
-    margin-left: -1px;
+    margin-left: -5px;
+    z-index: 100;
+    margin-top: 0px;
 }
-
-
 
 .content-container .content-header .right {
     position: absolute;

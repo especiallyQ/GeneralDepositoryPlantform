@@ -6,6 +6,7 @@ const Main = () => import('@/views/index/main.vue')
 const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
 const Depository = () => import('@/views/depository/depository.vue')
 const DepositDetails = () => import('@/views/depository/depositDetails.vue')
+const DepositoryHis = () => import('@/views/depository/depositoryHis.vue')
 const ApprovalManagement = () => import('@/views/approvalManagement/approvalManagement.vue')
 const userManagement = () => import('@/views/userManagement/index.vue');
 const systemConfiguration = () => import('@/views/systemConfiguration')
@@ -41,7 +42,7 @@ const routes = [{
     nameKey: 'userManagement',
     leaf: false,
     menuShow: true,
-    iconCls: 'el-icon-connection sidebar-icon',
+    iconCls: 'cmsp-icon-yonghuliang sidebar-icon',
     children: [{
         path: '/userManagement', component: userManagement, name: 'userManagement', nameKey: 'userManagement', menuShow: true, meta: { requireAuth: false }
     },
@@ -60,6 +61,9 @@ const routes = [{
         },
         {
             path: '/depositDetails/:rowId', component: DepositDetails, name: 'DepositDetails', nameKey: 'DepositDetails', meta: { requireAuth: true }
+        },
+        {
+            path: '/DepositoryHis/:id/:rowId', component: DepositoryHis, name: 'DepositoryHis', nameKey: 'DepositoryHis', meta: { requireAuth: true }
         },
     ]
 
@@ -83,7 +87,7 @@ const routes = [{
     name: 'system',
     nameKey: 'systemConfiguration',
     leaf: true,
-    iconCls: 'ext-icon-regulatory sidebar-icon',
+    iconCls: 'ext-icon-monitor  sidebar-icon',
     component: Main,
     children: [
         {
