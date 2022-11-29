@@ -25,7 +25,8 @@
                                         @click="clickChangeCode" />
                                 </span>
                             </el-form-item>
-                            <el-button type="primary" class="rigth-btn" @click="submit('verifyForm')" :loading="logining">查询</el-button>
+                            <el-button type="primary" class="rigth-btn" @click="submit('verifyForm')"
+                                :loading="logining">查询</el-button>
                         </el-form>
                         <div class="table-footer" v-show="drawerVisible">
                             <el-table :data="tableData" border style="width: 100%"
@@ -48,7 +49,8 @@
                 </el-tab-pane>
                 <el-tab-pane label="文件验证">
                     <div class="from-style">
-                        <el-form label-position="right" label-width="80px" :model="verifyFormFile" :rules="rules" ref="verifyFormFile"  hide-required-asterisk> 
+                        <el-form label-position="right" label-width="80px" :model="verifyFormFile" :rules="rules"
+                            ref="verifyFormFile" hide-required-asterisk>
                             <el-form-item label="存证模板" prop="depositoryTemplateId">
                                 <el-select v-model="verifyFormFile.depositoryTemplateId" placeholder="请选择存证模板"
                                     style="width: 100%" @focus="getDepositoryListData">
@@ -60,7 +62,8 @@
                             <el-form-item label="文件凭证">
                                 <el-input v-model="verifyFormFile.fileHash" style="width:578px" disabled></el-input>
                                 <el-upload class="upload-file" action="" ref="upload" :limit="1" :file-list="fileList"
-                                    :auto-upload="false" :before-upload="beforeUpload" :on-exceed="handleExceed">
+                                    :auto-upload="true" :before-upload="beforeUpload" :on-exceed="handleExceed"
+                                    :on-change="handleChange" :http-request="Upload">
                                     <el-button type="primary">点击上传</el-button>
                                 </el-upload>
                             </el-form-item>
@@ -72,7 +75,8 @@
                                         @click="clickChangeCode" />
                                 </span>
                             </el-form-item>
-                            <el-button type="primary" class="rigth-btn" @click="submit1('verifyFormFile')" :loading="logining1">查询</el-button>
+                            <el-button type="primary" class="rigth-btn" @click="submit1('verifyFormFile')"
+                                :loading="logining1">查询</el-button>
                         </el-form>
                         <div class="table-footer" v-show="fileVisible">
                             <el-table :data="tableFileData" border style="width: 100%"
@@ -101,9 +105,9 @@
                         <p>{</p>
                         <ul>
                             <li v-for="(item, index) in tabId == 0 ? verifyDetails : verifyDetailsFile" :key="index">"
-                            {{
-                                    index
-                            }}":
+                                {{
+                                        index
+                                }}":
                                 "{{ item }}"</li>
                         </ul>
                         <p>}</p>
@@ -117,7 +121,7 @@
     </div>
 </template>
 <script>
-import { getPictureCheckCode, getDepositoryList, dataVerify, fileVerify } from "@/util/api";
+import { getPictureCheckCode, getDepositoryList, dataVerify, fileVerify, getFileHash } from "@/util/api";
 import { JSONSwitchFormData } from "@/util/util.js";
 import url from "@/util/url";
 export default {
@@ -155,6 +159,7 @@ export default {
             }],
             fileList: [],
             file: null,//存放文件
+            fileH: null,
             DepositoryListData: [],//查看详情时数据
             verifyDetails: [],//数据验证详情数据
             verifyDetailsFile: [],//文件验证详情数据
@@ -196,6 +201,16 @@ export default {
         this.changeCode();
     },
     methods: {
+        Upload() {
+                let data = JSONSwitchFormData({ "file": this.file });
+            getFileHash(data).then((res) => {
+                    this.verifyFormFile.fileHash = res.data.data
+                })
+            
+        },
+        handleChange(file, fileList) {
+            this.fileH = file;
+        },
         async getDepositoryListData() {
             const res = await getDepositoryList()
             if (res.data.code === 0) {
@@ -209,7 +224,7 @@ export default {
             }
         },
         beforeUpload(file) {
-            this.file = file
+            this.file = file;
         },
         handleExceed(files, fileList) {
             this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
@@ -255,7 +270,6 @@ export default {
                     this.tableData[0].factHash = this.verifyForm.factHash;
                     this.drawerVisible = true;
                     this.logining = false;
-
                     this.$message({
                         message: '查询成功',
                         type: "success",
@@ -275,6 +289,8 @@ export default {
                     file: this.file,
                     verifyCodeToken: this.verifyCodeToken
                 }
+                // let data = JSONSwitchFormData(this.file);
+                //   this.getFileHash(data);
                 let fromaData = JSONSwitchFormData(respData);
                 const res = await fileVerify(fromaData);
                 if (res.data.code === 0) {
@@ -282,6 +298,7 @@ export default {
                         message: '查询成功',
                         type: "success",
                     });
+                    this.$refs.upload.clearFiles();
                     this.logining1 = false;
                     this.file = null;
                     this.verifyDetailsFile = res.data.data.depositoryParamList;
@@ -292,6 +309,7 @@ export default {
                     this.fileVisible = true;
                     this.logining1 = false;
                 } else {
+                    this.$refs.upload.clearFiles();
                     this.logining1 = false;
                     this.file = null;
                     this.fileVisible = false;
@@ -372,7 +390,7 @@ export default {
 
 .tabs .dialog-content {
     height: 300px;
-    border-top: 1px solid  #000;
+    border-top: 1px solid #000;
     border-bottom: 1px solid #000;
 }
 

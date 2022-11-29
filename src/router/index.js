@@ -6,8 +6,9 @@ const Main = () => import('@/views/index/main.vue')
 const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
 const Depository = () => import('@/views/depository/depository.vue')
 const DepositDetails = () => import('@/views/depository/depositDetails.vue')
-const userManagement = () => import('@/views/userManagement/index.vue');
+const userManagement = () => import('@/views/userManagement/index.vue')
 const systemConfiguration = () => import('@/views/systemConfiguration')
+const dictionary = () => import('@/views/dictionary/index.vue')
 
 Vue.use(Router);
 
@@ -62,7 +63,20 @@ const routes = [{
         },
     ]
 
-},
+    },
+    {
+        path: '/main',
+        name: '',
+        nameKey: 'dictionary',
+        leaf: true,
+        iconCls: 'ext-icon-monitor  sidebar-icon',
+        component: Main,
+        children: [
+            {
+                path: '/dictionary', component: dictionary, name: 'dictionary', nameKey: 'dictionary', meta: { requireAuth: true }
+            }
+        ]
+    },
 {
     path: '/main',
     name: 'system',
@@ -76,7 +90,8 @@ const routes = [{
         }
     ]
 
-},
+    },
+
 ];
 
 const router = new Router({

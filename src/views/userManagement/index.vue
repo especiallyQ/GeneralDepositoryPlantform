@@ -3,7 +3,7 @@
         <ContentHead headTitle="用户管理" headSubTitle="账号管理"></ContentHead>
         <div class="content-container module-wrapper">
             <div class="content-header">
-                <span class="left-text">账号类型</span>
+                <span class="left-text"> 账号类型:</span>
                 <el-select v-model="selectValue" placeholder="请选择" @change="selectPage" size="small">
                     <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
