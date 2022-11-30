@@ -1,37 +1,46 @@
 <template>
   <div>
     <el-dialog
-      title="编辑存证模板"
+      title="审批"
       :visible.sync="dialogFormVisible"
       center
       :close-on-click-modal="false"
       @close="close"
-      width="498px"
+      width="598px"
     >
-      <el-form
-        :model="form"
-        label-width="100px"
-        class="selectForm"
-        v-loading="getLoading"
-      >
-        <el-form-item label="存证模板名称">
+      <el-form label-width="100px" class="selectForm" v-loading="getLoading">
+        <el-form-item label="审批类型">
           <el-input
-            v-model="form.depositoryTemplateName"
             :disabled="true"
+            :value="form.depositoryTemplateName"
           ></el-input>
         </el-form-item>
+        <div class="box" v-for="item in editData" :key="item.paramName">
+          <div class="left-list">
+            <el-form-item :label="item.paramName">
+              <el-input
+                :disabled="true"
+                :placeholder="item.oldParam"
+              ></el-input>
+            </el-form-item>
+          </div>
+          <div class="el-icon-right icon-right"></div>
+          <div :class="item.edited ? 'newData-red' : ''">
+            <el-input :disabled="true" :placeholder="item.newParam"></el-input>
+          </div>
+        </div>
         <div class="dialog-footer">
-          <el-button @click="close">取消</el-button>
+          <el-button @click="close(0)">取消</el-button>
           <el-button
             type="danger"
-            @click="submitApproval(2)"
+            @click="submitApprovalRejectResult"
             :loading="rejectLoading"
             :disabled="agreeLoading"
             >拒绝</el-button
           >
           <el-button
             type="primary"
-            @click="submitApproval(1)"
+            @click="submitApprovalSuccessResult"
             :loading="agreeLoading"
             :disabled="rejectLoading"
             >通过</el-button
@@ -43,10 +52,14 @@
 </template>
   
   <script>
-import { submitApprovalResult, getApprovalComparisonData } from "@/util/api";
+import {
+  submitApprovalSuccess,
+  submitApprovalReject,
+  getApprovalComparisonData,
+} from "@/util/api";
 
 export default {
-  name: "editTemplateDialog",
+  name: "ComparisonDialog",
   props: {
     approvalDialogVisible: {
       type: Boolean,
@@ -67,6 +80,7 @@ export default {
       form: {
         depositoryTemplateName: null, //存证模板名称
       },
+      editData: null, //审核新旧数据
     };
   },
   watch: {
@@ -81,17 +95,24 @@ export default {
 
   methods: {
     // 关闭新建存证模板时触发
-    close() {
-      this.$emit("updateTemplateDialog", false);
+    close(val) {
+      this.$emit("closeApprovalDialog", val);
     },
 
     open() {
-      // this.getLoading = true;
+      this.getLoading = true;
       // 获取模板数据
       getApprovalComparisonData(this.approvalId)
         .then((res) => {
           if (res.data.code === 0) {
             this.getLoading = false;
+            this.$set(
+              this.form,
+              "depositoryTemplateName",
+              res.data.data.approvalType
+            );
+            this.editData = res.data.data.params;
+            console.log(this.editData);
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
@@ -109,31 +130,50 @@ export default {
         });
     },
 
-    //  提交审批结果
-    submitApproval(val) {
-      switch (val) {
-        case 1:
-          this.agreeLoading = true;
-          break;
-        case 2:
-          this.rejectLoading = true;
-          break;
-      }
-      const data = {
-        id: this.approvalId,
-        status: val,
-      };
-      submitApprovalResult(data)
+    //  提交审批通过结果
+    submitApprovalSuccessResult() {
+      this.agreeLoading = true;
+      submitApprovalSuccess(this.approvalId)
         .then((res) => {
           if (res.data.code === 0) {
-            this.close();
+            this.close(1);
             this.$message({
-              message: "审批成功",
+              message: "审批已通过",
               type: "success",
               duration: 2000,
             });
           } else {
-            this.close();
+            this.close(0);
+            this.$message({
+              message: res.data.message || this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.close(0);
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
+    },
+    //  提交审批拒绝结果
+    submitApprovalRejectResult() {
+      this.rejectLoading = true;
+      submitApprovalReject(this.approvalId)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.close(1);
+            this.$message({
+              message: "审批已拒绝",
+              type: "warning",
+              duration: 2000,
+            });
+          } else {
+            this.close(0);
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
@@ -142,7 +182,7 @@ export default {
           }
         })
         .catch(() => {
-          this.close();
+          this.close(0);
           this.$message({
             message: "系统错误",
             type: "error",
@@ -154,7 +194,7 @@ export default {
 };
 </script>
   
-  <style scoped>
+<style lang="less" scoped>
 .dialog-footer {
   text-align: right;
 }
@@ -167,8 +207,27 @@ export default {
   margin-right: 5px;
 }
 
-.selectForm >>> .el-form-item__label {
-  font-size: 12px;
-  font-family: "Courier New", Courier, monospace;
+.selectForm {
+  /deep/.el-form-item__label {
+    font-size: 12px;
+    font-family: "Courier New", Courier, monospace;
+  }
+}
+
+.newData-red {
+  /deep/.el-input__inner::placeholder {
+    color: red;
+  }
+}
+
+.box {
+  display: flex;
+
+  .icon-right {
+    width: 50px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+  }
 }
 </style>

@@ -279,11 +279,19 @@ export default {
       editDepoMsgList(formData)
         .then((res) => {
           if (res.data.code === 0) {
-            this.$message({
-              type: "success",
-              message: "编辑成功",
-              duration: 2000,
-            });
+            if (res.data.data === 0) {
+              this.$message({
+                type: "warning",
+                message: "当前存证信息已被提交，正在等待管理员审批",
+                duration: 2000,
+              });
+            } else {
+              this.$message({
+                type: "success",
+                message: "编辑成功",
+                duration: 2000,
+              });
+            }
             this.closeSaveDepositDialog(1);
           } else {
             this.$message({

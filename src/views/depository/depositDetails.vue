@@ -266,8 +266,8 @@ export default {
       if (refresh) {
         this.listLoading = true;
         this.currentPage = 1;
-        this.getDepositoryListMsg();
         this.getTemplateDetails();
+        this.getDepositoryListMsg();
       }
     },
 

@@ -9,8 +9,8 @@
             v-if="activeName === '0'"
           ></ApprovalList
         ></el-tab-pane>
-        <el-tab-pane label="已审核任务" name="1"
-          ><ApprovalList :activeName="activeName" v-if="activeName === '1'" ></ApprovalList
+        <el-tab-pane label="已审核任务" name="666"
+          ><ApprovalList :activeName="activeName" v-if="activeName === '666'" ></ApprovalList
         ></el-tab-pane>
       </el-tabs>
     </div>

@@ -299,7 +299,7 @@ export default {
               message: "新建成功",
               duration: 2000,
             });
-            this.$emit("getTemplateList");
+            this.$emit("getNewTemplateList");
           } else {
             this.close();
             this.$message({

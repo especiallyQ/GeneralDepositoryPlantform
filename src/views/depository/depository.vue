@@ -117,9 +117,6 @@
               <el-button
                 type="text"
                 class="el-button-text"
-                :disabled="
-                  (role === '2' && user !== scope.row.creator) || role === '3'
-                "
                 @click="viewDetails(scope.row.id)"
                 >查看详情</el-button
               >
@@ -143,13 +140,13 @@
         :createTemplateDialogVisible.sync="createTemplateDialogVisible"
         @updateTemplateDialog="changeCreateTemplateDialog"
         @getNewTemplateList="getNewTemplateList"
-        @getTemplateList="getTemplateList"
       ></CreateTemplateDialog>
       <EditTemplateDialog
         v-if="editTemplateDialogVisible"
         :editTemplateDialogVisible.sync="editTemplateDialogVisible"
         :editTemplateNameId="editTemplateNameId"
         @updateTemplateDialog="changeEditTemplateDialog"
+        @getNewTemplateList="getNewTemplateList"
       ></EditTemplateDialog>
     </div>
   </div>
@@ -221,7 +218,7 @@ export default {
   },
   mounted() {
     this.getTemplateCreator();
-    this.getTemplateList();
+    this.getNewTemplateList();
   },
 
   computed: {},

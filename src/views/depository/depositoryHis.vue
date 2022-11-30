@@ -74,7 +74,10 @@
   
   <script>
 import ContentHead from "@/components/contentHead";
-import { getTemplateDetailsData, getTemplateDetailsListData } from "@/util/api";
+import {
+  getTemplateDetailsData,
+  getDepositoryHistoryMessage,
+} from "@/util/api";
 import { rgb } from "@/util/util";
 export default {
   name: "DepositoryHis",
@@ -98,7 +101,7 @@ export default {
   mounted() {
     this.DepositPageLoading = true;
     this.getTemplateDetails();
-    this.getDepositoryListMsg();
+    this.getDepositoryHistoryListMsg();
   },
   methods: {
     // 获取模板上方详情信息
@@ -141,20 +144,19 @@ export default {
         });
     },
 
-    // 获取模板下方列表数据
-    getDepositoryListMsg() {
+    // 获取模板下方历史列表数据
+    getDepositoryHistoryListMsg() {
       const { rowId } = this.$route.params;
-      getTemplateDetailsListData(rowId, this.currentPage, this.pageSize)
+      getDepositoryHistoryMessage(rowId, this.currentPage, this.pageSize)
         .then((res) => {
           if (res.data.code === 0) {
             this.tableData = [];
             for (let key of res.data.data.depositoryList) {
-              const { createTime, creator, depositoryId, factHash } = key;
+              const { createTime, approver, submitter } = key;
               this.tableData.push({
-                depositoryId,
+                approver,
                 createTime,
-                creator,
-                factHash,
+                submitter,
                 ...JSON.parse(key.content),
               });
             }
@@ -182,21 +184,19 @@ export default {
       this.pageSize = val;
       this.currentPage = 1;
       this.listLoading = true;
-      this.getDepositoryListMsg();
+      this.getDepositoryHistoryListMsg();
     },
 
     // 切换当前页码
     handleCurrentChange(val) {
       this.currentPage = val;
       this.listLoading = true;
-      this.getDepositoryListMsg();
+      this.getDepositoryHistoryListMsg();
     },
 
     // 返回存证信息
     backDepositDetails() {
-        // this.$router.go(-1)
-        const { id } = this.$route.params;
-        this.$router.push(`/depositDetails/${id}`);
+      this.$router.go(-1)
     },
   },
 
@@ -207,7 +207,7 @@ export default {
         {
           enName: "creator",
           name: "提交人",
-          props: "creator",
+          props: "submitter",
           align: "center",
           width: "195px",
         },

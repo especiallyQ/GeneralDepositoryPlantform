@@ -357,11 +357,25 @@ export function editDepoMsgList(data) {
     })
 }
 
+// 存证信息-获取存证历史信息
+export function getDepositoryHistoryMessage(depositoryId, pageNo, pageSize) {
+    return get({
+
+        url: `${url.ORG_LIST}/history/getHistoryList/${depositoryId}/${pageNo}/${pageSize}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+
+
 // 审批管理相关-----------------------------
 // 审批管理-获取审批人下拉列表数据
 export function getApproverList() {
     return get({
-        url: `${url.ORG_LIST}/depository/updateDepositoryTemplate`,
+        url: `${url.ORG_LIST}/approval/getApproverList`,
         method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
@@ -370,9 +384,9 @@ export function getApproverList() {
 }
 
 // 审批管理-获取审批事项列表数据
-export function getApprovalList(currentPage, pageSize, approver, submitter, status) {
+export function getApprovalList(pageNo, pageSize, approver, submitter, status) {
     return get({
-        url: `${url.ORG_LIST}/depository/getDepositoryTemplateList/${currentPage}/${pageSize}/${status}?creatorId=${submitter}&depositoryTemplateName=${approver}`,
+        url: `${url.ORG_LIST}/approval/getApprovalList/${pageNo}/${pageSize}/${status}?operatorId=${approver}&submitter=${submitter}`,
         method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
@@ -380,22 +394,32 @@ export function getApprovalList(currentPage, pageSize, approver, submitter, stat
     })
 }
 
-// 审批管理-获取审批事项列表数据
-export function getApprovalComparisonData(approvalId) {
+// 审批管理-获取审批Dialog数据
+export function getApprovalComparisonData(id) {
     return get({
-        url: `${url.ORG_LIST}/depository/getDepositoryTemplateList/${approvalId}`,
+        url: `${url.ORG_LIST}/approval/getApprovalFormData/${id}`,
         method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
         }
     })
 }
-// 审批管理-提交审批结果
-export function submitApprovalResult(data) {
+
+// 审批管理-提交通过审批结果
+export function submitApprovalSuccess(id) {
     return put({
-        url: `${url.ORG_LIST}/depository/getDepositoryTemplateList`,
+        url: `${url.ORG_LIST}/approval/acceptApproval/${id}`,
         method: 'put',
-        data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
+        }
+    })
+}
+// 审批管理-提交拒绝审批结果
+export function submitApprovalReject(id) {
+    return put({
+        url: `${url.ORG_LIST}/approval/refusedApproval/${id}`,
+        method: 'put',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
         }
