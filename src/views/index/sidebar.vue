@@ -127,6 +127,7 @@ export default {
               dataOverview: "数据概览",
               depositoryTitle: "存证管理",
               userManagement: "账号管理",
+              dictionary:"字典管理",
               systemConfiguration: "系统配置",
             }[it.nameKey];
           });
@@ -190,7 +191,8 @@ export default {
             main: false,
             data: true,
             userManagement: true,
-            depositoryTitle: true,
+          depositoryTitle: true,
+          dictionary:this.role === "1" || this.role === "2",
             systemConfiguration: this.role === "1",
           }[item.nameKey] || false;
 

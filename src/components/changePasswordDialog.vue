@@ -15,11 +15,7 @@
             </el-form-item>
         </el-form>
         <div class="dialog-footer">
-            <el-button  @click="closeDialog"> 取消 </el-button>
-            <!-- <el-button
-                @click="resetForm('rulePasswordForm')">
-                0000
-            </el-button> -->
+            <el-button @click="closeDialog"> 取消 </el-button>
             <el-button type="primary" @click="submitForm('rulePasswordForm')">
                 确定
             </el-button>
@@ -119,7 +115,6 @@ export default {
             this.$emit("success", true);
         },
         submitForm(formName) {
-            console.log(this.rulePasswordForm);
             this.$refs[formName].validate((valid) => {
                 if (valid) {
                     this.getResetPassword();
@@ -137,8 +132,8 @@ export default {
             //     newAccountPwd: sm3(this.rulePasswordForm.pass),
             // };
             resetPassword({
-                    oldAccountPwd: sm3(this.rulePasswordForm.oldPass),
-                    newAccountPwd: sm3(this.rulePasswordForm.pass),
+                oldAccountPwd: sm3(this.rulePasswordForm.oldPass),
+                newAccountPwd: sm3(this.rulePasswordForm.pass),
                 // reqData, {}
             })
                 .then((res) => {
@@ -166,7 +161,7 @@ export default {
                 .catch((err) => {
                     this.$message({
                         type: "error",
-                        message: err.data || "",
+                        message: "",
                     });
                 });
         },
