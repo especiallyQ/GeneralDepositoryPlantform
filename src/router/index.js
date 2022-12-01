@@ -6,7 +6,9 @@ const Main = () => import('@/views/index/main.vue')
 const DataOverview = () => import("@/views/dataOverview/dataOverview.vue")
 const Depository = () => import('@/views/depository/depository.vue')
 const DepositDetails = () => import('@/views/depository/depositDetails.vue')
-const userManagement = () => import('@/views/userManagement/index.vue')
+const DepositoryHis = () => import('@/views/depository/depositoryHis.vue')
+const ApprovalManagement = () => import('@/views/approvalManagement/approvalManagement.vue')
+const userManagement = () => import('@/views/userManagement/index.vue');
 const systemConfiguration = () => import('@/views/systemConfiguration')
 const dictionary = () => import('@/views/dictionary/index.vue')
 
@@ -61,22 +63,39 @@ const routes = [{
         {
             path: '/depositDetails/:rowId', component: DepositDetails, name: 'DepositDetails', nameKey: 'DepositDetails', meta: { requireAuth: true }
         },
+        {
+            path: '/DepositoryHis/:id/:rowId', component: DepositoryHis, name: 'DepositoryHis', nameKey: 'DepositoryHis', meta: { requireAuth: true }
+        },
     ]
 
-    },
-    {
-        path: '/main',
-        name: '',
-        nameKey: 'dictionary',
-        leaf: true,
-        iconCls: 'ext-icon-monitor  sidebar-icon',
-        component: Main,
-        children: [
-            {
-                path: '/dictionary', component: dictionary, name: 'dictionary', nameKey: 'dictionary', meta: { requireAuth: true }
-            }
-        ]
-    },
+},
+{
+    path: '/main',
+    name: '',
+    nameKey: 'dictionary',
+    leaf: true,
+    iconCls: 'cmsp-icon-jiedian sidebar-icon',
+    component: Main,
+    children: [
+        {
+            path: '/dictionary', component: dictionary, name: 'dictionary', nameKey: 'dictionary', meta: { requireAuth: true }
+        }
+    ]
+},
+{
+    path: '/main',
+    name: 'approval',
+    nameKey: 'approvalManagement',
+    leaf: true,
+    iconCls: 'cmsp-icon-qukuailian4 sidebar-icon',
+    component: Main,
+    children: [
+        {
+            path: '/approvalManagement', component: ApprovalManagement, name: 'ApprovalManagement', nameKey: 'approvalManagement', meta: { requireAuth: true }
+        },
+    ]
+
+},
 {
     path: '/main',
     name: 'system',
@@ -90,7 +109,7 @@ const routes = [{
         }
     ]
 
-    },
+},
 
 ];
 

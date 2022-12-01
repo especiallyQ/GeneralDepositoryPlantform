@@ -171,6 +171,7 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.close();
+            this.$emit("getNewTemplateList");
             this.$message({
               type: "success",
               message: "编辑成功",
