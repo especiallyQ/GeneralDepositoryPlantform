@@ -77,6 +77,7 @@ export function fileVerify(data) {
     })
 }
 
+// 获取文件Hash
 export function getFileHash(data) {
     return post({
         url: `${url.ORG_LIST}/getFileHash`,

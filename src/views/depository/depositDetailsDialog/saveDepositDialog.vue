@@ -39,25 +39,25 @@
             v-else
             class="upload-demo"
             ref="upload"
-            action=""
-            :auto-upload="false"
+            :action="`${url.ORG_LIST}/getFileHash`"
             :limit="1"
-            :file-list="fileList"
+            :auto-upload="true"
+            :on-success="
+              (response) => {
+                handleSuccess(response, item.parameterName);
+              }
+            "
             :on-remove="
               () => {
                 handleRemove(item.parameterName);
               }
             "
-            :on-change="
-              (file, fileList) => {
-                handleChange(file, fileList, item.parameterName);
-              }
-            "
+            :on-change="handleChange"
+            :on-error="handleError"
           >
             <el-button slot="trigger" size="small" type="primary"
               >选取文件</el-button
             >
-            <div slot="tip" class="el-upload__tip"></div>
           </el-upload>
         </el-form-item>
         <div class="dialog-footer">
@@ -82,6 +82,7 @@ import {
   validateDepositoryContent,
   editDepoMsgList,
 } from "@/util/api";
+import url from "@/util/url";
 export default {
   props: {
     // 控制Dialog是否显示
@@ -114,7 +115,9 @@ export default {
       form: {
         //表单数据
       },
-      fileList: [],
+      url, //服务器地址
+      fileHash: "", //文件Hash
+      fileKeyName: "",
     };
   },
 
@@ -139,7 +142,7 @@ export default {
     },
 
     // 改变文件状态
-    handleChange(file, fileList, parameterName) {
+    handleChange(file, fileList) {
       if (fileList.length >= 2) {
         return;
       }
@@ -148,7 +151,19 @@ export default {
           this.$refs.ruleForm.clearValidate(key.parameterName);
         }
       }
-      this.$set(this.form, parameterName, file);
+    },
+
+    // 上传文件获取Hash
+    handleSuccess(response, parameterName) {
+      this.$set(this.form, parameterName, response.data);
+    },
+
+    handleError() {
+      this.$message({
+        message: "文件上传失败，请稍后重试",
+        type: "error",
+        duration: 2000,
+      });
     },
 
     // 关闭Dialog时
@@ -230,7 +245,7 @@ export default {
       let formData = new FormData();
       for (let key of this.parameter) {
         if (key.parameterType === "file") {
-          formData.append("file", key.parameterValue.raw);
+          formData.append("file", key.parameterValue);
           key.parameterValue = "";
         }
       }
@@ -271,7 +286,7 @@ export default {
       formData.append("templateId", this.templateMsg.id);
       for (let key of this.parameter) {
         if (key.parameterType === "file") {
-          formData.append("file", key.parameterValue.raw);
+          formData.append("file", key.parameterValue);
           key.parameterValue = "";
         }
       }
@@ -318,7 +333,7 @@ export default {
       formData.append("depositoryId", this.depositoryId);
       for (let key of this.parameter) {
         if (key.parameterType === "file") {
-          formData.append("file", key.parameterValue.raw);
+          formData.append("file", key.parameterValue);
           key.parameterValue = "";
         }
       }
