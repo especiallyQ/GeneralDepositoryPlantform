@@ -16,7 +16,7 @@
             </div>
             <div class="content-center">
                 <template>
-                    <el-table :data="accountListData" style="width: 100%" v-loading="loading">
+                    <el-table :data="dictionaryListData" style="width: 100%" v-loading="loading">
                         <el-table-column prop="accountName" label="字典名称" align="center">
                         </el-table-column>
                         <el-table-column prop="contact" label="数据类型" align="center" >
@@ -58,7 +58,7 @@ import EditDictionaryDialog from "../dictionary/components/editDictionaryDialog.
 
 import ContentHead from "@/components/contentHead.vue";
 import {
-    accountList,
+    dictionaryList,
     deleteDictionaryInfo,
 } from "@/util/api.js";
 
@@ -76,8 +76,8 @@ export default {
             createDictionaryDialogVisible: false, //控制新建dialog是否显示
             editDictionaryDialogVisible: false,//控制编辑dialog是否显示
             editTemplateNameId:'',
-            accountListData: [], //账号管理页面初始化数据
-            selectValue: "", //账号管理选择框结果
+            dictionaryListData: [], //字典管理页面初始化数据
+            selectValue: "", //选择框结果
             inputKeyWords: "", //存放搜索数据
             //存放数据类型选择框数据
             dataTypes: [
@@ -111,9 +111,9 @@ export default {
         },
         //账号管理初始化
         async getDictionaryList() {
-            const res = await accountList({
+            const res = await dictionaryList({
                 pageNumber: this.pageNumber,
-                pageSize: `${this.pageSize}?roleId=${this.selectValue}&accountName=${this.inputKeyWords}`,
+                pageSize: `${this.pageSize}?type=${this.selectValue}&name=${this.inputKeyWords}`,
             });
             if (res.data.code === 0) {
                 if (

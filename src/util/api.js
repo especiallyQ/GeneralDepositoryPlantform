@@ -163,6 +163,22 @@ export function resetAccountPassword(data) {
     })
 }
 
+//字典管理相关接口 =-----------------------------------
+
+//账号管理初始化 
+export function dictionaryList(data, list) {
+    const params = reviseParam(data, list);
+    return get({
+        url: `${url.ORG_LIST}/dictionary/getDictionaryList/${params.str}`,
+        method: 'get',
+        params: params.querys,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+
 //系统配置相关接口-----------------------------
 
 //获取存证合约列表下拉框

@@ -76,7 +76,7 @@
                                 </span>
                             </el-form-item>
                             <el-button type="primary" class="rigth-btn" @click="submit1('verifyFormFile')"
-                                :loading="logining1">查询</el-button>
+                                :loading="logining1" :disabled="disabled">查询</el-button>
                         </el-form>
                         <div class="table-footer" v-show="fileVisible">
                             <el-table :data="tableFileData" border style="width: 100%"
@@ -128,6 +128,7 @@ export default {
     name: "HomePage",
     data() {
         return {
+            disabled:true,
             logining: false,
             logining1: false,
             dialogVisible: false,//控制查看详情dialog是否显示
@@ -204,7 +205,15 @@ export default {
         Upload() {
                 let data = JSONSwitchFormData({ "file": this.file });
             getFileHash(data).then((res) => {
-                    this.verifyFormFile.fileHash = res.data.data
+                if (res.data.code == 0) {
+                    console.log(9999999);
+                    this.disabled = false;
+                    this.verifyFormFile.fileHash = res.data.data;
+                    this.$message({
+                        message: '上传成功',
+                        type: "success",
+                    });
+                }
                 })
             
         },
@@ -217,7 +226,7 @@ export default {
                 this.DepositoryListData = res.data.data;
             } else {
                 this.$message({
-                    message: '',
+                    message: '系统错误',
                     type: "error",
                     duration: 2000,
                 });
@@ -254,7 +263,7 @@ export default {
             });
         },
         async inquire() {
-            this.$refs.upload.submit();
+            // this.$refs.upload.submit();
             if (this.tabId == 0) {
                 let resData = {
                     ...this.verifyForm,
@@ -286,7 +295,7 @@ export default {
             } else {
                 let respData = {
                     ...this.verifyFormFile,
-                    file: this.file,
+                    // file: this.file,
                     verifyCodeToken: this.verifyCodeToken
                 }
                 // let data = JSONSwitchFormData(this.file);

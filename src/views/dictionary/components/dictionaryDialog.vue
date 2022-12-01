@@ -168,6 +168,7 @@ export default {
                 dataType,
                 params: this.params,
             }
+            console.log(data);
             // this.loading = true;
             createAccount(data).then((res) => {
                 if (res.data.code === 0) {
