@@ -1,11 +1,12 @@
 <template>
   <div>
-    <ContentHead headTitle="存证管理" headSubTitle="存证信息列表"></ContentHead>
+    <ContentHead headTitle="存证管理" headSubTitle="存证信息历史"></ContentHead>
     <div class="module-wrapper" v-loading="DepositPageLoading">
       <div class="search-part">
         <div class="icon" :style="{ background: getColor }">
           {{ firstCharacter }}
         </div>
+
         <div class="template-details">
           <div class="template-name-freeze">
             {{ templateMsg.depositoryTemplateName }}
@@ -16,6 +17,9 @@
               <el-tag effect="dark" size="mini" type="danger" v-else>
                 已冻结
               </el-tag>
+              <el-button size="small" @click="backDepositDetails"
+                >返回</el-button
+              >
             </div>
           </div>
           <el-descriptions size="medium" style="fontsize: 25px">
@@ -34,24 +38,6 @@
           </el-descriptions>
         </div>
       </div>
-      <div class="input-btn">
-        <el-button
-          type="primary"
-          size="small"
-          @click="openSaveDepositDialog(0)"
-          :disabled="templateMsg.freeze === 1"
-          v-if="setBtnShow"
-          >录入存证内容</el-button
-        >
-        <el-button
-          type="primary"
-          size="mini"
-          @click="openSaveAllDepositDialog(0)"
-          :disabled="templateMsg.freeze === 1"
-          v-if="setBtnShow"
-          >批量录入</el-button
-        >
-      </div>
       <div class="depository-list" v-if="!DepositPageLoading">
         <el-table
           :data="tableData"
@@ -69,35 +55,6 @@
             show-overflow-tooltip
           >
           </el-table-column>
-          <el-table-column label="操作" align="center" min-width="220px">
-            <template slot-scope="scope">
-              <el-button
-                type="text"
-                class="el-button-text"
-                @click="openSaveDepositDialog(1, scope.row)"
-                :disabled="templateMsg.freeze === 1"
-                >编辑</el-button
-              >
-              <el-button
-                type="text"
-                class="el-button-text"
-                @click="handleHis(scope.row.depositoryId)"
-                >历史版本</el-button
-              >
-              <el-button
-                type="text"
-                class="el-button-text"
-                @click="openSaveDepositDialog(2, scope.row)"
-                >数据校验</el-button
-              >
-              <el-button
-                type="text"
-                class="el-button-text"
-                @click="copyDepositMsg(scope.row)"
-                >获取凭证</el-button
-              >
-            </template>
-          </el-table-column>
         </el-table>
       </div>
       <el-pagination
@@ -112,27 +69,20 @@
       >
       </el-pagination>
     </div>
-    <SaveDepositDialog
-      v-if="enteringDepositDialogVisible"
-      :visible.sync="enteringDepositDialogVisible"
-      :templateMsg="templateMsg"
-      :dialogFlag="dialogFlag"
-      :depositoryId="depositoryId"
-      @closeSaveDetailsDialog="closeSaveDepositDialog"
-    ></SaveDepositDialog>
   </div>
 </template>
-
-<script>
+  
+  <script>
 import ContentHead from "@/components/contentHead";
-import { getTemplateDetailsData, getTemplateDetailsListData } from "@/util/api";
-import SaveDepositDialog from "@/views/depository/depositDetailsDialog/saveDepositDialog.vue";
+import {
+  getTemplateDetailsData,
+  getDepositoryHistoryMessage,
+} from "@/util/api";
 import { rgb } from "@/util/util";
 export default {
-  name: "DepositDetails",
+  name: "DepositoryHis",
   components: {
     ContentHead,
-    SaveDepositDialog,
   },
   data() {
     return {
@@ -145,22 +95,19 @@ export default {
       listLoading: false, //列表loading
       tableData: [], //存证信息列表数据
       newTableHeader: [], //存证信息列表表头
-      enteringDepositDialogVisible: false, //录入存证信息Dialog
-      dialogFlag: 0, //区分Dialog 0表示录入 1表示数据校验
       depositoryId: null, //数据校验列表id
-      setBtnShow: false, //录入按钮是否可见
     };
   },
   mounted() {
     this.DepositPageLoading = true;
     this.getTemplateDetails();
-    this.getDepositoryListMsg();
+    this.getDepositoryHistoryListMsg();
   },
   methods: {
     // 获取模板上方详情信息
     getTemplateDetails() {
-      const { rowId } = this.$route.params;
-      getTemplateDetailsData(rowId)
+      const { id } = this.$route.params;
+      getTemplateDetailsData(id)
         .then((res) => {
           if (res.data.code === 0) {
             this.newTableHeader = [];
@@ -197,20 +144,19 @@ export default {
         });
     },
 
-    // 获取模板下方列表数据
-    getDepositoryListMsg() {
+    // 获取模板下方历史列表数据
+    getDepositoryHistoryListMsg() {
       const { rowId } = this.$route.params;
-      getTemplateDetailsListData(rowId, this.currentPage, this.pageSize)
+      getDepositoryHistoryMessage(rowId, this.currentPage, this.pageSize)
         .then((res) => {
           if (res.data.code === 0) {
             this.tableData = [];
             for (let key of res.data.data.depositoryList) {
-              const { createTime, creator, depositoryId, factHash } = key;
+              const { createTime, approver, submitter } = key;
               this.tableData.push({
-                depositoryId,
+                approver,
                 createTime,
-                creator,
-                factHash,
+                submitter,
                 ...JSON.parse(key.content),
               });
             }
@@ -238,67 +184,19 @@ export default {
       this.pageSize = val;
       this.currentPage = 1;
       this.listLoading = true;
-      this.getDepositoryListMsg();
+      this.getDepositoryHistoryListMsg();
     },
 
     // 切换当前页码
     handleCurrentChange(val) {
       this.currentPage = val;
       this.listLoading = true;
-      this.getDepositoryListMsg();
+      this.getDepositoryHistoryListMsg();
     },
 
-    //   开启录入Dialog
-    // dialogFlag表示Dialog用途 0表示录入Dialog 1表示编辑存证信息 2表示数据校验Dialog
-    // row表示数据校验选中那一行的数据
-    openSaveDepositDialog(dialogFlag, row) {
-      this.enteringDepositDialogVisible = true;
-      this.dialogFlag = dialogFlag;
-      if (!!row) {
-        this.depositoryId = row.depositoryId;
-      }
-    },
-
-    //  关闭录入Dialog
-    // refresh表示是否刷新列表 0表示不刷新 1表示刷新
-    closeSaveDepositDialog(refresh = 0) {
-      this.enteringDepositDialogVisible = false;
-      if (refresh) {
-        this.listLoading = true;
-        this.currentPage = 1;
-        this.getTemplateDetails();
-        this.getDepositoryListMsg();
-      }
-    },
-
-    // 历史记录
-    handleHis(rowId) {
-      const { rowId: id } = this.$route.params;
-      this.$router.push(`/DepositoryHis/${id}/${rowId}`);
-    },
-
-    // 批量录入
-    openSaveAllDepositDialog() {
-      console.log("批量录入");
-    },
-
-    // 获取凭证
-    copyDepositMsg(row) {
-      this.$copyText(row.factHash)
-        .then(() => {
-          this.$message({
-            message: "已将存证凭证复制到剪贴板",
-            type: "success",
-            duration: 2000,
-          });
-        })
-        .catch(() => {
-          this.$message({
-            message: "获取存证凭证失败",
-            type: "error",
-            duration: 2000,
-          });
-        });
+    // 返回存证信息
+    backDepositDetails() {
+      this.$router.go(-1)
     },
   },
 
@@ -309,7 +207,14 @@ export default {
         {
           enName: "creator",
           name: "提交人",
-          props: "creator",
+          props: "submitter",
+          align: "center",
+          width: "195px",
+        },
+        {
+          enName: "approver",
+          name: "审批人",
+          props: "approver",
           align: "center",
           width: "195px",
         },
@@ -330,8 +235,8 @@ export default {
   },
 };
 </script>
-
-<style lang="less" scoped>
+  
+  <style lang="less" scoped>
 .icon {
   width: 45px;
   height: 45px;
@@ -347,27 +252,21 @@ export default {
   width: calc(100% - 40px);
 
   .template-name-freeze {
+    width: 100%;
     font-size: 18px;
     font-weight: bolder;
     display: flex;
     letter-spacing: 0.5px;
-    margin-bottom: 10px;
 
     .freeze-thaw {
       margin-left: 10px;
       line-height: 22px;
+      width: 92%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
   }
-}
-
-.input-btn {
-  width: 100%;
-  height: 82px;
-  display: flex;
-  justify-content: end;
-  box-sizing: border-box;
-  padding: 25px;
-  margin-top: -25px;
 }
 
 .depository-list {

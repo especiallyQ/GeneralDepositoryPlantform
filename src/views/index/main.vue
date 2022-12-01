@@ -81,8 +81,8 @@ export default {
             type: "error",
             duration: 2000,
           });
-          this.loading = false;
           router.push("/home");
+          this.loading = false;
         });
     },
     change: function (val) {
