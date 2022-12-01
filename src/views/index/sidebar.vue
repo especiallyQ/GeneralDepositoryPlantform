@@ -61,8 +61,7 @@
                   v-if="term.menuShow"
                   :style="{
                     color: term.path == activeRoute ? '#37eef2' : '',
-                    'border-left':
-                      term.path == activeRoute ? '' : '',
+                    'border-left': term.path == activeRoute ? '' : '',
                     'padding-left': term.path == activeRoute ? '53px' : '53px',
                     'background-color':
                       term.path == activeRoute ? '#1e293e' : '#0c1220',
@@ -127,7 +126,8 @@ export default {
               dataOverview: "数据概览",
               depositoryTitle: "存证管理",
               userManagement: "账号管理",
-              ApprovalManagement: "审批管理",
+              dictionary: "字典管理",
+              approvalManagement: "审批管理",
               systemConfiguration: "系统配置",
             }[it.nameKey];
           });
@@ -192,7 +192,8 @@ export default {
             data: true,
             userManagement: true,
             depositoryTitle: true,
-            ApprovalManagement: this.role === "1" || this.role === "2",
+            dictionary: this.role === "1" || this.role === "2",
+            approvalManagement: this.role === "1" || this.role === "2",
             systemConfiguration: this.role === "1",
           }[item.nameKey] || false;
 

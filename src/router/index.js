@@ -10,6 +10,7 @@ const DepositoryHis = () => import('@/views/depository/depositoryHis.vue')
 const ApprovalManagement = () => import('@/views/approvalManagement/approvalManagement.vue')
 const userManagement = () => import('@/views/userManagement/index.vue');
 const systemConfiguration = () => import('@/views/systemConfiguration')
+const dictionary = () => import('@/views/dictionary/index.vue')
 
 Vue.use(Router);
 
@@ -70,14 +71,27 @@ const routes = [{
 },
 {
     path: '/main',
+    name: '',
+    nameKey: 'dictionary',
+    leaf: true,
+    iconCls: 'cmsp-icon-jiedian sidebar-icon',
+    component: Main,
+    children: [
+        {
+            path: '/dictionary', component: dictionary, name: 'dictionary', nameKey: 'dictionary', meta: { requireAuth: true }
+        }
+    ]
+},
+{
+    path: '/main',
     name: 'approval',
-    nameKey: 'ApprovalManagement',
+    nameKey: 'approvalManagement',
     leaf: true,
     iconCls: 'cmsp-icon-qukuailian4 sidebar-icon',
     component: Main,
     children: [
         {
-            path: '/approvalManagement', component: ApprovalManagement, name: 'ApprovalManagement', nameKey: 'ApprovalManagement', meta: { requireAuth: true }
+            path: '/approvalManagement', component: ApprovalManagement, name: 'ApprovalManagement', nameKey: 'approvalManagement', meta: { requireAuth: true }
         },
     ]
 
@@ -96,6 +110,7 @@ const routes = [{
     ]
 
 },
+
 ];
 
 const router = new Router({

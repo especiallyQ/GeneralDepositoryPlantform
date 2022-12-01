@@ -77,6 +77,17 @@ export function fileVerify(data) {
     })
 }
 
+export function getFileHash(data) {
+    return post({
+        url: `${url.ORG_LIST}/getFileHash`,
+        method: 'post',
+        data: data,
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
+
 
 
 

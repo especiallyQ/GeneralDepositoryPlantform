@@ -31,6 +31,14 @@ let errCode = {
         en: "account info already exists",
         zh: "账号名重复"
     },
+    "202030": {
+        en: "password error",
+        zh:"原密码错误"
+    },
+    "202045": {
+        en: "",
+        zh:"新密码不能与原密码相同"
+    },
     "302000": {
         en: "user not logged in",
         zh: "未登录的用户"
