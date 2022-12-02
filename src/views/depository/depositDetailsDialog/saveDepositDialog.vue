@@ -34,6 +34,7 @@
             v-model="form[item.parameterName]"
             v-if="item.parameterType !== 'file'"
             :disabled="dialogFlag === 2"
+            @input="(event) => changeInput(event, item)"
           ></el-input>
           <el-upload
             v-else
@@ -47,6 +48,7 @@
                 handleSuccess(response, item.parameterName);
               }
             "
+            :on-exceed="handleExceed"
             :on-remove="
               () => {
                 handleRemove(item.parameterName);
@@ -64,6 +66,7 @@
           <el-button @click="closeSaveDepositDialog(0)">取消</el-button>
           <el-button
             @click="submitDialog('ruleForm')"
+            :disabled="dialogFlag === 1 && btnDisabled"
             type="primary"
             :loading="loading"
             >{{ dialogFlag === 2 ? "校验" : "确定" }}</el-button
@@ -111,13 +114,16 @@ export default {
       loading: false, //确定按钮loading
       getParameterLoading: false, // 获取表单数据loading
       parameter: [],
+      oldParameter: [],
       rules: {}, //验证规则
       form: {
         //表单数据
       },
       url, //服务器地址
-      fileHash: "", //文件Hash
-      fileKeyName: "",
+      fileHash: "", //旧上传文件Hash
+      btnDisabled: true, //确定按钮是否禁用
+      btnDisabledArr: [], //确定按钮是否禁用 为空表示新旧表单数据一样
+      btnDisabledFileArr: [], //确定按钮是否禁用 为空表示新旧文件数据一样
     };
   },
 
@@ -133,12 +139,62 @@ export default {
       },
       deep: true,
     },
+    btnDisabledArr: {
+      handler() {
+        if (
+          this.btnDisabledArr.length === 0 &&
+          this.btnDisabledFileArr.length === 0
+        ) {
+          this.btnDisabled = true;
+        } else {
+          this.btnDisabled = false;
+        }
+      },
+      deep: true,
+    },
+
+    btnDisabledFileArr: {
+      handler() {
+        if (
+          this.btnDisabledArr.length === 0 &&
+          this.btnDisabledFileArr.length === 0
+        ) {
+          this.btnDisabled = true;
+        } else {
+          this.btnDisabled = false;
+        }
+      },
+      deep: true,
+    },
   },
 
   methods: {
+    changeInput(event, item) {
+      for (let key of this.oldParameter) {
+        if (key.parameterName == item.parameterName) {
+          if (
+            key.parameterValue !== event &&
+            !this.btnDisabledArr.includes(key.parameterName)
+          ) {
+            this.btnDisabledArr.push(key.parameterName);
+          }
+          if (
+            key.parameterValue === event &&
+            this.btnDisabledArr.includes(key.parameterName)
+          ) {
+            this.btnDisabledArr.splice(
+              this.btnDisabledArr.indexOf(key.parameterName),
+              1
+            );
+          }
+        }
+      }
+    },
+
     // 移除文件
     handleRemove(parameterName) {
       this.form[parameterName] = null;
+      this.btnDisabledFileArr.pop();
     },
 
     // 改变文件状态
@@ -156,11 +212,25 @@ export default {
     // 上传文件获取Hash
     handleSuccess(response, parameterName) {
       this.$set(this.form, parameterName, response.data);
+      if (this.fileHash === response.data) {
+        this.btnDisabledFileArr.pop();
+      } else {
+        this.btnDisabledFileArr.push(1);
+      }
     },
 
+    handleExceed() {
+      this.$message({
+        message: "当前限制选择 1 个文件",
+        type: "warning",
+        duration: 2000,
+      });
+    },
+
+    // 上传文件错误处理
     handleError() {
       this.$message({
-        message: "文件上传失败，请稍后重试",
+        message: "文件上传失败或文件过大，请稍后重试",
         type: "error",
         duration: 2000,
       });
@@ -212,16 +282,18 @@ export default {
       getCheckDataMessage(this.depositoryId)
         .then((res) => {
           if (res.data.code === 0) {
-            this.parameter = res.data.data;
+            this.parameter = JSON.parse(JSON.stringify(res.data.data));
+            this.oldParameter = JSON.parse(JSON.stringify(res.data.data));
             for (let key of this.parameter) {
               if (key.parameterType === "file") {
+                this.fileHash = key.parameterValue;
                 this.$set(this.form, key.parameterName, null);
               } else {
                 this.$set(this.form, key.parameterName, key.parameterValue);
               }
-              this.createRules();
-              this.getParameterLoading = false;
             }
+            this.createRules();
+            this.getParameterLoading = false;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
@@ -245,7 +317,7 @@ export default {
       let formData = new FormData();
       for (let key of this.parameter) {
         if (key.parameterType === "file") {
-          formData.append("file", key.parameterValue);
+          formData.append("fileHash", key.parameterValue);
           key.parameterValue = "";
         }
       }
@@ -286,7 +358,7 @@ export default {
       formData.append("templateId", this.templateMsg.id);
       for (let key of this.parameter) {
         if (key.parameterType === "file") {
-          formData.append("file", key.parameterValue);
+          formData.append("fileHash", key.parameterValue);
           key.parameterValue = "";
         }
       }
@@ -323,7 +395,7 @@ export default {
             type: "error",
             duration: 2000,
           });
-          this.closeSaveDepositDialog(0);
+          this.closeSaveDepositDialog(1);
         });
     },
 
@@ -333,7 +405,7 @@ export default {
       formData.append("depositoryId", this.depositoryId);
       for (let key of this.parameter) {
         if (key.parameterType === "file") {
-          formData.append("file", key.parameterValue);
+          formData.append("fileHash", key.parameterValue);
           key.parameterValue = "";
         }
       }

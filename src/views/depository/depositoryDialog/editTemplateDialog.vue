@@ -36,7 +36,7 @@
           <el-input
             v-model="key.parameterType"
             class="el-input-width"
-            style="marginLeft: 8px"
+            style="marginleft: 8px"
             :disabled="true"
           ></el-input>
         </el-form-item>
@@ -55,7 +55,7 @@
           <el-input
             v-model="key.parameterType"
             class="el-input-width"
-            style="marginLeft: 8px"
+            style="marginleft: 8px"
             :disabled="true"
           ></el-input>
         </el-form-item>
@@ -77,6 +77,7 @@
             type="primary"
             @click="editDepositoryTemplate"
             :loading="loading"
+            :disabled="btnDisable"
             >确定</el-button
           >
         </div>
@@ -106,6 +107,8 @@ export default {
       dialogFormVisible: this.editTemplateDialogVisible, //控制dialog是否显示
       getLoading: false, //获取数据loading图标
       loading: false, //编辑按钮loading图标
+      remark: "", //备注
+      btnDisable: true,
       form: {
         depositoryTemplateName: null, //存证模板名称
         remark: null, //备注
@@ -117,6 +120,17 @@ export default {
   watch: {
     editTemplateDialogVisible() {
       this.dialogFormVisible = this.editTemplateDialogVisible;
+    },
+    form: {
+      handler() {
+        console.log(this.form.remark);
+        if (this.remark === this.form.remark) {
+          this.btnDisable = true;
+        } else {
+          this.btnDisable = false;
+        }
+      },
+      deep: true,
     },
   },
 
@@ -137,8 +151,9 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             const { depositoryTemplateName, remark, params } = res.data.data;
+            this.remark = remark || "";
             this.form.depositoryTemplateName = depositoryTemplateName;
-            this.form.remark = remark;
+            this.form.remark = remark || "";
             this.form.parameterParamsForm1 = params.splice(0, 1);
             this.form.parameterParamsForm2 = params;
             this.getLoading = false;

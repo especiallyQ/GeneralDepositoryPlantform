@@ -333,7 +333,7 @@ export function saveDepositoryContent(data) {
     })
 }
 
-// 存证信息-获取数据校验信息
+// 存证信息-获取数据校验信息和编辑存证原始数据
 export function getCheckDataMessage(depositoryId) {
     return get({
         url: `${url.ORG_LIST}/depository/initDepositoryParam/${depositoryId}`,
