@@ -2,11 +2,11 @@
     <el-dialog title="新建字典" :visible.sync="createDictionaryDialogVisible" width="498px" align="center"
         :close-on-click-modal="false" @open="resetForm1('ruleForm')" :before-close="closeDialog">
         <el-form :model="dictionaryForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="字典名称" prop="dictionaryName">
-                <el-input v-model="dictionaryForm.dictionaryName" maxlength="20" show-word-limit></el-input>
+            <el-form-item label="字典名称" prop="dicName">
+                <el-input v-model="dictionaryForm.dicName" maxlength="20" show-word-limit></el-input>
             </el-form-item>
-            <el-form-item label="数据类型" prop="dataType">
-                <el-select v-model="dictionaryForm.dataType" placeholder="请选择数据类型" style="width: 100%">
+            <el-form-item label="数据类型" prop="dicType">
+                <el-select v-model="dictionaryForm.dicType" placeholder="请选择数据类型" style="width: 100%">
                     <el-option v-for="item in dataTypes" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
@@ -35,7 +35,7 @@
 
 <script>
 import { JSONSwitchFormData } from "@/util/util.js";
-import { createAccount } from "@/util/api.js";
+import { addDictionary } from "@/util/api.js";
 export default {
     name: "dictionaryDialog",
     props: {
@@ -51,21 +51,21 @@ export default {
             //存放选择框数据
             dataTypes: [
                 {
-                    value: "string",
+                    value: "字符串",
                     label: "字符串",
                 },
                 {
-                    value: "int",
+                    value: "整数",
                     label: "整数",
                 },
                 {
-                    value: "float",
+                    value: "浮点数",
                     label: "浮点数",
                 },
             ],
             dictionaryForm: {
-                dictionaryName: "", //字典名称
-                dataType: "", //数据类型
+                dicName: "", //字典名称
+                dicType: "", //数据类型
                 dictionaryData1: [
                     {
                         dictionaryContent: "",
@@ -74,7 +74,7 @@ export default {
                 dictionaryData2: [],
             },
             rules: {
-                dictionaryName: [
+                dicName: [
                     {
                         required: true,
                         message: "请输入字典名称",
@@ -87,10 +87,10 @@ export default {
                         trigger: "blur",
                     },
                 ],
-                dataType: [
+                dicType: [
                     {
                         required: true,
-                        message: "请选择账号类型",
+                        message: "请选择字典类型",
                         trigger: "change",
                     },
                 ],
@@ -111,6 +111,8 @@ export default {
                 ...this.dictionaryForm.dictionaryData2,
             ];
         },
+    },
+    mounted() {
     },
     methods: {
         // 点击+添加参数项
@@ -160,33 +162,38 @@ export default {
                 }
             });
         },
-      //新建字典
+        //新建字典
         addDictionaryTemplate() {
-            const { dictionaryName, dataType } = this.dictionaryForm;
+            const { dicName, dicType } = this.dictionaryForm;
+            let dicContent = this.params.map(obj => {
+                return obj.dictionaryContent
+            })
             let data = {
-                dictionaryName,
-                dataType,
-                params: this.params,
+                dicName,
+                dicType,
+                dicContent: dicContent,
             }
-            console.log(data);
-            // this.loading = true;
-            createAccount(data).then((res) => {
+            this.loading = true;
+            addDictionary(data).then((res) => {
                 if (res.data.code === 0) {
+                    this.loading = false;
                     this.closeDialog()
-                    this.$parent.getAccountList();
+                    this.$parent.selectPage();
                     this.$message({
                         type: "success",
                         message: "新建成功!",
                     });
-                }else {
-                this.closeDialog()
-                this.$message({
-                    message: this.$chooseLang(res.data.code),
-                    type: "error",
-                    duration: 2000,
-                });
-            }
+                } else {
+                    this.loading = false;
+                    this.closeDialog()
+                    this.$message({
+                        message: this.$chooseLang(res.data.code),
+                        type: "error",
+                        duration: 2000,
+                    });
+                }
             }).catch(() => {
+                this.loading = false;
                 this.closeDialog()
                 this.$message({
                     message: "系统错误",
@@ -202,15 +209,16 @@ export default {
         resetForm1(formName) {
             this.$refs[formName].resetFields();
             this.clearDictionaryForm();
-            
+            this.loading = false;
+
         },
         closeDialog() {
             this.$emit("update:createDictionaryDialogVisible", false);
-            
+
         },
         clearDictionaryForm() {
             this.dictionaryForm.dictionaryData1[0].dictionaryContent = '',
-            this.dictionaryForm.dictionaryData2=[]
+                this.dictionaryForm.dictionaryData2 = []
         },
     },
 };
@@ -218,6 +226,6 @@ export default {
 
 <style scoped>
 .demo-ruleForm .dialog-footer {
-    margin-left: 195px;
+    text-align: right;
 }
 </style>

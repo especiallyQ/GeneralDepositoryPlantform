@@ -63,10 +63,12 @@
                                 <el-input v-model="verifyFormFile.fileHash" style="width:578px" disabled></el-input>
                                 <el-upload class="upload-file" action="" ref="upload" :limit="1" :file-list="fileList"
                                     :auto-upload="true" :before-upload="beforeUpload" :on-exceed="handleExceed"
-                                    :on-change="handleChange" :http-request="Upload">
+                                    :on-change="handleChange" :http-request="Upload" :on-remove="handleRemove">
                                     <el-button type="primary">点击上传</el-button>
                                 </el-upload>
                             </el-form-item>
+                            <el-progress :percentage="parseInt(percentage)" status="success"
+                                style="width:94%;margin-left:82px;margin-top: -20px;"></el-progress>
                             <el-form-item label="验证码" prop="verifyCode">
                                 <el-input v-model="verifyFormFile.verifyCode" placeholder="请输入验证码" maxlength="4"
                                     style="width:600px"></el-input>
@@ -128,7 +130,9 @@ export default {
     name: "HomePage",
     data() {
         return {
-            disabled:true,
+            percentage: 0,
+
+            disabled: true,
             logining: false,
             logining1: false,
             dialogVisible: false,//控制查看详情dialog是否显示
@@ -203,10 +207,10 @@ export default {
     },
     methods: {
         Upload() {
-                let data = JSONSwitchFormData({ "file": this.file });
-            getFileHash(data).then((res) => {
+            let func = this.uploadProgress;
+            let data = JSONSwitchFormData({ "file": this.file });
+            getFileHash(data, func).then((res) => {
                 if (res.data.code == 0) {
-                    console.log(9999999);
                     this.disabled = false;
                     this.verifyFormFile.fileHash = res.data.data;
                     this.$message({
@@ -214,11 +218,19 @@ export default {
                         type: "success",
                     });
                 }
-                })
-            
+            })
+
+        },
+        uploadProgress(progressEvent) {
+            // console.log(Math.round((progressEvent.loaded / progressEvent.total) * 10000) / 100.0);
+            this.percentage = Math.round((progressEvent.loaded / progressEvent.total) * 10000) / 100.0;
         },
         handleChange(file, fileList) {
             this.fileH = file;
+        },
+        handleRemove(file) {
+            console.log(file);
+            this.verifyFormFile.fileHash = '';
         },
         async getDepositoryListData() {
             const res = await getDepositoryList()

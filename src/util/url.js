@@ -1,3 +1,3 @@
 export default {
-    ORG_LIST: '/GDP-service'
+    ORG_LIST: 'http://192.168.1.156:5010/GDP-service'
 }

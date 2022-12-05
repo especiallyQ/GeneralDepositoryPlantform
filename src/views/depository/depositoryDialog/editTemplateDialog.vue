@@ -132,6 +132,7 @@ export default {
 
     open() {
       this.getLoading = true;
+      
       // 获取模板数据
       getEditDepositoryTemplate(this.editTemplateNameId)
         .then((res) => {

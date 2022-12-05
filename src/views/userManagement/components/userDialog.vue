@@ -16,7 +16,7 @@
             </el-form-item>
             <el-form-item class="dialog-footer">
                 <el-button @click="resetForm('ruleForm')">取 消 </el-button>
-                <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm')" :loading="loading">确 定</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -36,6 +36,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             //存放选择框数据
             roleOptions: [
                 {
@@ -90,19 +91,20 @@ export default {
     },
     methods: {
         submitForm(formName) {
-            // console.log(this.accountForm);
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
-                    this.$emit("update:createUserAccountDialogVisible", false);
+                    this.loading = true;
                     let formData = JSONSwitchFormData(this.accountForm);
                     const res = await createAccount(formData);
                     if (res.data.code === 0) {
-                        this.$parent.getAccountList();
+                        this.$emit("update:createUserAccountDialogVisible", false);
+                        this.$parent.selectPage();
                         this.$message({
                             type: "success",
                             message: "新建成功!",
                         });
                     } else {
+                        this.closeDialog();
                         this.$message({
                             message: this.$chooseLang(res.data.code),
                             type: "error",
@@ -119,9 +121,11 @@ export default {
         },
         resetForm1(formName) {
             this.$refs[formName].resetFields();
+            this.loading = false;
         },
         closeDialog() {
             this.$emit("update:createUserAccountDialogVisible", false);
+            this.loading = false;
         },
     },
 };
@@ -129,6 +133,6 @@ export default {
 
 <style scoped>
 .demo-ruleForm .dialog-footer {
-    margin-left: 195px;
+    text-align: right;
 }
 </style>

@@ -290,7 +290,10 @@ export default {
                         cancelButtonText: "取消",
                     })
                         .then(async () => {
-                            const res = await resetAccountPassword(row.accountId);
+                            console.log(row);
+                            const res = await resetAccountPassword({
+                                accountId: row.accountId,
+                                accountName : row.accountName});
                             if (res.data.code === 0) {
                                 this.$message({
                                     type: "success",

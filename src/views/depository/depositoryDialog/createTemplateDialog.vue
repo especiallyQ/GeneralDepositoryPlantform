@@ -119,10 +119,6 @@ export default {
           label: "自定义字典",
           value: "x",
           disabled: false,
-          children: [{
-            label: "abc",
-            value: "aa"
-          }]
         },
         {
           label: "字符串",
@@ -316,8 +312,6 @@ export default {
         remark,
         params: this.params,
       };
-      console.log(this.childrens);
-      console.log(data);
       this.loading = true;
       saveDepoTemplate(data)
         .then((res) => {

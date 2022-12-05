@@ -77,14 +77,18 @@ export function fileVerify(data) {
     })
 }
 
-export function getFileHash(data) {
+export function getFileHash(data,uploadProgress) {
     return post({
         url: `${url.ORG_LIST}/getFileHash`,
         method: 'post',
         data: data,
         headers: {
             'Content-Type': 'multipart/form-data'
-        }
+        },
+        onUploadProgress: uploadProgress
+        // onUploadProgress: progressEvent => {
+        //     console.log(Math.round((progressEvent.loaded / progressEvent.total) * 10000) / 100.0);
+        // },
     })
 }
 
@@ -154,9 +158,8 @@ export function resetPassword(data) {
 //重置密码
 export function resetAccountPassword(data) {
     return put({
-        url: `${url.ORG_LIST}/account/resetPassword/${data}`,
+        url: `${url.ORG_LIST}/account/resetPassword/` + `${data.accountId}/${data.accountName}`,
         method: 'put',
-        data: data,
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
         }
@@ -165,7 +168,7 @@ export function resetAccountPassword(data) {
 
 //字典管理相关接口 =-----------------------------------
 
-//账号管理初始化 
+//字典管理初始化 
 export function dictionaryList(data, list) {
     const params = reviseParam(data, list);
     return get({
@@ -177,6 +180,40 @@ export function dictionaryList(data, list) {
         }
     })
 }
+//新建字典
+export function addDictionary(data) {
+    return post({
+        url: `${url.ORG_LIST}/dictionary/addDictionary`,
+        method: 'post',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
+            // 'Content-Type': 'multipart/form-data'
+        }
+    })
+}
+
+//删除字典
+export function delDictionary(data) {
+    return deleted({
+        url: `${url.ORG_LIST}/dictionary/deleteDictionary/${data}`,
+        method: 'delete',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+// 存证管理-获取存证模板编辑信息
+export function getDictionaryById(data) {
+    return get({
+        url: `${url.ORG_LIST}/dictionary/getDictionary/${data}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
 
 
 //系统配置相关接口-----------------------------
