@@ -25,19 +25,39 @@
         </el-form-item>
 
         <el-form-item
-          v-for="item in parameter"
+          v-for="item in oldParameter"
           :key="item.parameterName"
           :label="item.parameterName"
           :prop="item.parameterName"
         >
           <el-input
             v-model="form[item.parameterName]"
-            v-if="item.parameterType !== 'file'"
+            v-if="
+              item.parameterType !== 'file' &&
+              (item.parameterType !== 'dictionary' || dialogFlag === 2)
+            "
             :disabled="dialogFlag === 2"
             @input="(event) => changeInput(event, item)"
           ></el-input>
+          <el-select
+            v-if="item.parameterType === 'dictionary' && dialogFlag !== 2"
+            v-model="form[item.parameterName]"
+            @change="
+              (event) => {
+                changeInput(event, item);
+              }
+            "
+            style="width: 346px"
+          >
+            <el-option
+              v-for="items in item.parameterOption"
+              :key="items.index"
+              :value="items"
+              :label="items"
+            ></el-option>
+          </el-select>
           <el-upload
-            v-else
+            v-if="item.parameterType === 'file'"
             class="upload-demo"
             ref="upload"
             :action="`${url.ORG_LIST}/getFileHash`"
@@ -113,8 +133,8 @@ export default {
       dialogFormVisible: this.visible, //控制dialog是否显示
       loading: false, //确定按钮loading
       getParameterLoading: false, // 获取表单数据loading
-      parameter: [],
-      oldParameter: [],
+      parameter: [], //将要提交的参数
+      oldParameter: [], //原始获取的参数，用于对比
       rules: {}, //验证规则
       form: {
         //表单数据
@@ -169,9 +189,10 @@ export default {
   },
 
   methods: {
+    // 改变表单内容
     changeInput(event, item) {
       for (let key of this.oldParameter) {
-        if (key.parameterName == item.parameterName) {
+        if (key.parameterName === item.parameterName) {
           if (
             key.parameterValue !== event &&
             !this.btnDisabledArr.includes(key.parameterName)
@@ -256,7 +277,8 @@ export default {
       getInitAddDepository(this.templateMsg.id)
         .then((res) => {
           if (res.data.code === 0) {
-            this.parameter = res.data.data;
+            this.parameter = JSON.parse(JSON.stringify(res.data.data));
+            this.oldParameter = JSON.parse(JSON.stringify(res.data.data));
             this.createRules();
             this.getParameterLoading = false;
           } else {
@@ -505,7 +527,16 @@ export default {
             this.rules[key.parameterName] = [
               {
                 required: true,
-                message: `${key.parameterName}文件存证不能为空`,
+                message: `${key.parameterName}不能为空`,
+                trigger: ["blur", "change", "submit"],
+              },
+            ];
+            break;
+          case "dictionary":
+            this.rules[key.parameterName] = [
+              {
+                required: true,
+                message: `${key.parameterName}不能为空`,
                 trigger: ["blur", "change", "submit"],
               },
             ];
