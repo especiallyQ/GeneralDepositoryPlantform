@@ -23,6 +23,12 @@
             :disabled="dialogFlag !== 2"
           ></el-input>
         </el-form-item>
+        <el-form-item label="存证模板名称" v-if="dialogFlag !== 2">
+          <el-input
+            :placeholder="templateMsg.depositoryTemplateName"
+            :disabled="dialogFlag !== 2"
+          ></el-input>
+        </el-form-item>
 
         <el-form-item
           v-for="item in oldParameter"

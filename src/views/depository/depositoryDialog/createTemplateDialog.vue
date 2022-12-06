@@ -1,34 +1,104 @@
 <template>
   <div>
-    <el-dialog title="新建存证模板" :visible.sync="dialogFormVisible" center :close-on-click-modal="false" @close="close"
-      width="498px">
-      <el-form :model="form" :rules="rules" ref="ruleForm" label-width="100px" class="selectForm">
+    <el-dialog
+      title="新建存证模板"
+      :visible.sync="dialogFormVisible"
+      center
+      :close-on-click-modal="false"
+      @close="close"
+      width="498px"
+    >
+      <el-form
+        :model="form"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="100px"
+        class="selectForm"
+      >
         <el-form-item label="存证模板名称" prop="depositoryTemplateName">
-          <el-input v-model.trim="form.depositoryTemplateName" placeholder="请输入存证模板名称" maxlength="20"
-            :show-word-limit="true"></el-input>
+          <el-input
+            v-model.trim="form.depositoryTemplateName"
+            placeholder="请输入存证模板名称"
+            maxlength="20"
+            :show-word-limit="true"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="所属数据源" prop="depositoryTemplateDataOrigin">
+          <el-select
+            v-model="form.depositoryTemplateDataOrigin"
+            placeholder="请选择数据源"
+            style="width: 346px"
+          >
+            <el-option
+              v-for="(item, index) in dataOriginOptions"
+              :key="index"
+              :label="item"
+              :value="item"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
 
-      <el-form :model="parameterParamsForm" label-width="100px" class="selectForm">
-        <el-form-item label="存证参数" prop="parameter" :show-message="false"
-          v-for="(key, index) in parameterParamsForm.parameterParams1" :key="index">
-          <el-input v-model.trim="key.parameterName" placeholder="参数名" class="el-input-width" maxlength="20"
-            style="marginRight: 8px"></el-input>
-          <el-select v-model="key.parameterType" placeholder="参数类型" class="el-input-width" @change="changeFileDisabled">
-            <el-option v-for="(item, index) in parameterOption" :key="index" :label="item.label" :value="item.value"
-              :disabled="item.disabled"></el-option>
+      <el-form
+        :model="parameterParamsForm"
+        label-width="100px"
+        class="selectForm"
+      >
+        <el-form-item
+          label="存证参数"
+          prop="parameter"
+          :show-message="false"
+          v-for="(key, index) in parameterParamsForm.parameterParams1"
+          :key="index"
+        >
+          <el-input
+            v-model.trim="key.parameterName"
+            placeholder="参数名"
+            class="el-input-width"
+            maxlength="20"
+            style="marginRight: 8px"
+          ></el-input>
+          <el-select
+            v-model="key.parameterType"
+            placeholder="参数类型"
+            class="el-input-width"
+            @change="changeFileDisabled"
+          >
+            <el-option
+              v-for="(item, index) in parameterOption"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled"
+            ></el-option>
           </el-select>
-          <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
-            style="marginLeft: 8px"></el-button>
+          <el-button
+            type="primary"
+            circle
+            icon="el-icon-plus"
+            @click="addParameter"
+            size="mini"
+            style="marginLeft: 8px"
+          ></el-button>
         </el-form-item>
 
-        <el-form-item prop="parameter" :show-message="false"
-          v-for="(key, index) in parameterParamsForm.parameterParams2" :key="index + 1"
-          :validate-on-rule-change="false">
-          <el-input v-model.trim="key.parameterName" placeholder="参数名" class="el-input-width" style="marginRight: 8px">
+        <el-form-item
+          prop="parameter"
+          :show-message="false"
+          v-for="(key, index) in parameterParamsForm.parameterParams2"
+          :key="index + 1"
+          :validate-on-rule-change="false"
+        >
+          <el-input
+            v-model.trim="key.parameterName"
+            placeholder="参数名"
+            class="el-input-width"
+            style="marginRight: 8px"
+          >
           </el-input>
           <el-select
-            filterable 
+            filterable
             @click.native="test"
             v-model="key.parameterType"
             placeholder="参数类型"
@@ -52,26 +122,43 @@
             </template>
           </el-cascader> -->
 
-          <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
-            style="marginLeft: 8px"></el-button>
+          <el-button
+            type="danger"
+            circle
+            icon="el-icon-minus"
+            @click="removeParameter(index)"
+            size="mini"
+            style="marginLeft: 8px"
+          ></el-button>
         </el-form-item>
 
         <el-form-item label="备注">
-          <el-input type="textarea" v-model="form.remark" :rows="4" resize="none" maxlength="60"
-            :show-word-limit="true"></el-input>
+          <el-input
+            type="textarea"
+            v-model="form.remark"
+            :rows="4"
+            resize="none"
+            maxlength="60"
+            :show-word-limit="true"
+          ></el-input>
         </el-form-item>
       </el-form>
 
       <div class="dialog-footer">
         <el-button @click="close">取消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')" :loading="loading">确定</el-button>
+        <el-button
+          type="primary"
+          @click="submitForm('ruleForm')"
+          :loading="loading"
+          >确定</el-button
+        >
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { saveDepoTemplate } from "@/util/api";
+import { getDepoTemplateDataOrigin, saveDepoTemplate } from "@/util/api";
 
 export default {
   name: "createTemplateDialog",
@@ -87,6 +174,7 @@ export default {
       dialogFormVisible: this.createTemplateDialogVisible, //控制dialog是否显示
       loading: false, //loading图标
       fileDisabled: false, //文件类型是否可选
+      dataOriginOptions: [], //数据源列表
       form: {
         depositoryTemplateName: null, //存证模板名称
         remark: null, //备注
@@ -101,9 +189,9 @@ export default {
         ],
         parameterParams2: [],
       },
-     //模板参数下拉框
+      //模板参数下拉框
       parameterOption: [
-      {
+        {
           label: "自定义字典",
           value: "x",
           disabled: false,
@@ -139,6 +227,13 @@ export default {
             trigger: "blur",
           },
         ],
+        depositoryTemplateDataOrigin: [
+          {
+            required: true,
+            message: "请选择数据源",
+            trigger: "blur",
+          },
+        ],
       },
       parameterRules: {
         parameter: [{ required: true }],
@@ -165,6 +260,10 @@ export default {
       ];
     },
   },
+
+  mounted() {
+    this.getDepoTemplateDataOriginList();
+  },
   methods: {
     // 关闭新建存证模板时触发
     close() {
@@ -188,6 +287,30 @@ export default {
       const parameterNames = arr.map((item) => item[key]);
       const newParameterNames = Array.from(new Set(parameterNames));
       return parameterNames.length === newParameterNames.length ? true : false;
+    },
+
+    // 获取数据源列表
+    getDepoTemplateDataOriginList() {
+      getDepoTemplateDataOrigin()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.dataOriginOptions = res.data.data;
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          // this.close();
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
     },
 
     //提交新建存证模板表单
@@ -225,9 +348,11 @@ export default {
 
     // 存证模板新建方法
     addDepositoryTemplate() {
-      const { depositoryTemplateName, remark } = this.form;
+      const { depositoryTemplateName, depositoryTemplateDataOrigin, remark } =
+        this.form;
       let data = {
         depositoryTemplateName,
+        depositoryTemplateDataOrigin,
         remark,
         params: this.params,
       };
@@ -294,7 +419,7 @@ export default {
   margin-right: 5px;
 }
 
-.selectForm>>>.el-form-item__label {
+.selectForm >>> .el-form-item__label {
   font-size: 12px;
   font-family: "Courier New", Courier, monospace;
 }

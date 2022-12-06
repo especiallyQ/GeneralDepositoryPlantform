@@ -229,12 +229,23 @@ export function getTemplateListData(currentPage, pageSize, creatorId, templateNa
     })
 }
 
-// 存证信息-保存存证模板
+// 存证管理-保存存证模板
 export function saveDepoTemplate(data) {
     return post({
         url: `${url.ORG_LIST}/depository/createDepositoryTemplate`,
         method: 'post',
         data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 存证管理-获取数据源列表
+export function getDepoTemplateDataOrigin() {
+    return get({
+        url: `${url.ORG_LIST}/depository/getDepoTemplateDataOrigin`,
+        method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
         }
