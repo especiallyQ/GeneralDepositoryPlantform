@@ -4,7 +4,24 @@
     <div class="module-wrapper">
       <div class="search-part">
         <div class="search-part-left">
-          <el-form :inline="true" label-width="60px" class="search-form">
+          <el-form :inline="true" label-width="75px" class="search-form">
+            <el-form-item label="所属数据源:">
+              <el-select
+                v-model="dataOriginId"
+                style="width: 140px"
+                @change="changeSelectList"
+              >
+                <el-option
+                  v-for="item in dataOriginOptions"
+                  :key="item.id1"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <el-form :inline="true" label-width="55px" class="search-form">
             <el-form-item label="创建者:">
               <el-select
                 v-model="creatorId"
@@ -12,8 +29,8 @@
                 @change="changeSelectList"
               >
                 <el-option
-                  v-for="item in options"
-                  :key="item.id"
+                  v-for="item in creatorOptions"
+                  :key="item.id2"
                   :label="item.name"
                   :value="item.id"
                 >
@@ -24,8 +41,7 @@
           <el-form
             ref="form"
             :model="form"
-            label-width="80px"
-            class="search-form"
+            class="search-form search-creator"
             :inline="true"
           >
             <el-form-item>
@@ -157,6 +173,7 @@ import _ from "lodash";
 import ContentHead from "@/components/contentHead";
 import {
   getDepositoryTemplateCreator,
+  getDataOrigin,
   getTemplateListData,
   freezeTemplate,
   thawTemplate,
@@ -172,8 +189,16 @@ export default {
   },
   data() {
     return {
-      options: [
-        //下拉框选项
+      dataOriginOptions: [
+        //数据源下拉框选项
+        {
+          id: "",
+          name: "全部",
+        },
+      ],
+
+      creatorOptions: [
+        //创建者下拉框选项
         {
           id: "",
           name: "全部",
@@ -184,6 +209,7 @@ export default {
         templateName: "", //搜索框内容
       },
       creatorId: "", // 下拉框选中的创建者Id
+      dataOriginId: "", // 下拉框选中的数据源Id
       currentPage: 1, // 分页-当前页码
       pageSize: 10, // 分页-每页数据条目数
       role: localStorage.getItem("rootId"), // 登录账号的类型(角色) 1超级管理员 2普通管理员 3普通用户
@@ -194,6 +220,11 @@ export default {
         {
           label: "存证模板名称",
           prop: "depositoryTemplateName",
+          align: "center",
+        },
+        {
+          label: "所属数据源",
+          prop: "depositoryTemplateDataOrigin",
           align: "center",
         },
         {
@@ -218,6 +249,7 @@ export default {
   },
   mounted() {
     this.getTemplateCreator();
+    this.getDataOriginList();
     this.getNewTemplateList();
   },
 
@@ -228,7 +260,32 @@ export default {
       getDepositoryTemplateCreator()
         .then((res) => {
           if (res.data.code === 0) {
-            this.options = this.options.concat(res.data.data);
+            this.creatorOptions = this.creatorOptions.concat(res.data.data);
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
+    },
+
+    // 获取全部数据源列表
+    getDataOriginList() {
+      getDataOrigin()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.dataOriginOptions = this.dataOriginOptions.concat(
+              res.data.data
+            );
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
@@ -253,6 +310,7 @@ export default {
         this.currentPage,
         this.pageSize,
         this.creatorId,
+        this.dataOriginId,
         this.form.templateName
       )
         .then((res) => {
@@ -445,6 +503,10 @@ export default {
 <style lang="less" scoped>
 .search-form {
   margin-right: 15px;
+}
+
+.search-creator {
+  margin-left: 10px;
 }
 
 .depository-list {

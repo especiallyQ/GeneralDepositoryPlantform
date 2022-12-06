@@ -218,10 +218,21 @@ export function getDepositoryTemplateCreator() {
     })
 }
 
-// 存证管理-获取存证列表数据
-export function getTemplateListData(currentPage, pageSize, creatorId, templateName) {
+// 存证管理-获取数据源列表
+export function getDataOrigin() {
     return get({
-        url: `${url.ORG_LIST}/depository/getDepositoryTemplateList/${currentPage}/${pageSize}?creatorId=${creatorId}&depositoryTemplateName=${templateName}`,
+        url: `${url.ORG_LIST}/depository/getDataOrigin`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 存证管理-获取存证列表数据
+export function getTemplateListData(currentPage, pageSize, creatorId, dataOriginId, templateName) {
+    return get({
+        url: `${url.ORG_LIST}/depository/getDepositoryTemplateList/${currentPage}/${pageSize}?dataOriginId=${dataOriginId}&creatorId=${creatorId}&depositoryTemplateName=${templateName}`,
         method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
@@ -241,7 +252,7 @@ export function saveDepoTemplate(data) {
     })
 }
 
-// 存证管理-获取数据源列表
+// 存证管理-获取新建存证Dialog数据源列表
 export function getDepoTemplateDataOrigin() {
     return get({
         url: `${url.ORG_LIST}/depository/getDepoTemplateDataOrigin`,
