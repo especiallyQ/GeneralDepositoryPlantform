@@ -20,7 +20,12 @@
             :disabled="true"
           ></el-input>
         </el-form-item>
-
+        <el-form-item label="所属数据源">
+          <el-input
+            v-model="form.depositoryTemplateDataOrigin"
+            :disabled="true"
+          ></el-input>
+        </el-form-item>
         <el-form-item
           label="存证参数"
           prop="parameter"
@@ -36,7 +41,7 @@
           <el-input
             v-model="key.parameterType"
             class="el-input-width"
-            style="marginleft: 8px"
+            style="marginLeft: 8px"
             :disabled="true"
           ></el-input>
         </el-form-item>
@@ -55,7 +60,7 @@
           <el-input
             v-model="key.parameterType"
             class="el-input-width"
-            style="marginleft: 8px"
+            style="marginLeft: 8px"
             :disabled="true"
           ></el-input>
         </el-form-item>
@@ -150,9 +155,16 @@ export default {
       getEditDepositoryTemplate(this.editTemplateNameId)
         .then((res) => {
           if (res.data.code === 0) {
-            const { depositoryTemplateName, remark, params } = res.data.data;
+            const {
+              depositoryTemplateName,
+              depositoryTemplateDataOrigin,
+              remark,
+              params,
+            } = res.data.data;
             this.remark = remark || "";
             this.form.depositoryTemplateName = depositoryTemplateName;
+            this.form.depositoryTemplateDataOrigin =
+              depositoryTemplateDataOrigin;
             this.form.remark = remark || "";
             this.form.parameterParamsForm1 = params.splice(0, 1);
             this.form.parameterParamsForm2 = params;
