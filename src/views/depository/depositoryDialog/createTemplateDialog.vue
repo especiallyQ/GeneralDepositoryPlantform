@@ -14,10 +14,21 @@
           v-for="(key, index) in parameterParamsForm.parameterParams1" :key="index">
           <el-input v-model.trim="key.parameterName" placeholder="参数名" class="el-input-width" maxlength="20"
             style="marginRight: 8px"></el-input>
-          <el-select v-model="key.parameterType" placeholder="参数类型" class="el-input-width" @change="changeFileDisabled">
+            <el-cascader 
+          v-model="key.parameterType" 
+          placeholder="参数类型" 
+          @change="changeFileDisabled"
+            :options="parameterOption" 
+            :props="parameterProps"
+            :show-all-levels="false" 
+            class="el-input-width"
+            @focus="getDictionaryName"
+            filterable>
+          </el-cascader>
+          <!-- <el-select v-model="key.parameterType" placeholder="参数类型" class="el-input-width" @change="changeFileDisabled">
             <el-option v-for="(item, index) in parameterOption" :key="index" :label="item.label" :value="item.value"
-              :disabled="item.disabled"></el-option>
-          </el-select>
+              :disabled="item.disabled"  ></el-option>
+          </el-select> -->
           <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
             style="marginLeft: 8px"></el-button>
         </el-form-item>
@@ -28,39 +39,32 @@
           <el-input v-model.trim="key.parameterName" placeholder="参数名" class="el-input-width" style="marginRight: 8px">
           </el-input>
 
-          <el-select filterable v-model="key.parameterType" placeholder="参数类型" class="el-input-width"
+          <!-- <el-select filterable v-model="key.parameterType" placeholder="参数类型" class="el-input-width"
             @change="changeFileDisabled">
             <el-option v-for="(item, index) in parameterOption" :key="index" :type="item.value"
-              @mouseover.native="mouseover" @mouseleave.native="mouseleave" :label="item.label" :value="item.value"
+                :label="item.label" :value="item.value"
               :disabled="item.disabled">
-              <!-- <el-popover placement="right"  width="200" trigger="hover" v-show="item.value=='x'"
-                ><div class="sign-out-wrapper">
-                  <el-input placeholder="账号名" v-model="inputKeyWords" clearable style="width:75%;margin-right: 5px;" size="small">
-                </el-input>
-                <el-button class="searchButton" icon="el-icon-search" @click="selectPage" size="small"></el-button>
-                <div class="change-password" @click="changePassword">修改密码</div>
-          <div class="change-password" @click="lookVersion">查看版本</div>
-          <div class="sign-out" @click="signOut">退出登录</div>
-                  
-                </div>
-                <el-button slot="reference" type="text" style="width:100%">{{ item.label }}</el-button>
-              </el-popover> -->
+              
             </el-option>
-          </el-select>
+          </el-select> -->
+          <el-cascader 
+          v-model="key.parameterType" 
+          placeholder="参数类型" 
+          @change="changeFileDisabled"
+            :options="parameterOption" 
+            :props="parameterProps"
+            :show-all-levels="false" 
+            class="el-input-width"
+            @focus="getDictionaryName"
+            filterable>
+          </el-cascader>
 
 
 
 
 
 
-          <!-- <el-cascader v-model="key.parameterType" placeholder="参数类型" @change="changeFileDisabled"
-            :options="parameterOption" :show-all-levels="false" class="el-input-width"
-            :props="{ expandTrigger: 'hover' }" @focus="test" filterable>
-            <template slot-scope="{ node, data }">
-              <span>{{ data.label }}</span>
-              <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
-            </template>
-          </el-cascader> -->
+          
 
           <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
             style="marginLeft: 8px"></el-button>
@@ -81,7 +85,7 @@
 </template>
 
 <script>
-import { saveDepoTemplate } from "@/util/api";
+import { saveDepoTemplate,dicictionaryName} from "@/util/api";
 
 export default {
   name: "createTemplateDialog",
@@ -113,12 +117,20 @@ export default {
         ],
         parameterParams2: [],
       },
+      parameterProps: {
+        label: 'label',
+        value: "value",
+        disabled: 'disabled',
+        children: 'children',
+        expandTrigger: 'hover',
+      },
       //模板参数下拉框
       parameterOption: [
         {
           label: "自定义字典",
-          value: "x",
+          value: "dic",
           disabled: false,
+          children:[]
         },
         {
           label: "字符串",
@@ -178,74 +190,16 @@ export default {
     },
   },
   methods: {
-    // 关闭新建存证模板时触发
-    mouseover(e) {
-      if (!this.containerNode && e.target.getAttribute('type') === 'x') {
-        clearTimeout(this.timer)
-        const inputNode = document.createElement('input')
-        this.containerNode = document.createElement('div')
-        this.containerNode.appendChild(inputNode)
-
-        inputNode.style.position = 'absolute'
-        inputNode.style.top = '0'
-        inputNode.style.left = '0'
-        inputNode.style.width = '200px'
-        inputNode.style.height = '50px'
-        
-        const node = e.target.parentNode.parentNode.parentNode.parentNode
-
-        node.appendChild(this.containerNode)
-        this.containerNode.style.position = 'absolute'
-        this.containerNode.style.width = '200px'
-        this.containerNode.style.minHeight = '100px'
-        this.containerNode.style.bottom = '40%'
-        this.containerNode.style.left = '100%'
-        this.containerNode.style.zIndex = 9999
-        this.containerNode.style.backgroundColor = '#ffffff'
-
-        this.containerNode.addEventListener('mouseover', () => {
-          do {
-            clearTimeout(this.timer)
-            this.timer = null
-          } while (this.timer)
-        })
-        this.containerNode.addEventListener('mouseleave', () => {
-          this.timer = setTimeout(() => {
-            this.containerNode.remove()
-            this.containerNode = null
-          }, 500)
-        })
-
-        inputNode.addEventListener('mouseover', () => {
-          do {
-            clearTimeout(this.timer)
-            this.timer = null
-          } while (this.timer)
-        })
-        inputNode.addEventListener('mouseleave', () => {
-          this.timer = setTimeout(() => {
-            this.containerNode.remove()
-            this.containerNode = null
-          }, 500)
-        })
-
-        inputNode.addEventListener('focus', () => {
-          do {
-            clearTimeout(this.timer)
-            this.timer = null
-          } while (this.timer)
-        })
-
-        inputNode.addEventListener('blur', () => {
-        })
-      }
-    },
-    mouseleave(e) {
-      if (e.target.getAttribute('type') === 'x') {
-        this.timer = setTimeout(() => {
-          this.containerNode.remove()
-          this.containerNode = null
-        }, 500)
+    async getDictionaryName() {
+      const res = await dicictionaryName();
+      if (res.data.code === 0) {
+      let dicData =  res.data.data.map((obj) => {
+        return {
+          label: obj.dicName,
+          value:obj.id
+          }
+      })
+        this.parameterOption[0].children = dicData;
       }
     },
     close() {
@@ -312,6 +266,7 @@ export default {
         remark,
         params: this.params,
       };
+      console.log(data);
       this.loading = true;
       saveDepoTemplate(data)
         .then((res) => {

@@ -115,6 +115,7 @@ export default {
                 pageNumber: this.pageNumber,
                 pageSize: `${this.pageSize}?type=${this.selectValue}&name=${this.inputKeyWords}`,
             });
+            
             if (res.data.code === 0) {
                 // console.log(res.data.data);
                 if (
@@ -127,7 +128,6 @@ export default {
                 this.total = res.data.data.total;
                 this.loading = false;
                 for (let item of this.dictionaryListData) {
-
                     return this.dictionaryListData = item
                 }
             } else {

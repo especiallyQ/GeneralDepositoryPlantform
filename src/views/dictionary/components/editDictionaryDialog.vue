@@ -25,7 +25,7 @@
                 <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
-
+            
             <el-form-item class="dialog-footer">
                 <el-button @click="resetForm('ruleForm')">取 消 </el-button>
                 <el-button type="primary" @click="submitForm('ruleForm')" :loading="loading">确 定</el-button>
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { createAccount, getDictionaryById } from "@/util/api.js";
+import { updateDictionary, getDictionaryById } from "@/util/api.js";
 export default {
     name: "editDictionaryDialog",
     props: {
@@ -116,7 +116,7 @@ export default {
     methods: {
         // 点击+添加参数项
         addParameter() {
-            this.dictionaryForm.dictionaryData2.push({
+            this.dictionaryForm.dictionaryData2.push({  
                 dictionaryContent: "", //参数名称
             });
         },
@@ -137,20 +137,18 @@ export default {
 
         open() {
             this.getLoading = true;
-            // console.log(this.editDictionaryId);
             getDictionaryById(this.editDictionaryId)
                 .then((res) => {
-                    // console.log(res);
                     if (res.data.code === 0) {
+                        console.log(res.data.data);
                         this.getLoading = false;
                         this.dictionaryForm.dictionaryName = res.data.data.dicName;
                         this.dictionaryForm.dataType = res.data.data.dicType;
-                        this.dictionaryForm.dictionaryData1[0].dictionaryContent = res.data.data.dicContent;
-                        let pattern = /\"(.*)\"/;
-                        let result = res.data.data.dicContent.match(pattern);
-                        console.log(result[1]); // = abas
-                        console.log(typeof res.data.data.dicContent);
-                        // this.dictionaryForm.dictionaryData2 = res.data.data.dicContent;
+                        this.dictionaryForm.dictionaryData1[0].dictionaryContent = res.data.data.dicContent.splice(0, 1);
+                        console.log(res.data.data.dicContent);
+                        let data = res.data.data.dicContent;
+                        this.dictionaryForm.dictionaryData2 = data
+                        console.log(this.dictionaryForm.dictionaryData2);
                     } else {
                         this.$message({
                             message: this.$chooseLang(res.data.code),
@@ -167,9 +165,6 @@ export default {
                 });
         },
         submitForm(formName) {
-            // 请求成功，清空数据
-            // this.dictionaryForm.dictionaryData1[0].dictionaryContent = '',
-            // this.dictionaryForm.dictionaryData2=[]
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
                     for (let i = 0; i < this.params.length; i++) {
@@ -187,22 +182,22 @@ export default {
                             return;
                         }
                     }
-                    this.edtiDictionaryTemplate();
+                    this.editDictionaryData();
                 } else {
                     return false;
                 }
             });
         },
         //编辑字典
-        edtiDictionaryTemplate() {
-            const { dictionaryName } = this.dictionaryForm;
+        editDictionaryData() {
+            // const { dictionaryName } = this.dictionaryForm;
             let data = {
                 id: this.editDictionaryId,
-                dictionaryName,
-                params: this.params,
+                dicName:this.dictionaryForm.dictionaryName,
+                dicContent: this.params,
             }
             // console.log(data);
-            createAccount(data).then((res) => {
+            updateDictionary(data).then((res) => {
                 if (res.data.code === 0) {
                     this.closeDialog()
                     this.$parent.getAccountList();

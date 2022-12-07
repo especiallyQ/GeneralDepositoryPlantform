@@ -6,19 +6,19 @@
                 <el-input v-model="dictionaryForm.dicName" maxlength="20" show-word-limit></el-input>
             </el-form-item>
             <el-form-item label="数据类型" prop="dicType">
-                <el-select v-model="dictionaryForm.dicType" placeholder="请选择数据类型" style="width: 100%">
+                <el-select v-model="dictionaryForm.dicType" @change="test" placeholder="请选择数据类型" style="width: 100%">
                     <el-option v-for="item in dataTypes" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
             </el-form-item>
-
-            <el-form-item label="字典内容" prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData1"
-                :key="index">
+            <el-form-item label="字典内容" v-for="(key, index) in dictionaryForm.dictionaryData1" :key="index"
+                :prop="key.dictionaryContent">
                 <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" style="width: 320px"></el-input>
                 <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
-            <el-form-item v-for="(key, index) in dictionaryForm.dictionaryData2" :key="index + 1">
+            <el-form-item prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData2"
+                :key="index + 1">
                 <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" class="el-input-width"
                     style="width: 320px"></el-input>
                 <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
@@ -34,8 +34,7 @@
 </template>
 
 <script>
-import { JSONSwitchFormData } from "@/util/util.js";
-import { addDictionary } from "@/util/api.js";
+import { addDictionary, dicictionaryName } from "@/util/api.js";
 export default {
     name: "dictionaryDialog",
     props: {
@@ -47,6 +46,7 @@ export default {
     },
     data() {
         return {
+            allDicName: [],
             loading: false,
             //存放选择框数据
             dataTypes: [
@@ -94,14 +94,16 @@ export default {
                         trigger: "change",
                     },
                 ],
-                dictionaryData1: [
-                    {
-                        required: true,
-                        message: "请输入字典内容",
-                        trigger: "blur",
-                    },
-                ],
+                dictionaryData1: [],
+                // dictionaryData1: [
+                //     {
+                //         required: true,
+                //         message: "请输入字典内容",
+                //         trigger: "blur",
+                //     },
+                // ],
             },
+            allDictionaryContent: [],
         };
     },
     computed: {
@@ -113,8 +115,60 @@ export default {
         },
     },
     mounted() {
+        this.getDictionaryName()
     },
     methods: {
+        // createRules() {
+
+        //     // console.log(this.dictionaryForm.dicType);
+        //     switch (this.dictionaryForm.dicType) {
+        //         case "整数":
+        //             let pattern = /^[0-9]*$/;
+        //             console.log(this.dictionaryForm.dictionaryData1[0].dictionaryContent);
+        //             if (!pattern.test(this.dictionaryForm.dictionaryData1[0].dictionaryContent)) {
+        //                 this.$message({
+        //                         type: "error",
+        //                         message: "字典内容必须为整数",
+        //                 });
+        //                 return;
+        //             }
+        //             console.log(pattern.test(this.dictionaryForm.dictionaryData1[0].dictionaryContent));
+        //             break;
+        //         case "zi":
+        //             console.log("整数");
+        //             this.rules.dictionaryData1 = [
+        //                 {
+        //                     required: true,
+        //                     message: "请输入整数",
+        //                     trigger: "blur",
+        //                 },
+        //                 {
+        //                     pattern: /^[0-9]*$/,
+        //                     message: "字典内容必须是整数",
+        //                     trigger: "blur",
+        //                 },
+        //             ];
+        //             console.log(this.rules);
+        //             break;
+        //         case "浮点数":
+        //             this.rules.dictionaryData1 = [
+        //                 {
+        //                     required: true,
+        //                     message: "请输入浮点数",
+        //                     trigger: "blur",
+        //                 },
+        //                 {
+        //                     pattern: /^[0-9]+([.][0-9]{1,})?$/,
+        //                     message: "字典内容必须是浮点数",
+        //                     trigger: "blur",
+        //                 },
+        //             ];
+        //             break;
+        //     }
+        // },
+        test() {
+            // console.log(this.dictionaryForm.dicType);
+        },
         // 点击+添加参数项
         addParameter() {
             this.dictionaryForm.dictionaryData2.push({
@@ -135,10 +189,10 @@ export default {
                 : false;
         },
         submitForm(formName) {
-
-            // 请求成功，清空数据
-            // this.dictionaryForm.dictionaryData1[0].dictionaryContent = '',
-            // this.dictionaryForm.dictionaryData2=[]
+            let data = this.dictionaryForm.dictionaryData2.map(key => {
+                return key.dictionaryContent
+            })
+            this.allDictionaryContent = [this.dictionaryForm.dictionaryData1[0].dictionaryContent, ...data]
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
                     for (let i = 0; i < this.params.length; i++) {
@@ -156,11 +210,55 @@ export default {
                             return;
                         }
                     }
+                    for (let j = 0; j < this.allDicName.length; j++) {
+                        if (this.dictionaryForm.dicName === this.allDicName[j]) {
+                            this.$message({
+                                type: "error",
+                                message: "字典名称已存在",
+                            });
+                            return;
+                        }
+                    }
+                    switch (this.dictionaryForm.dicType) {
+                        case "整数":
+                            let intData = /^[0-9]*$/;
+                            for (let i = 0; i < this.allDictionaryContent.length; i++) {
+                                if (!intData.test(this.allDictionaryContent[i])) {
+                                    this.$message({
+                                        type: "error",
+                                        message: "字典内容必须为整数",
+                                    });
+                                    return;
+                                }
+                            }
+                        case "浮点数":
+                            let floatData = /^[0-9]+([.][0-9]{1,})?$/;
+                            for (let j = 0; j < this.allDictionaryContent.length; j++) {
+                                console.log(this.allDictionaryContent[j]);
+                                if (!floatData.test(this.allDictionaryContent[j])) {
+                                    this.$message({
+                                        type: "error",
+                                        message: "字典内容必须为浮点型",
+                                    });
+                                    return;
+                                }
+                            }
+                    }
                     this.addDictionaryTemplate();
                 } else {
                     return false;
                 }
             });
+        },
+        //拿到所有字典内容的名字
+        async getDictionaryName() {
+            const res = await dicictionaryName();
+            if (res.data.code === 0) {
+                let dicDataName = res.data.data.map((obj) => {
+                    return obj.dicName
+                })
+                this.allDicName = dicDataName;
+            }
         },
         //新建字典
         addDictionaryTemplate() {
@@ -179,6 +277,7 @@ export default {
                     this.loading = false;
                     this.closeDialog()
                     this.$parent.selectPage();
+                    this.rules.dictionaryData1 = [];
                     this.$message({
                         type: "success",
                         message: "新建成功!",

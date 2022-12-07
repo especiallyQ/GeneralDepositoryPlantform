@@ -192,6 +192,17 @@ export function addDictionary(data) {
         }
     })
 }
+//编辑字典
+export function updateDictionary(data) {
+    return put({
+        url: `${url.ORG_LIST}/dictionary/updateDictionary`,
+        method: 'put',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
 
 //删除字典
 export function delDictionary(data) {
@@ -203,13 +214,24 @@ export function delDictionary(data) {
         }
     })
 }
-// 存证管理-获取存证模板编辑信息
+// 通过Id拿到字典模块数据
 export function getDictionaryById(data) {
     return get({
         url: `${url.ORG_LIST}/dictionary/getDictionary/${data}`,
         method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//存证管理模块-新建存证内容-自定义字典-内容
+export function dicictionaryName() {
+    return post({
+        url: `${url.ORG_LIST}/dictionary/getDictionaryName`,
+        method: 'post',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
+            // 'Content-Type': 'multipart/form-data'
         }
     })
 }
