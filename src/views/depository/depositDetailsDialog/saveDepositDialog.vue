@@ -277,6 +277,7 @@ export default {
       getInitAddDepository(this.templateMsg.id)
         .then((res) => {
           if (res.data.code === 0) {
+            this.parameter = res.data.data;
             this.parameter = JSON.parse(JSON.stringify(res.data.data));
             this.oldParameter = JSON.parse(JSON.stringify(res.data.data));
             this.createRules();
@@ -484,6 +485,7 @@ export default {
 
     // 创建验证规则
     createRules() {
+      console.log(this.parameter);
       for (let key of this.parameter) {
         switch (key.parameterType) {
           case "string":

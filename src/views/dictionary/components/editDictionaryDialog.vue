@@ -1,7 +1,8 @@
 <template>
     <el-dialog title="编辑字典" :visible.sync="editDictionaryDialogVisible" width="498px" align="center"
         :close-on-click-modal="false" @open="resetForm1('ruleForm')" :before-close="closeDialog">
-        <el-form :model="dictionaryForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form :model="dictionaryForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"
+            v-loading="getLoading">
             <el-form-item label="字典名称" prop="dictionaryName">
                 <el-input v-model="dictionaryForm.dictionaryName" maxlength="20" show-word-limit></el-input>
             </el-form-item>
@@ -24,7 +25,7 @@
                 <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
-
+            
             <el-form-item class="dialog-footer">
                 <el-button @click="resetForm('ruleForm')">取 消 </el-button>
                 <el-button type="primary" @click="submitForm('ruleForm')" :loading="loading">确 定</el-button>
@@ -34,7 +35,7 @@
 </template>
 
 <script>
-import { createAccount } from "@/util/api.js";
+import { updateDictionary, getDictionaryById } from "@/util/api.js";
 export default {
     name: "editDictionaryDialog",
     props: {
@@ -43,7 +44,7 @@ export default {
             default: false,
             required: true,
         },
-        editTemplateNameId: {
+        editDictionaryId: {
             type: Number,
             required: true,
         },
@@ -51,18 +52,19 @@ export default {
     data() {
         return {
             loading: false,
+            getLoading: false,
             //存放选择框数据
             dataTypes: [
                 {
-                    value: "string",
+                    value: "字符串",
                     label: "字符串",
                 },
                 {
-                    value: "int",
+                    value: "整数",
                     label: "整数",
                 },
                 {
-                    value: "float",
+                    value: "浮点数",
                     label: "浮点数",
                 },
             ],
@@ -109,12 +111,12 @@ export default {
         },
     },
     mounted() {
-        this.open();
+        this.open()
     },
     methods: {
         // 点击+添加参数项
         addParameter() {
-            this.dictionaryForm.dictionaryData2.push({
+            this.dictionaryForm.dictionaryData2.push({  
                 dictionaryContent: "", //参数名称
             });
         },
@@ -131,14 +133,22 @@ export default {
                 ? true
                 : false;
         },
+
+
         open() {
-            getEditDepositoryTemplate(this.editTemplateNameId)
+            this.getLoading = true;
+            getDictionaryById(this.editDictionaryId)
                 .then((res) => {
                     if (res.data.code === 0) {
-                        this.dictionaryForm.dictionaryName = res.data.data.dictionaryName;
-                        this.dictionaryForm.dataType = res.data.data.dataType;
-                        this.dictionaryForm.dictionaryData1[0].dictionaryContent = res.data.data;
-                        this.dictionaryForm.dictionaryData2 = res.data.data;
+                        console.log(res.data.data);
+                        this.getLoading = false;
+                        this.dictionaryForm.dictionaryName = res.data.data.dicName;
+                        this.dictionaryForm.dataType = res.data.data.dicType;
+                        this.dictionaryForm.dictionaryData1[0].dictionaryContent = res.data.data.dicContent.splice(0, 1);
+                        console.log(res.data.data.dicContent);
+                        let data = res.data.data.dicContent;
+                        this.dictionaryForm.dictionaryData2 = data
+                        console.log(this.dictionaryForm.dictionaryData2);
                     } else {
                         this.$message({
                             message: this.$chooseLang(res.data.code),
@@ -155,9 +165,6 @@ export default {
                 });
         },
         submitForm(formName) {
-            // 请求成功，清空数据
-            // this.dictionaryForm.dictionaryData1[0].dictionaryContent = '',
-            // this.dictionaryForm.dictionaryData2=[]
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
                     for (let i = 0; i < this.params.length; i++) {
@@ -175,22 +182,22 @@ export default {
                             return;
                         }
                     }
-                    this.edtiDictionaryTemplate();
+                    this.editDictionaryData();
                 } else {
                     return false;
                 }
             });
         },
         //编辑字典
-        edtiDictionaryTemplate() {
-            const { dictionaryName} = this.dictionaryForm;
+        editDictionaryData() {
+            // const { dictionaryName } = this.dictionaryForm;
             let data = {
-                id: this.editTemplateNameId,
-                dictionaryName,
-                params: this.params,
+                id: this.editDictionaryId,
+                dicName:this.dictionaryForm.dictionaryName,
+                dicContent: this.params,
             }
-            console.log(data);
-            createAccount(data).then((res) => {
+            // console.log(data);
+            updateDictionary(data).then((res) => {
                 if (res.data.code === 0) {
                     this.closeDialog()
                     this.$parent.getAccountList();

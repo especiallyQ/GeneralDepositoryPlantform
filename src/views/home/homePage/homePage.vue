@@ -63,10 +63,12 @@
                                 <el-input v-model="verifyFormFile.fileHash" style="width:578px" disabled></el-input>
                                 <el-upload class="upload-file" action="" ref="upload" :limit="1" :file-list="fileList"
                                     :auto-upload="true" :before-upload="beforeUpload" :on-exceed="handleExceed"
-                                    :on-change="handleChange" :http-request="Upload">
+                                    :on-change="handleChange" :http-request="Upload" :on-remove="handleRemove">
                                     <el-button type="primary">点击上传</el-button>
                                 </el-upload>
                             </el-form-item>
+                            <el-progress :percentage="parseInt(percentage)" status="success"
+                                style="width:94%;margin-left:82px;margin-top: -20px;"></el-progress>
                             <el-form-item label="验证码" prop="verifyCode">
                                 <el-input v-model="verifyFormFile.verifyCode" placeholder="请输入验证码" maxlength="4"
                                     style="width:600px"></el-input>
@@ -76,7 +78,7 @@
                                 </span>
                             </el-form-item>
                             <el-button type="primary" class="rigth-btn" @click="submit1('verifyFormFile')"
-                                :loading="logining1">查询</el-button>
+                                :loading="logining1" :disabled="disabled">查询</el-button>
                         </el-form>
                         <div class="table-footer" v-show="fileVisible">
                             <el-table :data="tableFileData" border style="width: 100%"
@@ -128,6 +130,9 @@ export default {
     name: "HomePage",
     data() {
         return {
+            percentage: 0,
+
+            disabled: true,
             logining: false,
             logining1: false,
             dialogVisible: false,//控制查看详情dialog是否显示
@@ -202,14 +207,30 @@ export default {
     },
     methods: {
         Upload() {
-                let data = JSONSwitchFormData({ "file": this.file });
-            getFileHash(data).then((res) => {
-                    this.verifyFormFile.fileHash = res.data.data
-                })
-            
+            let func = this.uploadProgress;
+            let data = JSONSwitchFormData({ "file": this.file });
+            getFileHash(data, func).then((res) => {
+                if (res.data.code == 0) {
+                    this.disabled = false;
+                    this.verifyFormFile.fileHash = res.data.data;
+                    this.$message({
+                        message: '上传成功',
+                        type: "success",
+                    });
+                }
+            })
+
+        },
+        uploadProgress(progressEvent) {
+            // console.log(Math.round((progressEvent.loaded / progressEvent.total) * 10000) / 100.0);
+            this.percentage = Math.round((progressEvent.loaded / progressEvent.total) * 10000) / 100.0;
         },
         handleChange(file, fileList) {
             this.fileH = file;
+        },
+        handleRemove(file) {
+            console.log(file);
+            this.verifyFormFile.fileHash = '';
         },
         async getDepositoryListData() {
             const res = await getDepositoryList()
@@ -217,7 +238,7 @@ export default {
                 this.DepositoryListData = res.data.data;
             } else {
                 this.$message({
-                    message: '',
+                    message: '系统错误',
                     type: "error",
                     duration: 2000,
                 });
@@ -254,7 +275,7 @@ export default {
             });
         },
         async inquire() {
-            this.$refs.upload.submit();
+            // this.$refs.upload.submit();
             if (this.tabId == 0) {
                 let resData = {
                     ...this.verifyForm,
@@ -286,7 +307,7 @@ export default {
             } else {
                 let respData = {
                     ...this.verifyFormFile,
-                    file: this.file,
+                    // file: this.file,
                     verifyCodeToken: this.verifyCodeToken
                 }
                 // let data = JSONSwitchFormData(this.file);

@@ -56,7 +56,7 @@
                     <el-input v-model="accountForm.name" disabled></el-input>
                 </el-form-item>
                 <el-form-item label="联系方式" prop="contact">
-                    <el-input v-model="accountForm.contact"></el-input>
+                    <el-input v-model="accountForm.contact" ></el-input>
                 </el-form-item>
                 <el-form-item label="账号类型" prop="type">
                     <el-select v-model="accountForm.type" placeholder="请选择活动区域" style="width: 100%" disabled>
@@ -66,7 +66,7 @@
                 </el-form-item>
                 <el-form-item class="dialog-footer">
                     <el-button @click="reviseUserAccountDialogVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+                    <el-button type="primary" @click="submitForm('ruleForm')" :disabled="disabled">确 定</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>
@@ -98,6 +98,8 @@ export default {
             createUserAccountDialogVisible: false, //控制新建dialog是否显示
             reviseUserAccountDialogVisible: false, //控制修改dialog是否显示
             dialogVisible: false, //控制删除dialog是否显示
+            disabled: true,
+            oldContact:'',
             //存放表单数据
             accountForm: {
                 name: "",
@@ -148,6 +150,15 @@ export default {
     mounted() {
         this.getAccountList();
     },
+    watch: {
+        "accountForm.contact": function (newContact, oldContact) {
+            if (newContact != this.oldContact) {
+                this.disabled = false;
+            } else {
+                this.disabled = true;
+            }
+        }
+    },
     computed: {},
     methods: {
         submitForm(formName) {
@@ -194,24 +205,35 @@ export default {
         },
         //点击编辑时渲染数据
         reviseAccount(row) {
+            this.disabled = true;
             this.reviseUserAccountDialogVisible = true;
             this.accountForm.name = row.accountName;
             this.accountForm.contact = row.contact;
             this.accountForm.type = row.roleZh;
             this.accountForm.id = row.accountId;
+            this.oldContact = row.contact;
+            // console.log(this.oldContact);
         },
+
+        // isUpdataAccount() {
+        //     if()
+            
+        // },
         //编辑账号
         async update() {
-            this.reviseUserAccountDialogVisible = false;
+            // console.log(this.accountForm.contact);
             let formData = JSONSwitchFormData(this.accountForm);
             const res = await updateAccount(formData);
             if (res.data.code === 0) {
+                this.reviseUserAccountDialogVisible = false;
                 this.$message({
                     type: "success",
                     message: "编辑成功!",
                 });
+                this.pageNumber = 1;
                 this.getAccountList();
             } else {
+                this.reviseUserAccountDialogVisible = false;
                 this.$message({
                     message: this.$chooseLang(res.data.code),
                     type: "error",
@@ -268,7 +290,10 @@ export default {
                         cancelButtonText: "取消",
                     })
                         .then(async () => {
-                            const res = await resetAccountPassword(row.accountId);
+                            console.log(row);
+                            const res = await resetAccountPassword({
+                                accountId: row.accountId,
+                                accountName : row.accountName});
                             if (res.data.code === 0) {
                                 this.$message({
                                     type: "success",

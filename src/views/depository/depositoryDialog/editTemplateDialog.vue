@@ -146,10 +146,12 @@ export default {
 
     open() {
       this.getLoading = true;
+      
       // 获取模板数据
       getEditDepositoryTemplate(this.editTemplateNameId)
         .then((res) => {
           if (res.data.code === 0) {
+            console.log(res.data.data);
             const { depositoryTemplateName, remark, params } = res.data.data;
             this.remark = remark || "";
             this.form.depositoryTemplateName = depositoryTemplateName;
