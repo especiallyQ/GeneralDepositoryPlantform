@@ -82,9 +82,9 @@
                   重置密码</el-button
                 >
                 <el-button
-                  :disabled="row.roleId !== 2"
                   type="text"
                   style="font-size: 12px"
+                  v-if="row.roleId == 2"
                   @click="getAuthorityManagement(row)"
                 >
                   权限管理</el-button
@@ -153,7 +153,19 @@
       </el-form>
     </el-dialog>
     <el-drawer title="权限配置" :visible.sync="drawer">
-      <span>我来啦!</span>
+      <el-tree
+        :data="data"
+        show-checkbox
+        node-key="id"
+        :default-expanded-keys="[2, 3]"
+        :default-checked-keys="[9]"
+        :props="defaultProps"
+      >
+      </el-tree>
+      <div class="footer-btn">
+        <el-button style="width: 200px">重置</el-button>
+        <el-button type="primary" style="width: 200px">提交</el-button>
+      </div>
     </el-drawer>
   </div>
 </template>
@@ -228,6 +240,54 @@ export default {
             trigger: "blur",
           },
         ],
+      },
+      data: [
+        {
+          id: 1,
+          label: "数据源1",
+          children: [
+            {
+              id: 4,
+              label: "慈善存证模板",
+            },
+            {
+              id: 5,
+              label: "碳资产存证模板",
+              children: [
+                {
+                  id: 8,
+                  label: "录入存证内容",
+                },
+                {
+                  id: 9,
+                  label: "查看存证内容",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          label: "数据源2",
+        },
+        {
+          id: 3,
+          label: "数据源3",
+          children: [
+            {
+              id: 6,
+              label: "二级 3-1",
+            },
+            {
+              id: 7,
+              label: "二级 3-2",
+            },
+          ],
+        },
+      ],
+      defaultProps: {
+        children: "children",
+        label: "label",
       },
     };
   },
@@ -459,5 +519,11 @@ export default {
 .el-button.is-disabled {
   background-color: transparent !important;
   border-color: transparent !important;
+}
+
+.footer-btn {
+  position: absolute;
+  top: 93%;
+  left: 26px;
 }
 </style>
