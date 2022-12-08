@@ -22,7 +22,7 @@
             :props="parameterProps"
             :show-all-levels="false" 
             class="el-input-width"
-            @focus="getDictionaryName"
+            
             filterable>
           </el-cascader>
           <!-- <el-select v-model="key.parameterType" placeholder="参数类型" class="el-input-width" @change="changeFileDisabled">
@@ -55,7 +55,6 @@
             :props="parameterProps"
             :show-all-levels="false" 
             class="el-input-width"
-            @focus="getDictionaryName"
             filterable>
           </el-cascader>
 
@@ -98,6 +97,7 @@ export default {
   },
   data() {
     return {
+
       containerNode:null,
       timer: null,
       dialogFormVisible: this.createTemplateDialogVisible, //控制dialog是否显示
@@ -128,7 +128,7 @@ export default {
       parameterOption: [
         {
           label: "自定义字典",
-          value: "dic",
+          value: "dictionary",
           disabled: false,
           children:[]
         },
@@ -189,6 +189,9 @@ export default {
       ];
     },
   },
+  mounted() {
+    this.getDictionaryName()
+  },
   methods: {
     async getDictionaryName() {
       const res = await dicictionaryName();
@@ -200,6 +203,12 @@ export default {
           }
       })
         this.parameterOption[0].children = dicData;
+      }
+      else {
+        this.$message({
+                type: "error",
+                message: "",
+              });
       }
     },
     close() {
@@ -260,6 +269,16 @@ export default {
 
     // 存证模板新建方法
     addDepositoryTemplate() {
+      // console.log(this.parameterOption[0].value);
+      console.log(this.params);
+      for (let i = 0; i < this.params.length; i++){
+        if (this.params[i].parameterType[0] == "dictionary") {
+          this.params[i].parameterType = this.params[i].parameterType[1]
+        } else {
+          this.params[i].parameterType = this.params[i].parameterType[0];
+        }
+
+      }
       const { depositoryTemplateName, remark } = this.form;
       let data = {
         depositoryTemplateName,
@@ -300,7 +319,7 @@ export default {
     // 判断文件类型是否被选中
     changeFileDisabled() {
       for (let i = 0; i < this.params.length; i++) {
-        if (this.params[i].parameterType === "file") {
+        if (this.params[i].parameterType[0] === "file") {
           this.parameterOption[this.parameterOption.length - 1].disabled = true;
           break;
         } else {

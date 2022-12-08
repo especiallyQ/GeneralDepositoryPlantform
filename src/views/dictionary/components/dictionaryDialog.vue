@@ -6,8 +6,8 @@
                 <el-input v-model="dictionaryForm.dicName" maxlength="20" show-word-limit></el-input>
             </el-form-item>
             <el-form-item label="数据类型" prop="dicType">
-                <el-select v-model="dictionaryForm.dicType" @change="test" placeholder="请选择数据类型" style="width: 100%">
-                    <el-option v-for="item in dataTypes" :key="item.value" :label="item.label" :value="item.value">
+                <el-select v-model="dictionaryForm.dicTypeLable" @change="getDicType" placeholder="请选择数据类型" style="width: 100%">
+                    <el-option v-for="item in dataTypes" :key="item.value" :label="item.label" :value="{value:item.value,label:item.label}">
                     </el-option>
                 </el-select>
             </el-form-item>
@@ -51,21 +51,22 @@ export default {
             //存放选择框数据
             dataTypes: [
                 {
-                    value: "字符串",
+                    value: "string",
                     label: "字符串",
                 },
                 {
-                    value: "整数",
+                    value: "int",
                     label: "整数",
                 },
                 {
-                    value: "浮点数",
+                    value: "float",
                     label: "浮点数",
                 },
             ],
             dictionaryForm: {
                 dicName: "", //字典名称
-                dicType: "", //数据类型
+                dicType: "", //数据类型value
+                dicTypeLable:'',//数据类型lable
                 dictionaryData1: [
                     {
                         dictionaryContent: "",
@@ -118,56 +119,11 @@ export default {
         this.getDictionaryName()
     },
     methods: {
-        // createRules() {
-
-        //     // console.log(this.dictionaryForm.dicType);
-        //     switch (this.dictionaryForm.dicType) {
-        //         case "整数":
-        //             let pattern = /^[0-9]*$/;
-        //             console.log(this.dictionaryForm.dictionaryData1[0].dictionaryContent);
-        //             if (!pattern.test(this.dictionaryForm.dictionaryData1[0].dictionaryContent)) {
-        //                 this.$message({
-        //                         type: "error",
-        //                         message: "字典内容必须为整数",
-        //                 });
-        //                 return;
-        //             }
-        //             console.log(pattern.test(this.dictionaryForm.dictionaryData1[0].dictionaryContent));
-        //             break;
-        //         case "zi":
-        //             console.log("整数");
-        //             this.rules.dictionaryData1 = [
-        //                 {
-        //                     required: true,
-        //                     message: "请输入整数",
-        //                     trigger: "blur",
-        //                 },
-        //                 {
-        //                     pattern: /^[0-9]*$/,
-        //                     message: "字典内容必须是整数",
-        //                     trigger: "blur",
-        //                 },
-        //             ];
-        //             console.log(this.rules);
-        //             break;
-        //         case "浮点数":
-        //             this.rules.dictionaryData1 = [
-        //                 {
-        //                     required: true,
-        //                     message: "请输入浮点数",
-        //                     trigger: "blur",
-        //                 },
-        //                 {
-        //                     pattern: /^[0-9]+([.][0-9]{1,})?$/,
-        //                     message: "字典内容必须是浮点数",
-        //                     trigger: "blur",
-        //                 },
-        //             ];
-        //             break;
-        //     }
-        // },
-        test() {
-            // console.log(this.dictionaryForm.dicType);
+        getDicType(val) {
+            const { value, label } = val;
+            this.dictionaryForm.dicType = value;
+            this.dictionaryForm.dicTypeLable = label;
+            
         },
         // 点击+添加参数项
         addParameter() {
@@ -232,9 +188,9 @@ export default {
                                 }
                             }
                         case "浮点数":
+                            
                             let floatData = /^[0-9]+([.][0-9]{1,})?$/;
                             for (let j = 0; j < this.allDictionaryContent.length; j++) {
-                                console.log(this.allDictionaryContent[j]);
                                 if (!floatData.test(this.allDictionaryContent[j])) {
                                     this.$message({
                                         type: "error",
@@ -262,13 +218,14 @@ export default {
         },
         //新建字典
         addDictionaryTemplate() {
-            const { dicName, dicType } = this.dictionaryForm;
+            const { dicName, dicType ,dicTypeLable} = this.dictionaryForm;
             let dicContent = this.params.map(obj => {
                 return obj.dictionaryContent
             })
             let data = {
                 dicName,
                 dicType,
+                dicTypeLable,
                 dicContent: dicContent,
             }
             this.loading = true;
