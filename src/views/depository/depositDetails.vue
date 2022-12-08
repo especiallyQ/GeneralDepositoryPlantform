@@ -146,7 +146,7 @@ export default {
       tableData: [], //存证信息列表数据
       newTableHeader: [], //存证信息列表表头
       enteringDepositDialogVisible: false, //录入存证信息Dialog
-      dialogFlag: 0, //区分Dialog 0表示录入 1表示数据校验
+      dialogFlag: 0, //区分Dialog 0表示录入Dialog 1表示编辑存证信息 2表示数据校验Dialog
       depositoryId: null, //数据校验列表id
       setBtnShow: false, //录入按钮是否可见
     };
