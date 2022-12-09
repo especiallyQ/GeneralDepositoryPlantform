@@ -200,7 +200,7 @@ export default {
             localStorage.setItem("sidebarHide", "false");
 
             router.push("/main");
-          } else {
+          } else {  
             this.changeCode();
             this.msgErrorContent = this.$chooseLang(res.data.code);
             this.msgError = true;
