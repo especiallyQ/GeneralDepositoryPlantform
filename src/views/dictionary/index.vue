@@ -86,15 +86,15 @@ export default {
                     label: "全部",
                 },
                 {
-                    value: "string",
+                    value: "字符串",
                     label: "字符串",
                 },
                 {
-                    value: "int",
+                    value: "整数",
                     label: "整数",
                 },
                 {
-                    value: "float",
+                    value: "浮点数",
                     label: "浮点数",
                 },
             ],

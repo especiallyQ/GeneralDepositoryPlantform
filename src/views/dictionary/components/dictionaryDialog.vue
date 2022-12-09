@@ -6,7 +6,7 @@
                 <el-input v-model="dictionaryForm.dicName" maxlength="20" show-word-limit></el-input>
             </el-form-item>
             <el-form-item label="数据类型" prop="dicType">
-                <el-select v-model="dictionaryForm.dicTypeLable" @change="getDicType" placeholder="请选择数据类型" style="width: 100%">
+                <el-select v-model="dictionaryForm.dicTypeLabel" @change="getDicType" placeholder="请选择数据类型" style="width: 100%">
                     <el-option v-for="item in dataTypes" :key="item.value" :label="item.label" :value="{value:item.value,label:item.label}">
                     </el-option>
                 </el-select>
@@ -66,7 +66,7 @@ export default {
             dictionaryForm: {
                 dicName: "", //字典名称
                 dicType: "", //数据类型value
-                dicTypeLable:'',//数据类型lable
+                dicTypeLabel:'',//数据类型lable
                 dictionaryData1: [
                     {
                         dictionaryContent: "",
@@ -122,7 +122,7 @@ export default {
         getDicType(val) {
             const { value, label } = val;
             this.dictionaryForm.dicType = value;
-            this.dictionaryForm.dicTypeLable = label;
+            this.dictionaryForm.dicTypeLabel = label;
             
         },
         // 点击+添加参数项
@@ -218,14 +218,14 @@ export default {
         },
         //新建字典
         addDictionaryTemplate() {
-            const { dicName, dicType ,dicTypeLable} = this.dictionaryForm;
+            const { dicName, dicType ,dicTypeLabel} = this.dictionaryForm;
             let dicContent = this.params.map(obj => {
                 return obj.dictionaryContent
             })
             let data = {
                 dicName,
                 dicType,
-                dicTypeLable,
+                dicTypeLabel,
                 dicContent: dicContent,
             }
             this.loading = true;

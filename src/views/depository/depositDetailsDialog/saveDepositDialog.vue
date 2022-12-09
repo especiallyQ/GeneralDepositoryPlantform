@@ -189,9 +189,12 @@ export default {
   },
 
   methods: {
+    
     // 改变表单内容
     changeInput(event, item) {
       for (let key of this.oldParameter) {
+        console.log('@@@@@@@@@@@key@@@'+key.parameterValue);
+        console.log('@@@@@@@@@@@event@@'+event);
         if (key.parameterName === item.parameterName) {
           if (
             key.parameterValue !== event &&
@@ -485,7 +488,6 @@ export default {
 
     // 创建验证规则
     createRules() {
-      console.log(this.parameter);
       for (let key of this.parameter) {
         switch (key.parameterType) {
           case "string":
