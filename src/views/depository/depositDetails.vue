@@ -69,7 +69,7 @@
             show-overflow-tooltip
           >
           </el-table-column>
-          <el-table-column label="操作" align="center" min-width="220px">
+          <el-table-column label="操作" align="center" min-width="250px">
             <template slot-scope="scope">
               <el-button
                 type="text"
