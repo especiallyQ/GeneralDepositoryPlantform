@@ -123,7 +123,6 @@ export default {
     },
     form: {
       handler() {
-        console.log(this.form.remark);
         if (this.remark === this.form.remark) {
           this.btnDisable = true;
         } else {
@@ -151,13 +150,15 @@ export default {
       getEditDepositoryTemplate(this.editTemplateNameId)
         .then((res) => {
           if (res.data.code === 0) {
-            console.log(res.data.data);
+            // console.log(res.data.data.params);
             const { depositoryTemplateName, remark, params } = res.data.data;
             this.remark = remark || "";
             this.form.depositoryTemplateName = depositoryTemplateName;
             this.form.remark = remark || "";
             this.form.parameterParamsForm1 = params.splice(0, 1);
             this.form.parameterParamsForm2 = params;
+            console.log(this.form.parameterParamsForm1);
+            console.log( this.form.parameterParamsForm2);
             this.getLoading = false;
           } else {
             this.$message({

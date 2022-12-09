@@ -22,7 +22,7 @@
                         </el-table-column>
                         <el-table-column prop="dicType" label="数据类型" align="center">
                         </el-table-column>
-                        <el-table-column prop="dicContent" label="字典内容" align="center">
+                        <el-table-column prop="dicContent" label="字典内容" align="center" show-overflow-tooltip>
                         </el-table-column>
                         <el-table-column label="操作" align="center" class="remarks">
                             <template slot-scope="{ row }">
@@ -45,7 +45,7 @@
                 </el-pagination>
             </div>
         </div>
-        <DictionaryDialog :createDictionaryDialogVisible.sync="createDictionaryDialogVisible"></DictionaryDialog>
+        <DictionaryDialog v-if="createDictionaryDialogVisible" :createDictionaryDialogVisible.sync="createDictionaryDialogVisible"></DictionaryDialog>
         <EditDictionaryDialog v-if="editDictionaryDialogVisible" :editDictionaryDialogVisible.sync="editDictionaryDialogVisible"
             :editDictionaryId="editDictionaryId">
         </EditDictionaryDialog>

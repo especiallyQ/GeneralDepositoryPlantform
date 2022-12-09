@@ -4,7 +4,8 @@
         <el-form :model="dictionaryForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm"
             v-loading="getLoading">
             <el-form-item label="字典名称" prop="dictionaryName">
-                <el-input v-model="dictionaryForm.dictionaryName" maxlength="20" show-word-limit></el-input>
+                <el-input @input="(event) => changeInput(event)" v-model="dictionaryForm.dictionaryName" maxlength="20"
+                    show-word-limit></el-input>
             </el-form-item>
             <el-form-item label="数据类型">
                 <el-select v-model="dictionaryForm.dataType" placeholder="请选择数据类型" style="width: 100%" disabled>
@@ -15,27 +16,29 @@
 
             <el-form-item label="字典内容" prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData1"
                 :key="index">
-                <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" style="width: 320px"></el-input>
+                <el-input @input="(event) => changeInputDicData1(event)" v-model.trim="key.dictionaryContent"
+                    placeholder="请输入字典内容" style="width: 320px"></el-input>
                 <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
             <el-form-item v-for="(key, index) in dictionaryForm.dictionaryData2" :key="index + 1">
                 <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" class="el-input-width"
-                    style="width: 320px"></el-input>
+                    style="width: 320px" @input="(event) => changeInputDicData2(event)"></el-input>
                 <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
-            
+
             <el-form-item class="dialog-footer">
                 <el-button @click="resetForm('ruleForm')">取 消 </el-button>
-                <el-button type="primary" @click="submitForm('ruleForm')" :loading="loading">确 定</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm')" :loading="loading" :disabled="disabled">确
+                    定</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
 </template>
 
 <script>
-import { updateDictionary, getDictionaryById } from "@/util/api.js";
+import { updateDictionary, getDictionaryById, dicictionaryName } from "@/util/api.js";
 export default {
     name: "editDictionaryDialog",
     props: {
@@ -53,6 +56,12 @@ export default {
         return {
             loading: false,
             getLoading: false,
+            disabled: true,//确定按钮是否禁用
+            oldDictionaryName: '',
+            oldDictionaryContent1: '',
+            oldDictionaryContent2: '',
+            allDicName: [],//存放所有字典名字
+            allDictionaryContent: [],
             //存放选择框数据
             dataTypes: [
                 {
@@ -112,11 +121,41 @@ export default {
     },
     mounted() {
         this.open()
+        this.getDictionaryName()
     },
     methods: {
+        //编辑字典时，字典名称发生改变，确定按钮可以用，否则禁用
+        changeInput(event) {
+            if (this.oldDictionaryName != event) {
+                this.disabled = false;
+            } else {
+                this.disabled = true;
+            }
+        },
+        //编辑字典时，字典内容1发生改变，确定按钮可以用，否则禁用
+        changeInputDicData1(event) {
+            if (this.oldDictionaryContent1 != event) {
+                this.disabled = false;
+            } else {
+                this.disabled = true;
+            }
+        },
+        //编辑字典时，字典内容2发生改变，确定按钮可以用，否则禁用
+        changeInputDicData2(event) {
+            let data = this.oldDictionaryContent2.map((obj) => {
+                return obj.dictionaryContent
+            })
+            for (let i = 0; i < this.oldDictionaryContent2.length; i++) {
+                if (data.indexOf(event) == -1) {
+                    this.disabled = false;
+                } else {
+                    this.disabled = true;
+                }
+            }
+        },
         // 点击+添加参数项
         addParameter() {
-            this.dictionaryForm.dictionaryData2.push({  
+            this.dictionaryForm.dictionaryData2.push({
                 dictionaryContent: "", //参数名称
             });
         },
@@ -134,21 +173,19 @@ export default {
                 : false;
         },
 
-
         open() {
             this.getLoading = true;
             getDictionaryById(this.editDictionaryId)
                 .then((res) => {
                     if (res.data.code === 0) {
-                        console.log(res.data.data);
                         this.getLoading = false;
+                        this.oldDictionaryName = res.data.data.dicName; //存未改变的字典名称
                         this.dictionaryForm.dictionaryName = res.data.data.dicName;
                         this.dictionaryForm.dataType = res.data.data.dicType;
-                        this.dictionaryForm.dictionaryData1[0].dictionaryContent = res.data.data.dicContent.splice(0, 1);
-                        console.log(res.data.data.dicContent);
-                        let data = res.data.data.dicContent;
-                        this.dictionaryForm.dictionaryData2 = data
-                        console.log(this.dictionaryForm.dictionaryData2);
+                        this.oldDictionaryContent1 = res.data.data.dicContent[0].dictionaryContent;
+                        this.dictionaryForm.dictionaryData1 = res.data.data.dicContent.splice(0, 1);
+                        this.oldDictionaryContent2 = JSON.parse(JSON.stringify(res.data.data.dicContent));
+                        this.dictionaryForm.dictionaryData2 = res.data.data.dicContent;
                     } else {
                         this.$message({
                             message: this.$chooseLang(res.data.code),
@@ -164,7 +201,22 @@ export default {
                     });
                 });
         },
+        //拿到所有字典内容的名字
+        async getDictionaryName() {
+            const res = await dicictionaryName();
+            if (res.data.code === 0) {
+                let dicDataName = res.data.data.map((obj) => {
+                    return obj.dicName
+                })
+                dicDataName.splice(this.editDictionaryId - 1, 1);
+                this.allDicName = dicDataName;
+            }
+        },
         submitForm(formName) {
+            let data = this.dictionaryForm.dictionaryData2.map(key => {
+                return key.dictionaryContent
+            })
+            this.allDictionaryContent = [this.dictionaryForm.dictionaryData1[0].dictionaryContent, ...data]
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
                     for (let i = 0; i < this.params.length; i++) {
@@ -182,6 +234,40 @@ export default {
                             return;
                         }
                     }
+                    for (let j = 0; j < this.allDicName.length; j++) {
+                        if (this.dictionaryForm.dictionaryName === this.allDicName[j]) {
+                            this.$message({
+                                type: "error",
+                                message: "字典名称已存在",
+                            });
+                            return;
+                        }
+                    }
+                    switch (this.dictionaryForm.dataType) {
+                        case "整数":
+                            let intData = /^[0-9]*$/;
+                            for (let i = 0; i < this.allDictionaryContent.length; i++) {
+                                if (!intData.test(this.allDictionaryContent[i])) {
+                                    this.$message({
+                                        type: "error",
+                                        message: "字典内容必须为整数",
+                                    });
+                                    return;
+                                }
+                            }
+                        case "浮点数":
+
+                            let floatData = /^[0-9]+([.][0-9]{1,})?$/;
+                            for (let j = 0; j < this.allDictionaryContent.length; j++) {
+                                if (!floatData.test(this.allDictionaryContent[j])) {
+                                    this.$message({
+                                        type: "error",
+                                        message: "字典内容必须为浮点型",
+                                    });
+                                    return;
+                                }
+                            }
+                    }
                     this.editDictionaryData();
                 } else {
                     return false;
@@ -190,17 +276,21 @@ export default {
         },
         //编辑字典
         editDictionaryData() {
+            let dicContent = this.params.map(obj => {
+                return obj.dictionaryContent
+            })
             // const { dictionaryName } = this.dictionaryForm;
             let data = {
                 id: this.editDictionaryId,
-                dicName:this.dictionaryForm.dictionaryName,
-                dicContent: this.params,
+                dicName: this.dictionaryForm.dictionaryName,
+                dicContent: dicContent,
             }
-            // console.log(data);
+            this.loading = true;
             updateDictionary(data).then((res) => {
                 if (res.data.code === 0) {
+                    this.loading = false
                     this.closeDialog()
-                    this.$parent.getAccountList();
+                    this.$parent.selectPage();
                     this.$message({
                         type: "success",
                         message: "新建成功!",
@@ -239,6 +329,6 @@ export default {
 
 <style scoped>
 .demo-ruleForm .dialog-footer {
-    margin-left: 195px;
+    text-align: right;
 }
 </style>
