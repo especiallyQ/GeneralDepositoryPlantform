@@ -17,7 +17,10 @@
               <el-tag effect="dark" size="mini" type="danger" v-else>
                 已冻结
               </el-tag>
-              <el-button size="small" @click="backDepositDetails"
+              <el-button
+                class="backBtn"
+                size="small"
+                @click="backDepositDetails"
                 >返回</el-button
               >
             </div>
@@ -78,7 +81,7 @@ import {
   getTemplateDetailsData,
   getDepositoryHistoryMessage,
 } from "@/util/api";
-import { rgb } from "@/util/util";
+import { rgb, getDate } from "@/util/util";
 export default {
   name: "DepositoryHis",
   components: {
@@ -121,6 +124,7 @@ export default {
               });
             }
             this.templateMsg = res.data.data;
+            this.templateMsg.createTime = getDate(res.data.data.createTime);
             this.firstCharacter =
               res.data.data.depositoryTemplateName.substring(0, 1);
             this.DepositPageLoading = false;
@@ -153,9 +157,10 @@ export default {
             this.tableData = [];
             for (let key of res.data.data.depositoryList) {
               const { createTime, approver, submitter } = key;
+              let create_time = getDate(createTime);
               this.tableData.push({
                 approver,
-                createTime,
+                create_time,
                 submitter,
                 ...JSON.parse(key.content),
               });
@@ -196,7 +201,7 @@ export default {
 
     // 返回存证信息
     backDepositDetails() {
-      this.$router.go(-1)
+      this.$router.go(-1);
     },
   },
 
@@ -219,9 +224,9 @@ export default {
           width: "195px",
         },
         {
-          enName: "createTime",
+          enName: "create_time",
           name: "提交时间",
-          props: "createTime",
+          props: "create_time",
           align: "center",
           width: "195px",
         },
@@ -247,8 +252,9 @@ export default {
   font-size: 18px;
   font-weight: bolder;
 }
-
-.template-details {
+.search-part{
+  position: relative;
+  .template-details {
   width: calc(100% - 40px);
 
   .template-name-freeze {
@@ -257,17 +263,24 @@ export default {
     font-weight: bolder;
     display: flex;
     letter-spacing: 0.5px;
+    line-height: 35px;
 
     .freeze-thaw {
       margin-left: 10px;
-      line-height: 22px;
-      width: 92%;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+
+      .backBtn{
+        position: absolute;
+        top: 30px;
+        left: 1200px;
+      }
     }
   }
 }
+}
+
 
 .depository-list {
   margin: -15px 25px 0 25px;

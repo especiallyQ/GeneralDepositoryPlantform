@@ -269,8 +269,6 @@ export default {
 
     // 存证模板新建方法
     addDepositoryTemplate() {
-      // console.log(this.parameterOption[0].value);
-      console.log(this.params);
       for (let i = 0; i < this.params.length; i++){
         if (this.params[i].parameterType[0] == "dictionary") {
           this.params[i].parameterType = this.params[i].parameterType[1]
@@ -285,7 +283,6 @@ export default {
         remark,
         params: this.params,
       };
-      console.log(data);
       this.loading = true;
       saveDepoTemplate(data)
         .then((res) => {
