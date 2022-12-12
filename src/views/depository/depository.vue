@@ -14,7 +14,7 @@
                 <el-option
                   v-for="item in dataOriginOptions"
                   :key="item.id1"
-                  :label="item.name"
+                  :label="item.label"
                   :value="item.id"
                 >
                 </el-option>
@@ -193,7 +193,7 @@ export default {
         //数据源下拉框选项
         {
           id: "",
-          name: "全部",
+          label: "全部",
         },
       ],
 

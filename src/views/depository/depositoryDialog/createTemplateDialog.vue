@@ -24,17 +24,17 @@
               :show-word-limit="true"
             ></el-input>
           </el-form-item>
-          <el-form-item label="所属数据源" prop="depositoryTemplateDataOrigin">
+          <el-form-item label="所属数据源" prop="dataOriginId">
             <el-select
-              v-model="form.depositoryTemplateDataOrigin"
+              v-model="form.dataOriginId"
               placeholder="请选择数据源"
               style="width: 346px"
             >
               <el-option
-                v-for="(item, index) in dataOriginOptions"
-                :key="index"
-                :label="item"
-                :value="item"
+                v-for="item in dataOriginOptions"
+                :key="item.id"
+                :label="item.label"
+                :value="item.id"
               >
               </el-option>
             </el-select>
@@ -71,20 +71,6 @@
               filterable
             >
             </el-cascader>
-            <!-- <el-select
-              v-model="key.parameterType"
-              placeholder="参数类型"
-              class="el-input-width"
-              @change="changeFileDisabled"
-            >
-              <el-option
-                v-for="(item, index) in parameterOption"
-                :key="index"
-                :label="item.label"
-                :value="item.value"
-                :disabled="item.disabled"
-              ></el-option>
-            </el-select> -->
             <el-button
               type="primary"
               circle
@@ -109,22 +95,6 @@
               style="marginright: 8px"
             >
             </el-input>
-            <!-- <el-select
-              filterable
-              @click.native="test"
-              v-model="key.parameterType"
-              placeholder="参数类型"
-              class="el-input-width"
-              @change="changeFileDisabled"
-            >
-              <el-option
-                v-for="(item, index) in parameterOption"
-                :key="index"
-                :label="item.label"
-                :value="item.value"
-                :disabled="item.disabled"
-              ></el-option>
-            </el-select> -->
             <el-cascader
               v-model="key.parameterType"
               placeholder="参数类型"
@@ -194,7 +164,7 @@ export default {
       timer: null,
       dialogFormVisible: this.createTemplateDialogVisible, //控制dialog是否显示
       loading: false, //loading图标
-      dialogLoading: false, //新建存证Dialog加载
+      dialogLoading: true, //新建存证Dialog加载
       fileDisabled: false, //文件类型是否可选
       dataOriginOptions: [], //数据源列表
       form: {
@@ -258,7 +228,7 @@ export default {
             trigger: "blur",
           },
         ],
-        depositoryTemplateDataOrigin: [
+        dataOriginId: [
           {
             required: true,
             message: "请选择数据源",
@@ -293,7 +263,7 @@ export default {
   },
   mounted() {
     this.getDictionaryName();
-    // this.getDepoTemplateDataOriginList();
+    this.getDepoTemplateDataOriginList();
   },
   methods: {
     async getDictionaryName() {
@@ -352,7 +322,6 @@ export default {
           }
         })
         .catch(() => {
-          this.dialogLoading = false;
           this.$message({
             message: "系统错误",
             type: "error",
@@ -403,11 +372,10 @@ export default {
           this.params[i].parameterType = this.params[i].parameterType[0];
         }
       }
-      const { depositoryTemplateName, depositoryTemplateDataOrigin, remark } =
-        this.form;
+      const { depositoryTemplateName, dataOriginId, remark } = this.form;
       let data = {
         depositoryTemplateName,
-        depositoryTemplateDataOrigin,
+        dataOriginId,
         remark,
         params: this.params,
       };
