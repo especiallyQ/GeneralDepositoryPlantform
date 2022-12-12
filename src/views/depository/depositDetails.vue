@@ -349,13 +349,13 @@ export default {
   .template-name-freeze {
     font-size: 18px;
     font-weight: bolder;
+    height: 35px;
     display: flex;
     letter-spacing: 0.5px;
-    margin-bottom: 10px;
-
+    line-height: 35px;
     .freeze-thaw {
       margin-left: 10px;
-      line-height: 22px;
+      line-height: 30px;
     }
   }
 }
