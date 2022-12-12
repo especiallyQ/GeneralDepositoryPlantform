@@ -84,7 +84,7 @@
                 <el-button
                   type="text"
                   style="font-size: 12px"
-                  v-if="row.roleId == 2"
+                  v-if="row.roleId !== '3'"
                   @click="getAuthorityManagement(row)"
                 >
                   权限管理</el-button

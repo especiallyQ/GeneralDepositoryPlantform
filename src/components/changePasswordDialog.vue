@@ -127,6 +127,7 @@ export default {
             this.$refs[formName].resetFields();
         },
         getResetPassword() {
+            this.loading = true;
             // let reqData = {
             //     oldAccountPwd: sm3(this.rulePasswordForm.oldPass),
             //     newAccountPwd: sm3(this.rulePasswordForm.pass),

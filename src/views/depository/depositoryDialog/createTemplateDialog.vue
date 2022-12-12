@@ -60,7 +60,18 @@
               maxlength="20"
               style="marginright: 8px"
             ></el-input>
-            <el-select
+            <el-cascader
+              v-model="key.parameterType"
+              placeholder="参数类型"
+              @change="changeFileDisabled"
+              :options="parameterOption"
+              :props="parameterProps"
+              :show-all-levels="false"
+              class="el-input-width"
+              filterable
+            >
+            </el-cascader>
+            <!-- <el-select
               v-model="key.parameterType"
               placeholder="参数类型"
               class="el-input-width"
@@ -73,7 +84,7 @@
                 :value="item.value"
                 :disabled="item.disabled"
               ></el-option>
-            </el-select>
+            </el-select> -->
             <el-button
               type="primary"
               circle
@@ -98,7 +109,7 @@
               style="marginright: 8px"
             >
             </el-input>
-            <el-select
+            <!-- <el-select
               filterable
               @click.native="test"
               v-model="key.parameterType"
@@ -113,15 +124,18 @@
                 :value="item.value"
                 :disabled="item.disabled"
               ></el-option>
-            </el-select>
-            <!-- <el-cascader v-model="key.parameterType" placeholder="参数类型" @change="changeFileDisabled"
-            :options="parameterOption" :show-all-levels="false" class="el-input-width"
-            :props="{ expandTrigger: 'hover' }" @focus="test" filterable>
-            <template slot-scope="{ node, data }">
-              <span>{{ data.label }}</span>
-              <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
-            </template>
-          </el-cascader> -->
+            </el-select> -->
+            <el-cascader
+              v-model="key.parameterType"
+              placeholder="参数类型"
+              @change="changeFileDisabled"
+              :options="parameterOption"
+              :props="parameterProps"
+              :show-all-levels="false"
+              class="el-input-width"
+              filterable
+            >
+            </el-cascader>
 
             <el-button
               type="danger"
@@ -160,8 +174,11 @@
 </template>
 
 <script>
-import { getDepoTemplateDataOrigin, saveDepoTemplate } from "@/util/api";
-
+import {
+  getDepoTemplateDataOrigin,
+  saveDepoTemplate,
+  dicictionaryName,
+} from "@/util/api";
 export default {
   name: "createTemplateDialog",
   props: {
@@ -173,9 +190,11 @@ export default {
   },
   data() {
     return {
+      containerNode: null,
+      timer: null,
       dialogFormVisible: this.createTemplateDialogVisible, //控制dialog是否显示
       loading: false, //loading图标
-      dialogLoading: true, //新建存证Dialog加载
+      dialogLoading: false, //新建存证Dialog加载
       fileDisabled: false, //文件类型是否可选
       dataOriginOptions: [], //数据源列表
       form: {
@@ -192,12 +211,21 @@ export default {
         ],
         parameterParams2: [],
       },
+      parameterProps: {
+        label: "label",
+        value: "value",
+        disabled: "disabled",
+        children: "children",
+        expandTrigger: "hover",
+      },
+
       //模板参数下拉框
       parameterOption: [
         {
           label: "自定义字典",
-          value: "x",
+          value: "dictionary",
           disabled: false,
+          children: [],
         },
         {
           label: "字符串",
@@ -263,12 +291,28 @@ export default {
       ];
     },
   },
-
   mounted() {
-    this.getDepoTemplateDataOriginList();
+    this.getDictionaryName();
+    // this.getDepoTemplateDataOriginList();
   },
   methods: {
-    // 关闭新建存证模板时触发
+    async getDictionaryName() {
+      const res = await dicictionaryName();
+      if (res.data.code === 0) {
+        let dicData = res.data.data.map((obj) => {
+          return {
+            label: obj.dicName,
+            value: obj.id,
+          };
+        });
+        this.parameterOption[0].children = dicData;
+      } else {
+        this.$message({
+          type: "error",
+          message: "",
+        });
+      }
+    },
     close() {
       this.$emit("updateTemplateDialog", false);
     },
@@ -308,6 +352,7 @@ export default {
           }
         })
         .catch(() => {
+          this.dialogLoading = false;
           this.$message({
             message: "系统错误",
             type: "error",
@@ -351,6 +396,13 @@ export default {
 
     // 存证模板新建方法
     addDepositoryTemplate() {
+      for (let i = 0; i < this.params.length; i++) {
+        if (this.params[i].parameterType[0] == "dictionary") {
+          this.params[i].parameterType = this.params[i].parameterType[1];
+        } else {
+          this.params[i].parameterType = this.params[i].parameterType[0];
+        }
+      }
       const { depositoryTemplateName, depositoryTemplateDataOrigin, remark } =
         this.form;
       let data = {
@@ -359,7 +411,6 @@ export default {
         remark,
         params: this.params,
       };
-      console.log(this.childrens);
       console.log(data);
       this.loading = true;
       saveDepoTemplate(data)
@@ -394,7 +445,7 @@ export default {
     // 判断文件类型是否被选中
     changeFileDisabled() {
       for (let i = 0; i < this.params.length; i++) {
-        if (this.params[i].parameterType === "file") {
+        if (this.params[i].parameterType[0] === "file") {
           this.parameterOption[this.parameterOption.length - 1].disabled = true;
           break;
         } else {
@@ -409,6 +460,11 @@ export default {
 </script>
 
 <style scoped>
+.sign-out-wrapper {
+  line-height: 32px;
+  text-align: center;
+}
+
 .dialog-footer {
   text-align: right;
 }

@@ -188,9 +188,12 @@ export default {
   },
 
   methods: {
+    
     // 改变表单内容
     changeInput(event, item) {
       for (let key of this.oldParameter) {
+        console.log('@@@@@@@@@@@key@@@'+key.parameterValue);
+        console.log('@@@@@@@@@@@event@@'+event);
         if (key.parameterName === item.parameterName) {
           if (
             key.parameterValue !== event &&
@@ -276,6 +279,7 @@ export default {
       getInitAddDepository(this.templateMsg.id)
         .then((res) => {
           if (res.data.code === 0) {
+            this.parameter = res.data.data;
             this.parameter = JSON.parse(JSON.stringify(res.data.data));
             this.oldParameter = JSON.parse(JSON.stringify(res.data.data));
             this.createRules();

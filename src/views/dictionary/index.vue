@@ -11,17 +11,18 @@
                 <el-input placeholder="字典名称" v-model="inputKeyWords" clearable class="search" size="small">
                 </el-input>
                 <el-button class="searchButton" icon="el-icon-search" @click="selectPage" size="small"></el-button>
-                <el-button type="primary" size="small" class="right" @click="newDictionary" v-if="role == 1 || role == 2">
+                <el-button type="primary" size="small" class="right" @click="newDictionary"
+                    v-if="role == 1 || role == 2">
                     新建字典</el-button>
             </div>
             <div class="content-center">
                 <template>
-                    <el-table :data="accountListData" style="width: 100%" v-loading="loading">
-                        <el-table-column prop="accountName" label="字典名称" align="center">
+                    <el-table :data="dictionaryListData" style="width: 100%" v-loading="loading">
+                        <el-table-column prop="dicName" label="字典名称" align="center">
                         </el-table-column>
-                        <el-table-column prop="contact" label="数据类型" align="center" >
+                        <el-table-column prop="dicType" label="数据类型" align="center">
                         </el-table-column>
-                        <el-table-column prop="roleZh" label="字典内容" align="center">
+                        <el-table-column prop="dicContent" label="字典内容" align="center" show-overflow-tooltip>
                         </el-table-column>
                         <el-table-column label="操作" align="center" class="remarks">
                             <template slot-scope="{ row }">
@@ -44,11 +45,10 @@
                 </el-pagination>
             </div>
         </div>
-        <DictionaryDialog :createDictionaryDialogVisible.sync="createDictionaryDialogVisible"></DictionaryDialog>
-        <EditDictionaryDialog 
-        :editDictionaryDialogVisible.sync="editDictionaryDialogVisible"
-        :editTemplateNameId="editTemplateNameId">
-    </EditDictionaryDialog>
+        <DictionaryDialog v-if="createDictionaryDialogVisible" :createDictionaryDialogVisible.sync="createDictionaryDialogVisible"></DictionaryDialog>
+        <EditDictionaryDialog v-if="editDictionaryDialogVisible" :editDictionaryDialogVisible.sync="editDictionaryDialogVisible"
+            :editDictionaryId="editDictionaryId">
+        </EditDictionaryDialog>
     </div>
 </template>
 
@@ -58,13 +58,13 @@ import EditDictionaryDialog from "../dictionary/components/editDictionaryDialog.
 
 import ContentHead from "@/components/contentHead.vue";
 import {
-    accountList,
-    deleteDictionaryInfo,
+    dictionaryList,
+    delDictionary,
 } from "@/util/api.js";
 
 export default {
     name: "dictionary",
-    components: { ContentHead ,DictionaryDialog,EditDictionaryDialog},
+    components: { ContentHead, DictionaryDialog, EditDictionaryDialog },
     data() {
         return {
             pageNumber: 1, //分页器的第几页
@@ -75,9 +75,9 @@ export default {
             total: 0, //总共的条数
             createDictionaryDialogVisible: false, //控制新建dialog是否显示
             editDictionaryDialogVisible: false,//控制编辑dialog是否显示
-            editTemplateNameId:'',
-            accountListData: [], //账号管理页面初始化数据
-            selectValue: "", //账号管理选择框结果
+            editDictionaryId: '',
+            dictionaryListData: [], //字典管理页面初始化数据
+            selectValue: "", //选择框结果
             inputKeyWords: "", //存放搜索数据
             //存放数据类型选择框数据
             dataTypes: [
@@ -86,15 +86,15 @@ export default {
                     label: "全部",
                 },
                 {
-                    value: "string",
+                    value: "字符串",
                     label: "字符串",
                 },
                 {
-                    value: "int",
+                    value: "整数",
                     label: "整数",
                 },
                 {
-                    value: "float",
+                    value: "浮点数",
                     label: "浮点数",
                 },
             ],
@@ -109,22 +109,27 @@ export default {
             this.pageNumber = 1;
             this.getDictionaryList();
         },
-        //账号管理初始化
+        //字典管理初始化
         async getDictionaryList() {
-            const res = await accountList({
+            const res = await dictionaryList({
                 pageNumber: this.pageNumber,
-                pageSize: `${this.pageSize}?roleId=${this.selectValue}&accountName=${this.inputKeyWords}`,
+                pageSize: `${this.pageSize}?type=${this.selectValue}&name=${this.inputKeyWords}`,
             });
+            
             if (res.data.code === 0) {
+                // console.log(res.data.data);
                 if (
                     Object.prototype.toString.call(res.data.data) == "[object Object]"
                 ) {
-                    this.accountListData = [res.data.data];
+                    this.dictionaryListData = [res.data.data.dictionaryList];
                 } else {
-                    this.accountListData = res.data.data;
+                    this.dictionaryListData = res.data.data.dictionaryList;
                 }
-                this.total = res.data.total;
+                this.total = res.data.data.total;
                 this.loading = false;
+                for (let item of this.dictionaryListData) {
+                    return this.dictionaryListData = item
+                }
             } else {
                 this.$message({
                     message: this.$chooseLang(res.data.code),
@@ -140,35 +145,38 @@ export default {
         //点击编辑显示dialog
         editDictionary(row) {
             this.editDictionaryDialogVisible = true;
-            this.editTemplateNameId = row.id;
+            this.editDictionaryId = row.id;
+            // this.$refs.child.open();
+
         },
         //删除账号
         delateDictionary(row) {
-            this.$confirm(`确定删除账号${row.accountName}?`, {
+
+            this.$confirm(`确定删除账号${row.dicName}?`, {
                 confirmButtonText: "确定",
                 cancelButtonText: "取消",
             })
                 .then(() => {
-                    this.$confirm(`确定删除${row.accountName}?`, {
+                    this.$confirm(`确定删除${row.dicName}?`, {
                         confirmButtonText: "确定",
                         cancelButtonText: "取消",
                     })
                         .then(async () => {
-                            const res = await deleteDictionaryInfo(row.accountId);
+                            const res = await delDictionary(row.id);
                             if (res.data.code === 0) {
                                 this.$message({
                                     type: "success",
                                     message: "删除成功!",
                                 });
                                 this.pageNumber =
-                                    this.accountListData.length > 1
+                                    this.dictionaryListData.length > 1
                                         ? this.pageNumber
                                         : this.pageNumber - 1;
                                 this.getDictionaryList();
                             } else {
                                 this.$message({
                                     message:
-                                        "系统中存在由当前账号创建的未冻结的存证模板，请先冻结存证模板，再进行删除账号操作",
+                                        "删除失败",
                                     type: "error",
                                 });
                             }

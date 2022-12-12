@@ -128,7 +128,6 @@ export default {
     },
     form: {
       handler() {
-        console.log(this.form.remark);
         if (this.remark === this.form.remark) {
           this.btnDisable = true;
         } else {
@@ -151,6 +150,7 @@ export default {
 
     open() {
       this.getLoading = true;
+      
       // 获取模板数据
       getEditDepositoryTemplate(this.editTemplateNameId)
         .then((res) => {
@@ -168,6 +168,8 @@ export default {
             this.form.remark = remark || "";
             this.form.parameterParamsForm1 = params.splice(0, 1);
             this.form.parameterParamsForm2 = params;
+            console.log(this.form.parameterParamsForm1);
+            console.log( this.form.parameterParamsForm2);
             this.getLoading = false;
           } else {
             this.$message({

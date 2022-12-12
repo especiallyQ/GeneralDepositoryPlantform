@@ -2,23 +2,23 @@
     <el-dialog title="新建字典" :visible.sync="createDictionaryDialogVisible" width="498px" align="center"
         :close-on-click-modal="false" @open="resetForm1('ruleForm')" :before-close="closeDialog">
         <el-form :model="dictionaryForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="字典名称" prop="dictionaryName">
-                <el-input v-model="dictionaryForm.dictionaryName" maxlength="20" show-word-limit></el-input>
+            <el-form-item label="字典名称" prop="dicName">
+                <el-input v-model="dictionaryForm.dicName" maxlength="20" show-word-limit></el-input>
             </el-form-item>
-            <el-form-item label="数据类型" prop="dataType">
-                <el-select v-model="dictionaryForm.dataType" placeholder="请选择数据类型" style="width: 100%">
-                    <el-option v-for="item in dataTypes" :key="item.value" :label="item.label" :value="item.value">
+            <el-form-item label="数据类型" prop="dicType">
+                <el-select v-model="dictionaryForm.dicTypeLabel" @change="getDicType" placeholder="请选择数据类型" style="width: 100%">
+                    <el-option v-for="item in dataTypes" :key="item.value" :label="item.label" :value="{value:item.value,label:item.label}">
                     </el-option>
                 </el-select>
             </el-form-item>
-
-            <el-form-item label="字典内容" prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData1"
-                :key="index">
+            <el-form-item label="字典内容" v-for="(key, index) in dictionaryForm.dictionaryData1" :key="index"
+                :prop="key.dictionaryContent">
                 <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" style="width: 320px"></el-input>
                 <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
-            <el-form-item v-for="(key, index) in dictionaryForm.dictionaryData2" :key="index + 1">
+            <el-form-item prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData2"
+                :key="index + 1">
                 <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" class="el-input-width"
                     style="width: 320px"></el-input>
                 <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
@@ -34,8 +34,7 @@
 </template>
 
 <script>
-import { JSONSwitchFormData } from "@/util/util.js";
-import { createAccount } from "@/util/api.js";
+import { addDictionary, dicictionaryName } from "@/util/api.js";
 export default {
     name: "dictionaryDialog",
     props: {
@@ -47,6 +46,7 @@ export default {
     },
     data() {
         return {
+            allDicName: [],
             loading: false,
             //存放选择框数据
             dataTypes: [
@@ -64,8 +64,9 @@ export default {
                 },
             ],
             dictionaryForm: {
-                dictionaryName: "", //字典名称
-                dataType: "", //数据类型
+                dicName: "", //字典名称
+                dicType: "", //数据类型value
+                dicTypeLabel:'',//数据类型lable
                 dictionaryData1: [
                     {
                         dictionaryContent: "",
@@ -74,7 +75,7 @@ export default {
                 dictionaryData2: [],
             },
             rules: {
-                dictionaryName: [
+                dicName: [
                     {
                         required: true,
                         message: "请输入字典名称",
@@ -87,21 +88,23 @@ export default {
                         trigger: "blur",
                     },
                 ],
-                dataType: [
+                dicType: [
                     {
                         required: true,
-                        message: "请选择账号类型",
+                        message: "请选择字典类型",
                         trigger: "change",
                     },
                 ],
-                dictionaryData1: [
-                    {
-                        required: true,
-                        message: "请输入字典内容",
-                        trigger: "blur",
-                    },
-                ],
+                dictionaryData1: [],
+                // dictionaryData1: [
+                //     {
+                //         required: true,
+                //         message: "请输入字典内容",
+                //         trigger: "blur",
+                //     },
+                // ],
             },
+            allDictionaryContent: [],
         };
     },
     computed: {
@@ -112,7 +115,16 @@ export default {
             ];
         },
     },
+    mounted() {
+        this.getDictionaryName()
+    },
     methods: {
+        getDicType(val) {
+            const { value, label } = val;
+            this.dictionaryForm.dicType = value;
+            this.dictionaryForm.dicTypeLabel = label;
+            
+        },
         // 点击+添加参数项
         addParameter() {
             this.dictionaryForm.dictionaryData2.push({
@@ -133,10 +145,10 @@ export default {
                 : false;
         },
         submitForm(formName) {
-
-            // 请求成功，清空数据
-            // this.dictionaryForm.dictionaryData1[0].dictionaryContent = '',
-            // this.dictionaryForm.dictionaryData2=[]
+            let data = this.dictionaryForm.dictionaryData2.map(key => {
+                return key.dictionaryContent
+            })
+            this.allDictionaryContent = [this.dictionaryForm.dictionaryData1[0].dictionaryContent, ...data]
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
                     for (let i = 0; i < this.params.length; i++) {
@@ -154,38 +166,90 @@ export default {
                             return;
                         }
                     }
+                    for (let j = 0; j < this.allDicName.length; j++) {
+                        if (this.dictionaryForm.dicName === this.allDicName[j]) {
+                            this.$message({
+                                type: "error",
+                                message: "字典名称已存在",
+                            });
+                            return;
+                        }
+                    }
+                    switch (this.dictionaryForm.dicType) {
+                        case "整数":
+                            let intData = /^[0-9]*$/;
+                            for (let i = 0; i < this.allDictionaryContent.length; i++) {
+                                if (!intData.test(this.allDictionaryContent[i])) {
+                                    this.$message({
+                                        type: "error",
+                                        message: "字典内容必须为整数",
+                                    });
+                                    return;
+                                }
+                            }
+                        case "浮点数":
+                            
+                            let floatData = /^[0-9]+([.][0-9]{1,})?$/;
+                            for (let j = 0; j < this.allDictionaryContent.length; j++) {
+                                if (!floatData.test(this.allDictionaryContent[j])) {
+                                    this.$message({
+                                        type: "error",
+                                        message: "字典内容必须为浮点型",
+                                    });
+                                    return;
+                                }
+                            }
+                    }
                     this.addDictionaryTemplate();
                 } else {
                     return false;
                 }
             });
         },
-      //新建字典
-        addDictionaryTemplate() {
-            const { dictionaryName, dataType } = this.dictionaryForm;
-            let data = {
-                dictionaryName,
-                dataType,
-                params: this.params,
+        //拿到所有字典内容的名字
+        async getDictionaryName() {
+            const res = await dicictionaryName();
+            if (res.data.code === 0) {
+                let dicDataName = res.data.data.map((obj) => {
+                    return obj.dicName
+                })
+                this.allDicName = dicDataName;
             }
-            // this.loading = true;
-            createAccount(data).then((res) => {
+        },
+        //新建字典
+        addDictionaryTemplate() {
+            const { dicName, dicType ,dicTypeLabel} = this.dictionaryForm;
+            let dicContent = this.params.map(obj => {
+                return obj.dictionaryContent
+            })
+            let data = {
+                dicName,
+                dicType,
+                dicTypeLabel,
+                dicContent: dicContent,
+            }
+            this.loading = true;
+            addDictionary(data).then((res) => {
                 if (res.data.code === 0) {
+                    this.loading = false;
                     this.closeDialog()
-                    this.$parent.getAccountList();
+                    this.$parent.selectPage();
+                    this.rules.dictionaryData1 = [];
                     this.$message({
                         type: "success",
                         message: "新建成功!",
                     });
-                }else {
-                this.closeDialog()
-                this.$message({
-                    message: this.$chooseLang(res.data.code),
-                    type: "error",
-                    duration: 2000,
-                });
-            }
+                } else {
+                    this.loading = false;
+                    this.closeDialog()
+                    this.$message({
+                        message: this.$chooseLang(res.data.code),
+                        type: "error",
+                        duration: 2000,
+                    });
+                }
             }).catch(() => {
+                this.loading = false;
                 this.closeDialog()
                 this.$message({
                     message: "系统错误",
@@ -201,15 +265,16 @@ export default {
         resetForm1(formName) {
             this.$refs[formName].resetFields();
             this.clearDictionaryForm();
-            
+            this.loading = false;
+
         },
         closeDialog() {
             this.$emit("update:createDictionaryDialogVisible", false);
-            
+
         },
         clearDictionaryForm() {
             this.dictionaryForm.dictionaryData1[0].dictionaryContent = '',
-            this.dictionaryForm.dictionaryData2=[]
+                this.dictionaryForm.dictionaryData2 = []
         },
     },
 };
@@ -217,6 +282,6 @@ export default {
 
 <style scoped>
 .demo-ruleForm .dialog-footer {
-    margin-left: 195px;
+    text-align: right;
 }
 </style>
