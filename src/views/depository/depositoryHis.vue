@@ -250,36 +250,36 @@ export default {
   font-size: 18px;
   font-weight: bolder;
 }
-.search-part{
+.search-part {
   position: relative;
   .template-details {
-  width: calc(100% - 40px);
+    width: calc(100% - 40px);
 
-  .template-name-freeze {
-    width: 100%;
-    font-size: 18px;
-    font-weight: bolder;
-    display: flex;
-    letter-spacing: 0.5px;
-    line-height: 35px;
-
-    .freeze-thaw {
-      margin-left: 10px;
-      width: 92%;
+    .template-name-freeze {
+      width: 100%;
+      font-size: 18px;
+      font-weight: bolder;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      letter-spacing: 0.5px;
+      line-height: 35px;
+      margin-bottom: 8px;
+      
+      .freeze-thaw {
+        margin-left: 10px;
+        width: 92%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-      .backBtn{
-        position: absolute;
-        top: 30px;
-        left: 1200px;
+        .backBtn {
+          position: absolute;
+          top: 30px;
+          left: 93%;
+        }
       }
     }
   }
 }
-}
-
 
 .depository-list {
   margin: -15px 25px 0 25px;
