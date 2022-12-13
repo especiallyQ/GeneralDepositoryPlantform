@@ -274,7 +274,7 @@ export default {
       .backBtn{
         position: absolute;
         top: 30px;
-        left: 1200px;
+        left: 92%;
       }
     }
   }
