@@ -182,9 +182,9 @@ export function submitTree(data) {
     return post({
         url: `${url.ORG_LIST}/authority/submit`,
         method: 'post',
-        data: data,
+        data,
         headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
         }
     })
 }

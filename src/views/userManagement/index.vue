@@ -84,7 +84,7 @@
                 <el-button
                   type="text"
                   style="font-size: 12px"
-                  v-if="row.roleId !== '3'"
+                  v-if="role !== '3'"
                   @click="getAuthorityManagement(row)"
                 >
                   权限管理</el-button
@@ -171,7 +171,7 @@
         v-loading="treeLoading"
       >
       </el-tree>
-      <div class="footer-btn">
+      <div class="footer-btn" v-if="rowRoleId !== 1">
         <el-button style="width: 200px" @click="resetTree">重置</el-button>
         <el-button type="primary" style="width: 200px" @click="submitDrawerTree"
           >提交</el-button
@@ -257,7 +257,7 @@ export default {
       drawer: false, //抽匣是否打开
       data: [], //tree列表数据
       attachment: [], //默认被选中的节点
-      rowRoleId: null, //被选中行账户权限,
+      rowRoleId: "1", //被选中行账户权限,
       treeLoading: true, //权限树Loading
       treeVisible: false, //权限树优化
       defaultProps: {
@@ -470,11 +470,13 @@ export default {
 
     // 提交权限树
     submitDrawerTree() {
-      let data = {
-        accountId: this.accountId,
-        selectedIds: this.$refs.tree.getCheckedKeys(),
-      };
-      submitTree(data)
+      let formData = new FormData();
+      formData.append("accountId", this.accountId);
+      formData.append(
+        "selectedIds",
+        JSON.stringify(this.$refs.tree.getCheckedKeys())
+      );
+      submitTree(formData)
         .then((res) => {
           if (res.data.code === 0) {
             this.$message({
