@@ -78,7 +78,7 @@ export function fileVerify(data) {
 }
 
 
-export function getFileHash(data,uploadProgress) {
+export function getFileHash(data, uploadProgress) {
     return post({
         url: `${url.ORG_LIST}/getFileHash`,
         method: 'post',
@@ -161,6 +161,28 @@ export function resetAccountPassword(data) {
     return put({
         url: `${url.ORG_LIST}/account/resetPassword/` + `${data.accountId}/${data.accountName}`,
         method: 'put',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+// 权限管理
+export function getAuthorityList(accountId) {
+    return get({
+        url: `${url.ORG_LIST}/authority/getAuthorityList/${accountId}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 提交权限树
+export function submitTree(data) {
+    return post({
+        url: `${url.ORG_LIST}/authority/submit`,
+        method: 'post',
+        data: data,
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
         }

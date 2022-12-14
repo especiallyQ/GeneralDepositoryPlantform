@@ -13,6 +13,7 @@
     "babel-polyfill": "^6.26.0",
     "core-js": "^3.6.5",
     "crypto-js": "^4.1.1",
+    "default-passive-events": "^2.0.0",
     "element-ui": "^2.15.10",
     "es6-promise": "^4.2.8",
     "js-cookie": "^3.0.1",

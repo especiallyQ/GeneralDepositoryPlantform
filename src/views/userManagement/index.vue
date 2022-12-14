@@ -152,19 +152,30 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-    <el-drawer title="权限配置" :visible.sync="drawer">
+    <el-drawer
+      title="权限配置"
+      :visible.sync="drawer"
+      :wrapperClosable="false"
+      :destroy-on-close="true"
+    >
       <el-tree
         :data="data"
         show-checkbox
         node-key="id"
+        ref="tree"
         :default-expanded-keys="[2, 3]"
-        :default-checked-keys="[9]"
+        :default-checked-keys="attachment"
+        :check-strictly="true"
         :props="defaultProps"
+        @check="changeTree"
+        v-loading="treeLoading"
       >
       </el-tree>
       <div class="footer-btn">
-        <el-button style="width: 200px">重置</el-button>
-        <el-button type="primary" style="width: 200px">提交</el-button>
+        <el-button style="width: 200px" @click="resetTree">重置</el-button>
+        <el-button type="primary" style="width: 200px" @click="submitDrawerTree"
+          >提交</el-button
+        >
       </div>
     </el-drawer>
   </div>
@@ -178,6 +189,8 @@ import {
   updateAccount,
   deleteAccountInfo,
   resetAccountPassword,
+  getAuthorityList,
+  submitTree,
 } from "@/util/api.js";
 import { JSONSwitchFormData } from "@/util/util.js";
 
@@ -206,7 +219,6 @@ export default {
       accountListData: [], //账号管理页面初始化数据
       selectValue: "", //账号管理选择框结果
       inputKeyWords: "", //存放搜索数据
-      drawer: false, //抽匣是否打开
       //存放选择框数据
       roleOptions: [
         {
@@ -241,50 +253,13 @@ export default {
           },
         ],
       },
-      data: [
-        {
-          id: 1,
-          label: "数据源1",
-          children: [
-            {
-              id: 4,
-              label: "慈善存证模板",
-            },
-            {
-              id: 5,
-              label: "碳资产存证模板",
-              children: [
-                {
-                  id: 8,
-                  label: "录入存证内容",
-                },
-                {
-                  id: 9,
-                  label: "查看存证内容",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: 2,
-          label: "数据源2",
-        },
-        {
-          id: 3,
-          label: "数据源3",
-          children: [
-            {
-              id: 6,
-              label: "二级 3-1",
-            },
-            {
-              id: 7,
-              label: "二级 3-2",
-            },
-          ],
-        },
-      ],
+
+      drawer: false, //抽匣是否打开
+      data: [], //tree列表数据
+      attachment: [], //默认被选中的节点
+      rowRoleId: null, //被选中行账户权限,
+      treeLoading: true, //权限树Loading
+      treeVisible: false, //权限树优化
       defaultProps: {
         children: "children",
         label: "label",
@@ -294,7 +269,16 @@ export default {
   mounted() {
     this.getAccountList();
   },
-  computed: {},
+
+  watch: {
+    attachment: {
+      handler() {
+        this.$refs.tree.setCheckedKeys(this.attachment);
+      },
+      deep: true,
+    },
+  },
+
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
@@ -453,7 +437,101 @@ export default {
     },
     // 权限管理按钮
     getAuthorityManagement(row) {
+      this.accountId = row.accountId;
+      this.rowRoleId = row.roleId;
+      getAuthorityList(row.accountId)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.attachment = JSON.parse(res.data.attachment);
+            this.data = res.data.data;
+            this.treeLoading = false;
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
       this.drawer = true;
+    },
+
+    // 重置权限树
+    resetTree() {
+      this.$refs.tree.setCheckedKeys(this.attachment);
+    },
+
+    // 提交权限树
+    submitDrawerTree() {
+      let data = {
+        accountId: this.accountId,
+        selectedIds: this.$refs.tree.getCheckedKeys(),
+      };
+      submitTree(data)
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.$message({
+              type: "success",
+              message: "编辑成功",
+              duration: 2000,
+            });
+            this.drawer = false;
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
+    },
+
+    // 权限树选择规则
+    changeTree(a, b) {
+      // 一级节点被取消
+      if (!b.checkedKeys.includes(a.id) && a.layer === 1) {
+        for (let key of a.children) {
+          this.$refs.tree.setChecked(key.id, false);
+          this.$refs.tree.setChecked(key.children[0].id, false);
+          this.$refs.tree.setChecked(key.children[1].id, false);
+        }
+        // 二级节点被选中
+      } else if (b.checkedKeys.includes(a.id) && a.layer === 2) {
+        switch (this.rowRoleId) {
+          case 2:
+            this.$refs.tree.setChecked(a.children[0].id, true);
+            this.$refs.tree.setChecked(a.children[1].id, true);
+            this.$refs.tree.setChecked(a.id.slice(0, a.id.indexOf("_")), true);
+            break;
+          case 3:
+            this.$refs.tree.setChecked(a.children[1].id, true);
+            this.$refs.tree.setChecked(a.id.slice(0, a.id.indexOf("_")), true);
+            break;
+        }
+        // 二级节点被取消
+      } else if (!b.checkedKeys.includes(a.id) && a.layer === 2) {
+        this.$refs.tree.setChecked(a.children[0].id, false);
+        this.$refs.tree.setChecked(a.children[1].id, false);
+        // 三级节点被选中
+      } else if (b.checkedKeys.includes(a.id) && a.layer === 3) {
+        this.$refs.tree.setChecked(a.id.slice(0, a.id.length - 2), true);
+        this.$refs.tree.setChecked(`${a.id.slice(0, a.id.length - 2)}_2`, true);
+        this.$refs.tree.setChecked(a.id.slice(0, a.id.indexOf("_")), true);
+      }
     },
   },
 };

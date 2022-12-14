@@ -29,7 +29,7 @@ import errcode from './util/errcode';
 import { chooseLang } from './util/errcode.js';
 /* 剪贴板 */
 import VueClipboard from 'vue-clipboard2';
-
+import 'default-passive-events'
 Vue.use(router);
 Vue.use(ElementUI, {
   size: 'medium'

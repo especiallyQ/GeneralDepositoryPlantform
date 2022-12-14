@@ -58,7 +58,7 @@
               placeholder="参数名"
               class="el-input-width"
               maxlength="20"
-              style="marginright: 8px"
+              style="marginRight: 8px"
             ></el-input>
             <el-cascader
               v-model="key.parameterType"
@@ -77,7 +77,7 @@
               icon="el-icon-plus"
               @click="addParameter"
               size="mini"
-              style="marginleft: 8px"
+              style="marginLeft: 8px"
             ></el-button>
           </el-form-item>
 
@@ -92,7 +92,7 @@
               v-model.trim="key.parameterName"
               placeholder="参数名"
               class="el-input-width"
-              style="marginright: 8px"
+              style="marginRight: 8px"
             >
             </el-input>
             <el-cascader
@@ -113,7 +113,7 @@
               icon="el-icon-minus"
               @click="removeParameter(index)"
               size="mini"
-              style="marginleft: 8px"
+              style="marginLeft: 8px"
             ></el-button>
           </el-form-item>
 
@@ -379,7 +379,6 @@ export default {
         remark,
         params: this.params,
       };
-      console.log(data);
       this.loading = true;
       saveDepoTemplate(data)
         .then((res) => {

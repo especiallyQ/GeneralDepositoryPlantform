@@ -168,8 +168,6 @@ export default {
             this.form.remark = remark || "";
             this.form.parameterParamsForm1 = params.splice(0, 1);
             this.form.parameterParamsForm2 = params;
-            console.log(this.form.parameterParamsForm1);
-            console.log( this.form.parameterParamsForm2);
             this.getLoading = false;
           } else {
             this.$message({

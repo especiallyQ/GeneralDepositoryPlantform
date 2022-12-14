@@ -112,7 +112,6 @@ export default {
               res.data.data.approvalType
             );
             this.editData = res.data.data.params;
-            console.log(this.editData);
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),

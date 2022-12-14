@@ -192,8 +192,6 @@ export default {
     // 改变表单内容
     changeInput(event, item) {
       for (let key of this.oldParameter) {
-        console.log('@@@@@@@@@@@key@@@'+key.parameterValue);
-        console.log('@@@@@@@@@@@event@@'+event);
         if (key.parameterName === item.parameterName) {
           if (
             key.parameterValue !== event &&
