@@ -157,6 +157,7 @@
       :visible.sync="drawer"
       :wrapperClosable="false"
       :destroy-on-close="true"
+      @closed="data = []"
     >
       <el-tree
         :data="data"
@@ -173,7 +174,11 @@
       </el-tree>
       <div class="footer-btn" v-if="rowRoleId !== 1">
         <el-button style="width: 200px" @click="resetTree">重置</el-button>
-        <el-button type="primary" style="width: 200px" @click="submitDrawerTree"
+        <el-button
+          type="primary"
+          style="width: 200px"
+          @click="submitDrawerTree"
+          :loading="btnLoading"
           >提交</el-button
         >
       </div>
@@ -256,10 +261,12 @@ export default {
 
       drawer: false, //抽匣是否打开
       data: [], //tree列表数据
+      allTreeId: [], //tree所有Id
       attachment: [], //默认被选中的节点
       rowRoleId: "1", //被选中行账户权限,
       treeLoading: true, //权限树Loading
       treeVisible: false, //权限树优化
+      btnLoading: false, //提交按钮Loading
       defaultProps: {
         children: "children",
         label: "label",
@@ -437,6 +444,8 @@ export default {
     },
     // 权限管理按钮
     getAuthorityManagement(row) {
+      this.treeLoading = true;
+      this.drawer = true;
       this.accountId = row.accountId;
       this.rowRoleId = row.roleId;
       getAuthorityList(row.accountId)
@@ -460,7 +469,6 @@ export default {
             duration: 2000,
           });
         });
-      this.drawer = true;
     },
 
     // 重置权限树
@@ -470,8 +478,18 @@ export default {
 
     // 提交权限树
     submitDrawerTree() {
+      for (let key of this.data) {
+        this.allTreeId.push(key.id);
+        if (key.children) {
+          for (let item of key.children) {
+            this.allTreeId.push(item.id);
+          }
+        }
+      }
+      this.btnLoading = true;
       let formData = new FormData();
       formData.append("accountId", this.accountId);
+      formData.append("allIds", JSON.stringify(this.allTreeId));
       formData.append(
         "selectedIds",
         JSON.stringify(this.$refs.tree.getCheckedKeys())
@@ -481,16 +499,18 @@ export default {
           if (res.data.code === 0) {
             this.$message({
               type: "success",
-              message: "编辑成功",
+              message: "权限修改成功",
               duration: 2000,
             });
             this.drawer = false;
+            this.btnLoading = false;
           } else {
             this.$message({
               message: this.$chooseLang(res.data.code),
               type: "error",
               duration: 2000,
             });
+            this.btnLoading = false;
           }
         })
         .catch(() => {
@@ -499,6 +519,7 @@ export default {
             type: "error",
             duration: 2000,
           });
+          this.btnLoading = false;
         });
     },
 
