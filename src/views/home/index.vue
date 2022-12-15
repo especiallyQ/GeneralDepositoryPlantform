@@ -10,7 +10,11 @@
         <li id="Login" :class="comName == 'Login' ? 'action' : ''">登录</li>
       </ul>
     </div>
+    <!-- <div class="gdp-header">
+      <span >登 录</span>
+    </div> -->
     <component :is="comName"></component>
+    <!-- <div class="gdp-footer"></div> -->
   </div>
 </template>
 
@@ -18,6 +22,7 @@
 import { random } from "@/util/util";
 import Login from "@/views/home/login/login.vue";
 import HomePage from "@/views/home/homePage/homePage.vue";
+import NewHomePage from "@/views/home/newHomePage/newHomePage.vue";
 export default {
   name: "Home",
 
@@ -153,9 +158,16 @@ export default {
   align-items: center;
   width: 100%;
   height: 100%;
-  background-color: #070c14;
+  // background-color: #070c14;
   overflow: hidden;
-
+ .gdp-footer{
+  width: 100%;
+  height: 300px;
+  // background-color: #F5F5F5 ;
+  position: fixed;
+    bottom: 0;
+    left: 0;
+ }
   .gdp-header {
     width: 100%;
     height: 60px;
@@ -164,7 +176,22 @@ export default {
     top: 0;
     left: 0;
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
+
+    span {
+      height: 100%;
+      display: flex;
+      font-size: 20px;
+      line-height: 60px;
+      margin-right: 30px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+
+          &:hover {
+          color: wheat;
+        }
+    }
 
     .gdp-title {
       width: 200px;

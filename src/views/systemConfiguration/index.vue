@@ -1,104 +1,135 @@
 <template>
     <div>
-        <ContentHead headTitle="系统配置"></ContentHead>
+        <ContentHead headTitle="系统配置" headSubTitle="数据源配置"></ContentHead>
         <div class="content-container module-wrapper">
-            <el-form class="system-form" label-position="right" label-width="auto" :model="systemConfigurationForm"
-                :rules="rules" ref="ruleForm">
-                <el-form-item label="CMSP服务地址:" prop="serverPath">
-                    <el-input v-model="systemConfigurationForm.serverPath"></el-input>
-                </el-form-item>
-                <el-form-item label="CMSP管理员账号:" prop="serverAccount">
-                    <el-input v-model="systemConfigurationForm.serverAccount"></el-input>
-                </el-form-item>
-                <el-form-item label="CMSP管理员密码:" prop="serverPassword">
-                    <el-input v-model="systemConfigurationForm.serverPassword" type="password"></el-input>
-                </el-form-item>
-                <el-form-item label="应用链名称:" prop="chainCode">
-                    <el-select v-model="systemConfigurationForm.chainCode" placeholder="请选择" style="width: 100%"
-                        @focus="getChainList" @change="selectData">
-                        <el-option v-for="item in chainCodeData" :key="item.chainCode" :label="item.chainCode"
-                            :value="{ value: item.chainCode, label: item.chainId }">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="存证合约:" prop="contractId">
-                    <el-select v-model="systemConfigurationForm.contractId" placeholder="请选择" style="width: 100%"
-                        @focus="getContractList">
-                        <el-option v-for="item in contractIdData" :key="item.contractId" :label="item.contractName"
-                            :value="item.contractId">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" class="form-btn" @click="submitForm('ruleForm')">确认配置</el-button>
-                </el-form-item>
-            </el-form>
+            <div class="content-header">
+                <el-input v-model="searchKeyWords" @keyup.enter.native="searchDataByName" placeholder="数据源名称" clearable
+                    class="search" size="small">
+                </el-input>
+                <el-button class="searchButton" icon="el-icon-search" size="small"
+                    @click="searchDataByName"></el-button>
+                <el-button type="primary" size="small" class="newBtn" @click="showSourceDialog">
+                    新建数据源
+                </el-button>
+            </div>
+            <div class="content-center">
+                <el-table :data="tableData" style="width: 100%" v-loading="listLoading">
+                    <el-table-column v-for="item in tableHeader" :key="item.label" :label="item.label" :prop="item.prop"
+                        :min-width="item.width" :align="item.align" show-overflow-tooltip>
+                    </el-table-column>
+                    <el-table-column label="操作" align="center" min-width="150px">
+                        <template slot-scope="{ row }">
+                            <el-button type="text" style="color: red; font-size: 12px" class="el-button-text"
+                                @click="deleteDataSource(row)">
+                                删除
+                            </el-button>
+                            <el-button type="text" style="font-size: 12px" class="el-button-text"
+                                @click="editDataSource(row)">
+                                编辑</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <div class="content-footer">
+                <el-pagination @size-change="handleSizeChange" @current-change="changePage" :current-page="pageNumber"
+                    :page-sizes="[10, 20, 30, 50]" :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper" :total="total">
+                </el-pagination>
+            </div>
         </div>
+        <CreateSourceDialog v-if="createSourceDialogVisible" :createSourceDialogVisible.sync="createSourceDialogVisible"
+            @getNewDataSourceList="getNewDataSourceList">
+        </CreateSourceDialog>
+        <EditSourceDialog v-if="editSourceDialogVisible" :editSourceDialogVisible.sync="editSourceDialogVisible"
+            :editDataSourceId="editDataSourceId" @getNewDataSourceList="getNewDataSourceList">
+        </EditSourceDialog>
+        <DeleteSourceDialog v-if="deleteSourceDialogVisible" :deleteSourceDialogVisible.sync="deleteSourceDialogVisible"
+            :deleteDataSourceId="deleteDataSourceId" @getNewDataSourceList="getNewDataSourceList"></DeleteSourceDialog>
     </div>
 </template>
-
 <script>
+import _ from "lodash";
+import CreateSourceDialog from "@/views/systemConfiguration/components/createSourceDialog.vue";
+import EditSourceDialog from "./components/editSourceDialog.vue";
+import DeleteSourceDialog from "./components/deleteSourceDialog.vue"
 import ContentHead from "@/components/contentHead.vue";
-import { JSONSwitchFormData } from "@/util/util.js";
-import { ContractList, ChainList, bindAccount } from "@/util/api.js";
-import { sm3 } from "sm-crypto";
+import { dataSourceList } from "@/util/api.js"
 export default {
     name: "systemConfiguration",
-    components: { ContentHead },
+    components: { ContentHead, CreateSourceDialog, EditSourceDialog, DeleteSourceDialog },
     data() {
         return {
-            contractIdData: [], //存证合约下拉框数据
-            chainCodeData: [], //应用链ID下拉框数据
-            //系统配置表单数据
-            systemConfigurationForm: {
-                serverPath: "", //CMSP服务地址
-                serverAccount: "", //CMSP管理员账号
-                serverPassword: "", //CMSP管理员密码
-                chainCode: "", //应用链名称
-                chainId: "", //应用链ID
-                contractId: "", //存证合约
-            },
-            rules: {
-                serverPath: [
-                    { required: true, message: "请输入CMSP服务地址", trigger: "blur" },
-                ],
-                serverAccount: [
-                    { required: true, message: "请输入CMSP管理员账号", trigger: "blur" },
-                ],
-                serverPassword: [
-                    { required: true, message: "请输入CMSP管理员密码", trigger: "blur" },
-                ],
-                chainCode: [
-                    { required: true, message: "请输入应用链ID", trigger: "change" },
-                ],
-                contractId: [
-                    { required: true, message: "请选择存证合约", trigger: "change" },
-                ],
-            },
+            createSourceDialogVisible: false,
+            editSourceDialogVisible: false,
+            deleteSourceDialogVisible: false,
+            editDataSourceId: '',
+            deleteDataSourceId: '',
+            searchKeyWords: "", //搜索框内容
+            listLoading: false, //数据源列表loading
+            pageNumber: 1, //分页器的第几页
+            pageSize: 10, //每一页展示的条数
+            total: 0, //总共的条数
+            tableData: [], // 数据源列表数据
+            //数据源列表表头数据
+            tableHeader: [
+                {
+                    label: "数据源名称",
+                    prop: "name",
+                    align: "center",
+                    width: "130px",
+                },
+                {
+                    label: "CMSP服务地址",
+                    prop: "cmspAddress",
+                    align: "center",
+                    width: "300px",
+                },
+                {
+                    label: "CMSP管理员账号",
+                    prop: "cmspAccount",
+                    align: "center",
+                    width: "150px",
+                },
+                {
+                    label: "应用链名称",
+                    prop: "chainName",
+                    align: "center",
+                    width: "150px",
+                },
+                {
+                    label: "存证合约名称",
+                    prop: "contract",
+                    align: "center",
+                    width: "150px",
+                },
+            ],
         };
     },
+    mounted() {
+        this.getDataSourceList();
+    },
     methods: {
-        selectData(data) {
-            this.systemConfigurationForm.contractId = "";
-            this.contractIdData=[];
-            const { value, label } = data;
-            this.systemConfigurationForm.chainCode = value;
-            this.systemConfigurationForm.chainId = label;
-            console.log(
-                this.systemConfigurationForm.chainCode,
-                this.systemConfigurationForm.chainId
-            );
-        },
-        //获取存证合约
-        async getContractList() {
-            const res = await ContractList(
-                `?serverAccount=${this.systemConfigurationForm.serverAccount}&serverPath=${this.systemConfigurationForm.serverPath}&serverPassword=${this.systemConfigurationForm.serverPassword}&chainId=${this.systemConfigurationForm.chainId}`
-            );
+        //初始化数据源列表
+        async getDataSourceList() {
+            const res = await dataSourceList({
+                pageNumber: this.pageNumber,
+                pageSize: `${this.pageSize}?name=${this.searchKeyWords}`,
+            });
             if (res.data.code === 0) {
-                this.contractIdData = res.data.data;
+                // console.log(res.data.data);
+                if (
+                    Object.prototype.toString.call(res.data.data) == "[object Object]"
+                ) {
+                    this.tableData = [res.data.data.datasourceList];
+                } else {
+                    this.tableData = res.data.data.datasourceList;
+                }
+                this.total = res.data.data.total;
+                this.listLoading = false;
+                for (let item of this.tableData) {
+                    return this.tableData = item
+                }
             } else {
-                this.contractIdData = [];
-                
                 this.$message({
                     message: this.$chooseLang(res.data.code),
                     type: "error",
@@ -106,78 +137,62 @@ export default {
                 });
             }
         },
-        //获取应用链ID
-        async getChainList() {
-            
-            if (this.systemConfigurationForm.serverPassword == "") {
-                const res = await ChainList({
-                    serverAccount: `?serverAccount=${this.systemConfigurationForm.serverAccount}&serverPath=${this.systemConfigurationForm.serverPath}&serverPassword=${this.systemConfigurationForm.serverPassword}`,
-                    // serverPassword: sm3(this.systemConfigurationForm.serverPassword),
-                });
-                if (res.data.code === 0) {
-                    this.chainCodeData = res.data.data;
-                } else {
-                    this.chainCodeData = [];
-                    this.systemConfigurationForm.chainCode = "";
-                    this.systemConfigurationForm.chainId = "";
-
-                    this.systemConfigurationForm.contractId = "";
-                    this.contractIdData = [];
-                    this.$message({
-                        message: this.$chooseLang(res.data.code),
-                        type: "error",
-                        duration: 2000,
-                    });
-                }
-            } else {
-                const res = await ChainList({
-                    serverAccount: `?serverAccount=${this.systemConfigurationForm.serverAccount
-                        }&serverPath=${this.systemConfigurationForm.serverPath
-                        }&serverPassword=${sm3(this.systemConfigurationForm.serverPassword)}`,
-                });
-                if (res.data.code === 0) {
-                    this.chainCodeData = res.data.data;
-                    // console.log(this.chainCodeData);
-                } else {
-                    this.chainCodeData = [];
-                    this.systemConfigurationForm.chainCode = "";
-                    this.systemConfigurationForm.chainId = "";
-
-                    this.systemConfigurationForm.contractId = "";
-                    this.contractIdData = [];
-                    this.$message({
-                        message: this.$chooseLang(res.data.code),
-                        type: "error",
-                        duration: 2000,
-                    });
-                }
-            }
+        editDataSource(row) {
+            this.editSourceDialogVisible = true;
+            this.editDataSourceId = row.id
         },
-        submitForm(formName) {
-            this.$refs[formName].validate(async (valid) => {
-                if (valid) {
-                    let formData = JSONSwitchFormData({
-                        ...this.systemConfigurationForm,
-                        serverPassword: sm3(this.systemConfigurationForm.serverPassword),
-                    });
-                    const res = await bindAccount(formData);
-                    if (res.data.code === 0) {
-                        this.$refs[formName].resetFields();
-                        this.$message({
-                            type: "success",
-                            message: "配置成功!",
-                        });
-                    } else {
-                        this.$message({
-                            message: this.$chooseLang(res.data.code),
-                            type: "error",
-                            duration: 2000,
-                        });
-                    }
-                } else {
-                    return false;
-                }
-            });
+        deleteDataSource(row) {
+            this.deleteSourceDialogVisible = true;
+            this.deleteDataSourceId = row.id;
+            // this.$confirm(`确定删除账号${row.name}?`, {
+            //     confirmButtonText: "确定",
+            //     cancelButtonText: "取消",
+            // }).then(async () => {
+            //                 const res = await delDictionary(row.id);
+            //                 if (res.data.code === 0) {
+            //                     this.$message({
+            //                         type: "success",
+            //                         message: "删除成功!",
+            //                     });
+            //                     this.pageNumber =
+            //                         this.dictionaryListData.length > 1
+            //                             ? this.pageNumber
+            //                             : this.pageNumber - 1;
+            //                     this.getDictionaryList();
+            //                 } else {
+            //                     this.$message({
+            //                         message:
+            //                             "删除失败",
+            //                         type: "error",
+            //                     });
+            //                 }
+            //             })
+            //             .catch(() => { });
+        },
+        showSourceDialog() {
+            this.createSourceDialogVisible = true;
+        },
+        // 切换每页显示条数
+        handleSizeChange(val) {
+            this.pageSize = val;
+            this.listLoading = true;
+            this.getDataSourceList();
+        },
+        // 切换当前页码
+        changePage(paper = 1) {
+            this.pageNumber = paper;
+            this.listLoading = true;
+            this.getDataSourceList();
+        },
+        //
+        searchDataByName: _.debounce(function () {
+            this.pageNumber = 1;
+            this.listLoading = true;
+            this.getDataSourceList();
+        }, 400),
+        getNewDataSourceList() {
+            this.pageNumber = 1;
+            this.getDataSourceList();
         },
     },
 };
@@ -185,20 +200,56 @@ export default {
 
 <style lang="less" scoped>
 .content-container {
-    position: relative;
-    height: 680px;
     background-color: white;
 
-    .system-form {
-        position: absolute;
-        top: 10%;
-        left: 50%;
-        margin-left: -300px;
-        width: 600px;
+    .el-message-box__message p {
+        text-align: center !important;
+    }
 
-        .form-btn {
-            float: right;
+    .content-header {
+        display: flex;
+        position: relative;
+        height: 100px;
+        align-items: center;
+
+        .search {
+            width: 180px;
+            margin-left: 30px;
         }
+
+        .searchButton {
+            color: #ffffff;
+            border: 0px;
+            height: 32px;
+            background-color: #4093ff;
+            border-top-left-radius: 0%;
+            border-bottom-left-radius: 0%;
+            margin-left: -5px;
+            z-index: 100;
+            margin-top: 0px;
+        }
+
+        .newBtn {
+            position: absolute;
+            right: 20px;
+        }
+    }
+
+    .content-center {
+        margin: 0 25px 0 25px;
+
+        .el-button-text {
+            background-color: transparent !important;
+            border-color: transparent !important;
+        }
+    }
+
+    .content-footer {
+        height: 76px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
     }
 }
 </style>

@@ -175,8 +175,9 @@ export default {
                             return;
                         }
                     }
+                    console.log(this.dictionaryForm.dicType);
                     switch (this.dictionaryForm.dicType) {
-                        case "整数":
+                        case "int":
                             let intData = /^[0-9]*$/;
                             for (let i = 0; i < this.allDictionaryContent.length; i++) {
                                 if (!intData.test(this.allDictionaryContent[i])) {
@@ -187,7 +188,7 @@ export default {
                                     return;
                                 }
                             }
-                        case "浮点数":
+                        case "float":
                             
                             let floatData = /^[0-9]+([.][0-9]{1,})?$/;
                             for (let j = 0; j < this.allDictionaryContent.length; j++) {
@@ -270,7 +271,6 @@ export default {
         },
         closeDialog() {
             this.$emit("update:createDictionaryDialogVisible", false);
-
         },
         clearDictionaryForm() {
             this.dictionaryForm.dictionaryData1[0].dictionaryContent = '',

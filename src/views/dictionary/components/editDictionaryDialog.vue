@@ -119,6 +119,21 @@ export default {
             ];
         },
     },
+    watch: {
+        'dictionaryForm.dictionaryData2.length': {
+            handler(newVal, oldVal) {
+                if (this.oldDictionaryContent2.length !== newVal) {
+                    this.disabled = false;
+                } else {
+                    this.disabled = true;
+                }
+                // if (this.oldDictionaryContent2.length === newVal  {
+                    
+                // }
+            },
+            deep: true
+        }
+    },
     mounted() {
         this.open()
         this.getDictionaryName()
@@ -126,6 +141,7 @@ export default {
     methods: {
         //编辑字典时，字典名称发生改变，确定按钮可以用，否则禁用
         changeInput(event) {
+            console.log(this.dictionaryForm.dictionaryData2.length);
             if (this.oldDictionaryName != event) {
                 this.disabled = false;
             } else {
@@ -208,7 +224,7 @@ export default {
                 let dicDataName = res.data.data.map((obj) => {
                     return obj.dicName
                 })
-                dicDataName.splice(this.editDictionaryId - 1, 1);
+                dicDataName.splice(dicDataName.indexOf(this.oldDictionaryName), 1);
                 this.allDicName = dicDataName;
             }
         },
@@ -256,7 +272,6 @@ export default {
                                 }
                             }
                         case "浮点数":
-
                             let floatData = /^[0-9]+([.][0-9]{1,})?$/;
                             for (let j = 0; j < this.allDictionaryContent.length; j++) {
                                 if (!floatData.test(this.allDictionaryContent[j])) {
@@ -293,7 +308,7 @@ export default {
                     this.$parent.selectPage();
                     this.$message({
                         type: "success",
-                        message: "新建成功!",
+                        message: "编辑成功!",
                     });
                 } else {
                     this.closeDialog()

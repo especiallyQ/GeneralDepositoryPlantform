@@ -29,6 +29,9 @@ import errcode from './util/errcode';
 import { chooseLang } from './util/errcode.js';
 /* 剪贴板 */
 import VueClipboard from 'vue-clipboard2';
+//base64加密
+import {Base64} from 'js-base64'
+Vue.prototype.$Base64 = Base64;
 
 Vue.use(router);
 Vue.use(ElementUI, {
