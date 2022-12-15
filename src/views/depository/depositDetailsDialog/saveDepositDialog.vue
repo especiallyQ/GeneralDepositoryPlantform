@@ -32,14 +32,22 @@
           <el-input
             v-model="form[item.parameterName]"
             v-if="
-              item.parameterType !== 'file' &&
-              (item.parameterType !== 'dictionary' || dialogFlag === 2)
+              item.parameterType === 'string' ||
+              item.parameterType === 'int' ||
+              item.parameterType === 'float' ||
+              (dialogFlag === 2 && item.parameterType !== 'file')
             "
             :disabled="dialogFlag === 2"
             @input="(event) => changeInput(event, item)"
           ></el-input>
           <el-select
-            v-if="item.parameterType === 'dictionary' && dialogFlag !== 2"
+            v-if="
+              item.parameterType !== 'string' &&
+              item.parameterType !== 'int' &&
+              item.parameterType !== 'float' &&
+              item.parameterType !== 'file' &&
+              dialogFlag !== 2
+            "
             v-model="form[item.parameterName]"
             @change="
               (event) => {
@@ -153,6 +161,7 @@ export default {
     form: {
       handler() {
         for (let key of this.parameter) {
+          delete key.parameterOption
           key.parameterValue = this.form[key.parameterName];
         }
       },
@@ -277,7 +286,6 @@ export default {
       getInitAddDepository(this.templateMsg.id)
         .then((res) => {
           if (res.data.code === 0) {
-            this.parameter = res.data.data;
             this.parameter = JSON.parse(JSON.stringify(res.data.data));
             this.oldParameter = JSON.parse(JSON.stringify(res.data.data));
             this.createRules();
@@ -533,7 +541,7 @@ export default {
               },
             ];
             break;
-          case "dictionary":
+          default:
             this.rules[key.parameterName] = [
               {
                 required: true,

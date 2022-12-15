@@ -43,7 +43,7 @@
         v-loading="listLoading"
         style="width: 100%"
         empty-text="暂无数据"
-        :row-style="{height:'55px'}"
+        :row-style="{ height: '55px' }"
       >
         <el-table-column align="right" width="60px">
           <template slot-scope="scope">
@@ -163,6 +163,7 @@
 import _ from "lodash";
 import { getApproverList, getApprovalList } from "@/util/api";
 import ApprovalDialog from "@/views/approvalManagement/components/approvalDialog.vue";
+import { getDate } from "@/util/util";
 export default {
   name: "ApprovalList",
   props: {
@@ -183,7 +184,7 @@ export default {
           approverName: "全部",
         },
       ],
-      tableData: null,
+      tableData: [],
       tableHeader: [
         {
           label: "提交人",
@@ -259,6 +260,10 @@ export default {
         .then((res) => {
           if (res.data.code === 0) {
             this.tableData = res.data.data;
+            for (let key of this.tableData) {
+              this.$set(key, 'submitTime', getDate(key.submitTime));
+              this.$set(key, 'approvalTime', getDate(key.approvalTime));
+            }
             this.total = res.data.total;
             this.listLoading = false;
           } else {
@@ -270,7 +275,8 @@ export default {
             this.listLoading = false;
           }
         })
-        .catch(() => {
+        .catch((err) => {
+  
           this.$message({
             message: "系统错误",
             type: "error",

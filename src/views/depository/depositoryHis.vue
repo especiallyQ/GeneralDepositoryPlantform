@@ -81,7 +81,7 @@ import {
   getTemplateDetailsData,
   getDepositoryHistoryMessage,
 } from "@/util/api";
-import { rgb } from "@/util/util";
+import { rgb, getDate } from "@/util/util";
 export default {
   name: "DepositoryHis",
   components: {
@@ -124,6 +124,7 @@ export default {
               });
             }
             this.templateMsg = res.data.data;
+            this.templateMsg.createTime = getDate(res.data.data.createTime);
             this.firstCharacter =
               res.data.data.depositoryTemplateName.substring(0, 1);
             this.DepositPageLoading = false;
@@ -156,9 +157,10 @@ export default {
             this.tableData = [];
             for (let key of res.data.data.depositoryList) {
               const { createTime, approver, submitter } = key;
+              let create_time = getDate(createTime);
               this.tableData.push({
                 approver,
-                createTime,
+                create_time,
                 submitter,
                 ...JSON.parse(key.content),
               });
@@ -222,9 +224,9 @@ export default {
           width: "195px",
         },
         {
-          enName: "createTime",
+          enName: "create_time",
           name: "提交时间",
-          props: "createTime",
+          props: "create_time",
           align: "center",
           width: "195px",
         },
