@@ -43,7 +43,7 @@
 </template>
 <script>
 import { JSONSwitchFormData } from "@/util/util.js";
-import { ContractList, ChainList, bindAccount } from "@/util/api.js";
+import { ContractList, ChainList, bindAccount, getDataOrigin } from "@/util/api.js";
 import { sm3, sm2 } from "sm-crypto";
 export default {
     name: 'createSourceDialog',
@@ -73,6 +73,7 @@ export default {
             chainCodeData: [], //应用链ID下拉框数据
             dialogFormVisible: this.createSourceDialogVisible,//控制dialog是否显示
             loading: false,
+            dataSourceAllName: [],
             //系统配置表单数据
             systemConfigurationForm: {
                 dataSourceName: "",//数据源名称
@@ -101,7 +102,7 @@ export default {
                     { required: true, message: "请输入CMSP管理员密码", trigger: "blur" },
                 ],
                 chainCode: [
-                    { required: true, message: "请输入应用链ID", trigger: "change" },
+                    { required: true, message: "请选择应用链名称", trigger: "change" },
                 ],
                 contractId: [
                     { required: true, message: "请选择存证合约", trigger: "change" },
@@ -109,11 +110,37 @@ export default {
             },
         }
     },
+    mounted() {
+        this.open()
+    },
     methods: {
+        //拿到数据源列表所有数据源名称
+        open() {
+            getDataOrigin().then((res) => {
+                if (res.data.code === 0) {
+                    this.dataSourceAllName = res.data.data.map((obj) => {
+                        return obj.label
+                    })
+                }
+            })
+        },
+
+
+
         //提交表单
         submitForm(formName) {
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
+                    for (let i = 0; i < this.dataSourceAllName.length; i++) {
+                        if (this.systemConfigurationForm.dataSourceName == this.dataSourceAllName[i]) {
+                            this.$message({
+                                message: "数据源名称重复",
+                                type: "error",
+                                duration: 2000,
+                            });
+                            return;
+                        }
+                    }
                     this.getBindAccount();
                 } else {
                     return false;
@@ -136,7 +163,7 @@ export default {
         async getChainList() {
             // let encPass = this.$Base64.encode(this.systemConfigurationForm.serverPassword);//加密
             // let decPass = this.$Base64.decode(encPass);//解密
-        
+
             const res = await ChainList(
                 {
                     serverAccount:

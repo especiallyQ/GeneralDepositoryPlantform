@@ -1,23 +1,24 @@
 <template>
     <div>
         <el-dialog :visible.sync="dialogFormVisible" @close="close" width="498px" center :close-on-click-modal="false">
-            <div class="dialog-header">
-                <div v-if="true">
-                    <span class="margins">该数据源下包含个未冻结的存证模板：<span>{{msg2}}</span></span>
+            <div class="dialog-header" v-loading="getLoading">
+                <div v-if="depositoryTemplateList.length">
+                    <span class="margins">该数据源下包含个未冻结的存证模板：<span v-for="(item, index) in depositoryTemplateList"
+                            :key="index">{{ item.depositoryTemplateName }} </span></span>
                     <span class="margins">删除后挂载在该数据源下的存证模板将会<span class="red">永久冻结</span></span>
                 </div>
-                <span class="marginss">是否确认删除数据源 {{msg}}</span>
+                <span class="marginss">是否确认删除数据源 {{ dataSourceName }}</span>
             </div>
             <div class="dialog-footer">
                 <el-button @click="close">取消</el-button>
-                <el-button type="primary">确定</el-button>
+                <el-button type="primary" @click="getDeleteDatasource" :loading="loading">确定</el-button>
             </div>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import { ContractList } from "@/util/api.js";
+import { deleteDataSourceById, deleteDatasource } from "@/util/api.js";
 export default {
     name: "deleteSourceDialog",
     props: {
@@ -29,28 +30,29 @@ export default {
         deleteDataSourceId: {
             type: Number,
             required: true,
+        },
+        deleteDataSourceName: {
+            type: String,
+            require: true
         }
     },
     watch: {
         deleteSourceDialogVisible() {
             this.dialogFormVisible = this.deleteSourceDialogVisible;
         },
+        deleteDataSourceName() {
+            this.dataSourceName = this.deleteDataSourceName
+        }
     },
     data() {
         return {
             dialogFormVisible: this.deleteSourceDialogVisible,
-            msg: '数据源1',
-            // msg1:['慈善捐款模板','慈善积分模板','坤坤模板']
-        }
-    },
-    computed: {
-        msg2() {
-            let ms1 = ['慈善捐款模板', '慈善积分模板', '坤坤模板'];
-            for (let key of ms1) {
-                let a = key
-            }
-            console.log(a);
-            return ms1
+            getLoading: false,
+            loading: false,
+            dataSourceName: this.deleteDataSourceName,
+            depositoryTemplateList: [],
+            depositoryTemplateIds: []
+            // ms1:['慈善捐款模板', '慈善积分模板', '坤坤模板'],
         }
     },
     mounted() {
@@ -58,8 +60,53 @@ export default {
     },
     methods: {
         open() {
-
+            this.getLoading = true;
+            deleteDataSourceById(this.deleteDataSourceId).then((res) => {
+                if (res.data.code === 0) {
+                    this.getLoading = false;
+                    this.depositoryTemplateList = res.data.data.depositoryList;
+                    this.depositoryTemplateIds = JSON.stringify(this.depositoryTemplateList.map((key) => {
+                        return key.depositoryTemplateId
+                    }))
+                } else {
+                    this.getLoading = false;
+                    this.$message({
+                        message: this.$chooseLang(res.data.code),
+                        type: "error",
+                        duration: 2000,
+                    });
+                }
+            })
         },
+        getDeleteDatasource() {
+            this.loading = true;
+            deleteDatasource(
+                {
+                    datasourceId: this.deleteDataSourceId,
+                    depositoryTemplateIds: this.depositoryTemplateIds
+                }
+            ).then((res) => {
+                if (res.data.code === 0) {
+                    this.close();
+                    this.$emit("getNewDataSourceList");
+                    this.$message({
+                        message: "删除成功",
+                        type: "error",
+                        duration: 2000,
+                    });
+                    this.loading = false;
+                } else {
+                    this.loading = false;
+                    this.close();
+                    this.$message({
+                        message: this.$chooseLang(res.data.code),
+                        type: "error",
+                        duration: 2000,
+                    });
+                }
+            })
+        },
+
         //关闭dialog
         close() {
             this.$emit("update:deleteSourceDialogVisible", false);

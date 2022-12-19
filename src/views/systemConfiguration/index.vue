@@ -43,8 +43,12 @@
         <EditSourceDialog v-if="editSourceDialogVisible" :editSourceDialogVisible.sync="editSourceDialogVisible"
             :editDataSourceId="editDataSourceId" @getNewDataSourceList="getNewDataSourceList">
         </EditSourceDialog>
-        <DeleteSourceDialog v-if="deleteSourceDialogVisible" :deleteSourceDialogVisible.sync="deleteSourceDialogVisible"
-            :deleteDataSourceId="deleteDataSourceId" @getNewDataSourceList="getNewDataSourceList"></DeleteSourceDialog>
+        <DeleteSourceDialog v-if="deleteSourceDialogVisible" 
+        :deleteSourceDialogVisible.sync="deleteSourceDialogVisible"
+            :deleteDataSourceId="deleteDataSourceId" 
+            :deleteDataSourceName="deleteDataSourceName"
+            @getNewDataSourceList="getNewDataSourceList"
+            ></DeleteSourceDialog>
     </div>
 </template>
 <script>
@@ -64,6 +68,7 @@ export default {
             deleteSourceDialogVisible: false,
             editDataSourceId: '',
             deleteDataSourceId: '',
+            deleteDataSourceName:"",
             searchKeyWords: "", //搜索框内容
             listLoading: false, //数据源列表loading
             pageNumber: 1, //分页器的第几页
@@ -144,30 +149,7 @@ export default {
         deleteDataSource(row) {
             this.deleteSourceDialogVisible = true;
             this.deleteDataSourceId = row.id;
-            // this.$confirm(`确定删除账号${row.name}?`, {
-            //     confirmButtonText: "确定",
-            //     cancelButtonText: "取消",
-            // }).then(async () => {
-            //                 const res = await delDictionary(row.id);
-            //                 if (res.data.code === 0) {
-            //                     this.$message({
-            //                         type: "success",
-            //                         message: "删除成功!",
-            //                     });
-            //                     this.pageNumber =
-            //                         this.dictionaryListData.length > 1
-            //                             ? this.pageNumber
-            //                             : this.pageNumber - 1;
-            //                     this.getDictionaryList();
-            //                 } else {
-            //                     this.$message({
-            //                         message:
-            //                             "删除失败",
-            //                         type: "error",
-            //                     });
-            //                 }
-            //             })
-            //             .catch(() => { });
+            this.deleteDataSourceName = row.name;
         },
         showSourceDialog() {
             this.createSourceDialogVisible = true;

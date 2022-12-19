@@ -19,7 +19,7 @@
                 </el-form-item>
                 <el-form-item label="应用链名称:" prop="chainCode">
                     <el-select v-model="systemConfigurationForm.chainName" placeholder="请选择应用链名称" @focus="getChainList"
-                        @change="selectChainData" style="width: 100%">
+                        @change="selectChainData" style="width: 100%" :value-key="chainCodeData.chainName">
                         <el-option v-for="item in chainCodeData" :key="item.chainCode" :label="item.chainName"
                             :value="{ value: item.chainCode, label: item.chainId, name: item.chainName }">
                         </el-option>
@@ -27,7 +27,8 @@
                 </el-form-item>
                 <el-form-item label="存证合约:" prop="contractId">
                     <el-select v-model="systemConfigurationForm.contractName" placeholder="请选择存证合约"
-                        @focus="getContractList" @change="selectContractData" style="width: 100%">
+                        @focus="getContractList" @change="selectContractData" style="width: 100%"
+                        :value-key="contractIdData.contractId">
                         <el-option v-for="item in contractIdData" :key="item.contractId" :label="item.contractName"
                             :value="{ value: item.contractId, label: item.contractName, contractVersion: item.contractVersion }">
                         </el-option>
@@ -43,7 +44,7 @@
 </template>
 <script>
 import { JSONSwitchFormData } from "@/util/util.js";
-import { ContractList, ChainList, bindAccount ,dataSourceListById} from "@/util/api.js";
+import { ContractList, ChainList, bindAccount, dataSourceListById, editDatasource, getDataOrigin } from "@/util/api.js";
 import { sm3 } from "sm-crypto";
 export default {
     name: 'editSourceDialog',
@@ -54,7 +55,7 @@ export default {
             required: true,
         },
         editDataSourceId: {
-            type: Number ,
+            type: Number,
             required: true,
         }
     },
@@ -66,6 +67,10 @@ export default {
             dialogFormVisible: this.editSourceDialogVisible,//控制dialog是否显示
             loading: false,
             getLoading: false,
+            accountId: '',
+            oldChainId: '',
+            oldDataSourceName: '',
+            dataSourceAllName: [],
             //系统配置表单数据
             systemConfigurationForm: {
                 dataSourceName: "",//数据源名称
@@ -93,7 +98,7 @@ export default {
                     { required: true, message: "请输入CMSP管理员密码", trigger: "blur" },
                 ],
                 chainCode: [
-                    { required: true, message: "请输入应用链ID", trigger: "change" },
+                    { required: true, message: "请选择应用链名称", trigger: "change" },
                 ],
                 contractId: [
                     { required: true, message: "请选择存证合约", trigger: "change" },
@@ -105,24 +110,46 @@ export default {
         editSourceDialogVisible() {
             this.dialogFormVisible = this.editSourceDialogVisible
         },
-            "systemConfigurationForm.chainName": {
-                handler(oldV, newV) {
-                    // if (oldV !== newV) {
-                    //     this.contractIdData = [];
-                    //     this.systemConfigurationForm.contractName = '';
-                    // }
+        "systemConfigurationForm.chainName": {
+            handler(oldV, newV) {
+                if (oldV !== newV) {
+                    // this.contractIdData = [];
+                    // this.systemConfigurationForm.contractName = '';
                 }
             }
+        }
     },
     mounted() {
         this.open();
+        this.getSourceAllName();
     },
     methods: {
+        getSourceAllName() {
+            getDataOrigin().then((res) => {
+                if (res.data.code === 0) {
+                    this.dataSourceAllName = res.data.data.map((obj) => {
+                        return obj.label
+                    })
+                    // console.log(this.oldDataSourceName);
+                }
+            })
+        },
 
         //提交表单
         submitForm(formName) {
+            this.dataSourceAllName.splice(this.dataSourceAllName.indexOf(this.oldDataSourceName), 1);
             this.$refs[formName].validate(async (valid) => {
                 if (valid) {
+                    for (let i = 0; i < this.dataSourceAllName.length; i++) {
+                        if (this.systemConfigurationForm.dataSourceName == this.dataSourceAllName[i]) {
+                            this.$message({
+                                message: "数据源名称重复",
+                                type: "error",
+                                duration: 2000,
+                            });
+                            return;
+                        }
+                    }
                     this.getBindAccount();
                 } else {
                     return false;
@@ -132,30 +159,39 @@ export default {
         open() {
             this.getLoading = true;
             dataSourceListById(this.editDataSourceId).then((res) => {
-                if (res.data.code === 0) { 
-                    const { chainName, contractName, name, serverAccount, serverPassword, serverPath } = res.data.data;
+                if (res.data.code === 0) {
+                    const { accountId, chainName, contractId, contractName, name, serverAccount, serverPassword, serverPath, chainCode, chainId } = res.data.data;
+                    this.oldChainId = JSON.parse(JSON.stringify(chainId));
+                    this.oldDataSourceName = JSON.parse(JSON.stringify(name));
                     this.systemConfigurationForm.dataSourceName = name;
                     this.systemConfigurationForm.serverPath = serverPath;
                     this.systemConfigurationForm.serverAccount = serverAccount;
                     this.systemConfigurationForm.serverPassword = serverPassword;
                     this.systemConfigurationForm.chainName = chainName;
+                    this.systemConfigurationForm.chainCode = chainCode;
                     this.systemConfigurationForm.contractName = contractName;
+                    this.systemConfigurationForm.contractId = contractId;
+                    this.systemConfigurationForm.chainId = chainId;
+                    this.accountId = accountId;
                     this.getChainList();
-                    this.$nextTick(() => {  this.$refs['ruleForm'].clearValidate();});
-
+                    // this.$nextTick(() => {  this.$refs['ruleForm'].clearValidate();});
                     this.getLoading = false;
                 } else {
                     this.getLoading = false;
-                        this.$message({
-                            message: this.$chooseLang(res.data.code),
-                            type: "error",
-                            duration: 2000,
-                        });
-                    }
+                    this.$message({
+                        message: this.$chooseLang(res.data.code),
+                        type: "error",
+                        duration: 2000,
+                    });
+                }
             })
 
         },
         selectChainData(data) {
+            if (this.oldChainId !== data.label) {
+                this.contractIdData = [];
+                this.systemConfigurationForm.contractName = '';
+            }
             const { value, label, name } = data;
             this.systemConfigurationForm.chainCode = value;
             this.systemConfigurationForm.chainId = label;
@@ -172,7 +208,7 @@ export default {
             const res = await ChainList(
                 {
                     serverAccount:
-                        `?serverAccount=${this.systemConfigurationForm.serverAccount}&serverPath=${this.systemConfigurationForm.serverPath}&serverPassword=${sm3(this.systemConfigurationForm.serverPassword)}   `,
+                        `?serverAccount=${this.systemConfigurationForm.serverAccount}&serverPath=${this.systemConfigurationForm.serverPath}&serverPassword=${this.$Base64.encode(this.systemConfigurationForm.serverPassword)}   `,
                 }
             );
             if (res.data.code === 0) {
@@ -188,7 +224,7 @@ export default {
         //获取存证合约
         async getContractList() {
             const res = await ContractList(
-                `?serverAccount=${this.systemConfigurationForm.serverAccount}&serverPath=${this.systemConfigurationForm.serverPath}&serverPassword=${sm3(this.systemConfigurationForm.serverPassword)}&chainId=${this.systemConfigurationForm.chainId}`
+                `?serverAccount=${this.systemConfigurationForm.serverAccount}&serverPath=${this.systemConfigurationForm.serverPath}&serverPassword=${this.$Base64.encode(this.systemConfigurationForm.serverPassword)}&chainId=${this.systemConfigurationForm.chainId}`
             );
             if (res.data.code === 0) {
                 this.contractIdData = res.data.data;
@@ -205,16 +241,18 @@ export default {
             this.loading = true;
             let formData = JSONSwitchFormData({
                 ...this.systemConfigurationForm,
-                serverPassword: sm3(this.systemConfigurationForm.serverPassword),
+                name: this.systemConfigurationForm.dataSourceName,
+                id: this.editDataSourceId,
+                serverPassword: this.$Base64.encode(this.systemConfigurationForm.serverPassword),
             });
-            bindAccount(formData).then((res) => {
+            editDatasource(formData).then((res) => {
                 if (res.data.code === 0) {
                     this.loading = false;
                     this.close();
                     this.$emit("getNewDataSourceList");
                     this.$message({
                         type: "success",
-                        message: "配置成功!",
+                        message: "编辑成功!",
                     });
                 } else {
                     this.loading = false;

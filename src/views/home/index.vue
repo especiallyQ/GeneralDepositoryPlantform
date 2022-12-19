@@ -1,7 +1,7 @@
 <template>
   <div class="gdp-login-container">
     <canvas id="canvas"></canvas>
-    <div class="gdp-header">
+    <!-- <div class="gdp-header">
       <div class="gdp-title">通用存证平台</div>
       <ul @click="changeTemplate">
         <li id="HomePage" :class="comName == 'HomePage' ? 'action' : ''">
@@ -9,12 +9,12 @@
         </li>
         <li id="Login" :class="comName == 'Login' ? 'action' : ''">登录</li>
       </ul>
-    </div>
-    <!-- <div class="gdp-header">
-      <span >登 录</span>
     </div> -->
+    <div class="gdp-header">
+      <span>登 录</span>
+    </div>
     <component :is="comName"></component>
-    <!-- <div class="gdp-footer"></div> -->
+    <div class="gdp-footer"></div>
   </div>
 </template>
 
@@ -160,19 +160,23 @@ export default {
   height: 100%;
   // background-color: #070c14;
   overflow: hidden;
- .gdp-footer{
-  width: 100%;
-  height: 300px;
-  // background-color: #F5F5F5 ;
-  position: fixed;
+
+  .gdp-footer {
+    width: 100%;
+    height: 300px;
+    background-color: #F5F5F5;
+    position: fixed;
+    opacity: 0.8;
     bottom: 0;
     left: 0;
- }
+  }
+
   .gdp-header {
     width: 100%;
     height: 60px;
-    background-color: #3f3f3f;
+    // background-color: #3f3f3f;
     position: fixed;
+
     top: 0;
     left: 0;
     display: flex;
@@ -188,9 +192,9 @@ export default {
       color: #fff;
       cursor: pointer;
 
-          &:hover {
-          color: wheat;
-        }
+      &:hover {
+        color: wheat;
+      }
     }
 
     .gdp-title {
@@ -213,6 +217,7 @@ export default {
       margin-right: 30px;
       font-weight: bold;
       color: #fff;
+
       .action {
         color: skyblue;
       }

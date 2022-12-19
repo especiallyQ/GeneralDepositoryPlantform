@@ -29,10 +29,9 @@
                             :on-exceed="handleExceed" :http-request="Upload" :on-remove="handleRemove">
                             <el-button type="primary" size="small">点击上传</el-button>
                         </el-upload>
-
                     </el-form-item>
                     <el-progress v-if="credentialType == 2 && progressVisible == true"
-                        :percentage="parseInt(percentage)" status="success"
+                        :percentage="parseInt(percentage)" :format="format"
                         style="width:88%;margin-left: 120px;margin-top: -20px;"></el-progress>
                     <el-form-item label="验证码" prop="verifyCode">
                         <el-input placeholder="请输入验证码" maxlength="4" style="width:460px"
@@ -142,7 +141,9 @@ export default {
         }
     },
     methods: {
-
+        format(percentage) {
+            return percentage === 100 ? '100%' : `${percentage}%`;
+        },
         Upload() {
             let func = this.uploadProgress;
             let data = JSONSwitchFormData({ "file": this.file });
@@ -249,6 +250,7 @@ export default {
             let fromData = JSONSwitchFormData(resData);
             const res = await dataVerify(fromData);
             if (res.data.code === 0) {
+                this.percentage = 0;
                 this.loading = false;
                 this.chainDataVisible = true;
                 this.verifyDetails = res.data.data.depositoryParamList;
@@ -260,6 +262,7 @@ export default {
                 });
             } else {
                 this.loading = false;
+                this.percentage = 0;
                 this.$message({
                     message: this.$chooseLang(res.data.code),
                     type: "error",

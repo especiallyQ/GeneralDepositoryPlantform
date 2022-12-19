@@ -221,14 +221,14 @@ export default {
         async getDictionaryName() {
             const res = await dicictionaryName();
             if (res.data.code === 0) {
-                let dicDataName = res.data.data.map((obj) => {
+                this.allDicName = res.data.data.map((obj) => {
                     return obj.dicName
                 })
-                dicDataName.splice(dicDataName.indexOf(this.oldDictionaryName), 1);
-                this.allDicName = dicDataName;
+               
             }
         },
         submitForm(formName) {
+            this.allDicName.splice(this.allDicName.indexOf(this.oldDictionaryName), 1);
             let data = this.dictionaryForm.dictionaryData2.map(key => {
                 return key.dictionaryContent
             })
