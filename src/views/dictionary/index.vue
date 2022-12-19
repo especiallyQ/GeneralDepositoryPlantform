@@ -87,15 +87,15 @@ export default {
                     label: "全部",
                 },
                 {
-                    value: "字符串",
+                    value: "string",
                     label: "字符串",
                 },
                 {
-                    value: "整数",
+                    value: "int",
                     label: "整数",
                 },
                 {
-                    value: "浮点数",
+                    value: "float",
                     label: "浮点数",
                 },
             ],
@@ -156,13 +156,12 @@ export default {
         },
         //删除账号
         delateDictionary(row) {
-
-            this.$confirm(`确定删除账号${row.dicName}?`, {
+            this.$confirm(`确定删除字典${row.dicName}?`, {
                 confirmButtonText: "确定",
                 cancelButtonText: "取消",
             })
                 .then(() => {
-                    this.$confirm(`确定删除${row.dicName}?`, {
+                    this.$confirm(`确定删除字典${row.dicName}?`, {
                         confirmButtonText: "确定",
                         cancelButtonText: "取消",
                     })

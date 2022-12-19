@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="home">
         <div class="home-page">
             <div class="from">
                 <span class="title">通用存证平台</span>
@@ -169,9 +169,20 @@ export default {
             this.verifyForm.dataHash = '';
         },
         beforeUpload(file) {
-            this.percentage = 0;
-            this.progressVisible = true;
-            this.file = file;
+            const isLt20M = file.size / 1024 / 1024 < 20;
+            if (!isLt20M) {
+                this.progressVisible = false;
+                this.fileList = []
+                this.$message({
+                    type: 'warning',
+                    message: '附件大小超限，文件不能超过 20M'
+                })
+            } else {
+                this.percentage = 0;
+                this.progressVisible = true;
+                this.file = file;
+            }
+
         },
         handleExceed(files, fileList) {
             this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
@@ -180,7 +191,6 @@ export default {
             this.$refs[formName].resetFields();
             this.chainDataVisible = false;
             this.tableData = [];
-            console.log(this.credentialType);
             this.$refs.verifyForm.clearValidate()
             if (this.credentialType == 2) {
                 this.disabled = true;
@@ -275,6 +285,10 @@ export default {
 
 </script>
 <style scoped >
+.home {
+    z-index: 1;
+}
+
 .home-page {
     /* position: absolute; */
     margin-top: -650px;
@@ -343,7 +357,9 @@ export default {
     display: flex;
     height: 300px;
     padding: 10px;
-    background-color: white;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 12px 0 #dfe2e9;
+    border-radius: 3px;
 }
 
 .table .table-footer {

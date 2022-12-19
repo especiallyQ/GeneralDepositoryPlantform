@@ -17,13 +17,15 @@
             <el-form-item label="字典内容" prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData1"
                 :key="index">
                 <el-input @input="(event) => changeInputDicData1(event)" v-model.trim="key.dictionaryContent"
-                    placeholder="请输入字典内容" style="width: 320px"></el-input>
+                    placeholder="请输入字典内容" style="width: 320px" maxlength="20"
+                    show-word-limit></el-input>
                 <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
             <el-form-item v-for="(key, index) in dictionaryForm.dictionaryData2" :key="index + 1">
                 <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" class="el-input-width"
-                    style="width: 320px" @input="(event) => changeInputDicData2(event)"></el-input>
+                    style="width: 320px" @input="(event) => changeInputDicData2(event)" maxlength="20"
+                    show-word-limit></el-input>
                 <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
@@ -120,18 +122,22 @@ export default {
         },
     },
     watch: {
-        'dictionaryForm.dictionaryData2.length': {
+        'dictionaryForm.dictionaryData2': {
             handler(newVal, oldVal) {
-                if (this.oldDictionaryContent2.length !== newVal) {
-                    this.disabled = false;
-                } else {
+                let newData =  newVal.map((obj) => {
+                    return obj.dictionaryContent
+                })
+                let oldData = this.oldDictionaryContent2.map((obj) => {
+                return obj.dictionaryContent
+                })
+                if (JSON.stringify(newData) == JSON.stringify(oldData)) {
                     this.disabled = true;
+                } else {
+                    this.disabled = false;
                 }
-                // if (this.oldDictionaryContent2.length === newVal  {
-                    
-                // }
             },
             deep: true
+            
         }
     },
     mounted() {
@@ -141,7 +147,6 @@ export default {
     methods: {
         //编辑字典时，字典名称发生改变，确定按钮可以用，否则禁用
         changeInput(event) {
-            console.log(this.dictionaryForm.dictionaryData2.length);
             if (this.oldDictionaryName != event) {
                 this.disabled = false;
             } else {
@@ -224,7 +229,6 @@ export default {
                 this.allDicName = res.data.data.map((obj) => {
                     return obj.dicName
                 })
-               
             }
         },
         submitForm(formName) {

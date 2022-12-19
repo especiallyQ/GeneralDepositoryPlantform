@@ -11,16 +11,21 @@
       </ul>
     </div> -->
     <div class="gdp-header">
-      <span>登 录</span>
+      <span @click="isLoginDialogVisible">登 录</span>
     </div>
-    <component :is="comName"></component>
+    <HomePage></HomePage>
+    <Login 
+    v-if="loginDialogVisible" 
+    :loginDialogVisible.sync="loginDialogVisible"
+    ></Login>
+    <!-- <component :is="comName"></component> -->
     <div class="gdp-footer"></div>
   </div>
 </template>
 
 <script>
 import { random } from "@/util/util";
-import Login from "@/views/home/login/login.vue";
+import Login from "@/views/home/login/index.vue";
 import HomePage from "@/views/home/homePage/homePage.vue";
 import NewHomePage from "@/views/home/newHomePage/newHomePage.vue";
 export default {
@@ -33,6 +38,7 @@ export default {
 
   data() {
     return {
+      loginDialogVisible:false,
       // canvas动画
       canvas1: null,
       canvas2: null,
@@ -145,6 +151,9 @@ export default {
       }
       window.requestAnimationFrame(this.animation);
     },
+    isLoginDialogVisible() {
+      this.loginDialogVisible = true;
+    }
   },
 };
 </script>
@@ -164,9 +173,11 @@ export default {
   .gdp-footer {
     width: 100%;
     height: 300px;
-    background-color: #F5F5F5;
+    background-color: #F7F7F7;
+    box-shadow: 0 4px 12px 0 #dfe2e9;
+    border-radius: 3px;
     position: fixed;
-    opacity: 0.8;
+    // opacity: 0.8;
     bottom: 0;
     left: 0;
   }

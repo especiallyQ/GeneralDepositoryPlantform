@@ -13,14 +13,16 @@
             </el-form-item>
             <el-form-item label="字典内容" v-for="(key, index) in dictionaryForm.dictionaryData1" :key="index"
                 :prop="key.dictionaryContent">
-                <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" style="width: 320px"></el-input>
+                <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" style="width: 320px" maxlength="20"
+                    show-word-limit></el-input>
                 <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
             <el-form-item prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData2"
                 :key="index + 1">
                 <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" class="el-input-width"
-                    style="width: 320px"></el-input>
+                    style="width: 320px" maxlength="20"
+                    show-word-limit></el-input>
                 <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
