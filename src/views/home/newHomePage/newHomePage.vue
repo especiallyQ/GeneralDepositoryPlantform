@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="home-page">
         <div class="tabs">
             <el-tabs type="border-card" class="data-bcg" @tab-click="handleClick">
@@ -491,4 +491,4 @@ export default {
 .el-table th {
     color: white;
 }
-</style>
+</style> -->

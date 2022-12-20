@@ -17,8 +17,7 @@
             <el-form-item label="字典内容" prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData1"
                 :key="index">
                 <el-input @input="(event) => changeInputDicData1(event)" v-model.trim="key.dictionaryContent"
-                    placeholder="请输入字典内容" style="width: 320px" maxlength="20"
-                    show-word-limit></el-input>
+                    placeholder="请输入字典内容" style="width: 320px" maxlength="20" show-word-limit></el-input>
                 <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
@@ -124,11 +123,11 @@ export default {
     watch: {
         'dictionaryForm.dictionaryData2': {
             handler(newVal, oldVal) {
-                let newData =  newVal.map((obj) => {
+                let newData = newVal.map((obj) => {
                     return obj.dictionaryContent
                 })
                 let oldData = this.oldDictionaryContent2.map((obj) => {
-                return obj.dictionaryContent
+                    return obj.dictionaryContent
                 })
                 if (JSON.stringify(newData) == JSON.stringify(oldData)) {
                     this.disabled = true;
@@ -137,7 +136,7 @@ export default {
                 }
             },
             deep: true
-            
+
         }
     },
     mounted() {

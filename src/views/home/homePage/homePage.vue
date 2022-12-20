@@ -171,12 +171,14 @@ export default {
         beforeUpload(file) {
             const isLt20M = file.size / 1024 / 1024 < 20;
             if (!isLt20M) {
+                console.log(file);
                 this.progressVisible = false;
                 this.fileList = []
                 this.$message({
                     type: 'warning',
                     message: '附件大小超限，文件不能超过 20M'
                 })
+                return;
             } else {
                 this.percentage = 0;
                 this.progressVisible = true;
