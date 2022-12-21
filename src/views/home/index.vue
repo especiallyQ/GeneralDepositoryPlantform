@@ -1,15 +1,6 @@
 <template>
   <div class="gdp-login-container">
     <canvas id="canvas"></canvas>
-    <!-- <div class="gdp-header">
-      <div class="gdp-title">通用存证平台</div>
-      <ul @click="changeTemplate">
-        <li id="HomePage" :class="comName == 'HomePage' ? 'action' : ''">
-          首页
-        </li>
-        <li id="Login" :class="comName == 'Login' ? 'action' : ''">登录</li>
-      </ul>
-    </div> -->
     <div class="gdp-header">
       <span @click="isLoginDialogVisible">登 录</span>
     </div>
@@ -18,7 +9,6 @@
     v-if="loginDialogVisible" 
     :loginDialogVisible.sync="loginDialogVisible"
     ></Login>
-    <!-- <component :is="comName"></component> -->
     <div class="gdp-footer"></div>
   </div>
 </template>
@@ -27,7 +17,6 @@
 import { random } from "@/util/util";
 import Login from "@/views/home/login/index.vue";
 import HomePage from "@/views/home/homePage/homePage.vue";
-import NewHomePage from "@/views/home/newHomePage/newHomePage.vue";
 export default {
   name: "Home",
 

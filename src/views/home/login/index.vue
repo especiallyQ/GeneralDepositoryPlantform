@@ -1,6 +1,5 @@
 <template>
     <div>
-
         <el-dialog title="登录" :visible.sync="dialogFormVisible" @close="close" width="380px" center
             :close-on-click-modal="false">
             <div class="msg-wrapper">

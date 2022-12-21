@@ -157,7 +157,6 @@ export default {
                     });
                 }
             })
-
         },
         uploadProgress(progressEvent) {
             // console.log(Math.round((progressEvent.loaded / progressEvent.total) * 10000) / 100.0);
@@ -167,6 +166,7 @@ export default {
             this.progressVisible = false;
             this.percentage = 0;
             this.verifyForm.dataHash = '';
+            return;
         },
         beforeUpload(file) {
             const isLt20M = file.size / 1024 / 1024 < 20;

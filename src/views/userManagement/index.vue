@@ -212,13 +212,7 @@ export default {
             this.accountForm.type = row.roleZh;
             this.accountForm.id = row.accountId;
             this.oldContact = row.contact;
-            // console.log(this.oldContact);
         },
-
-        // isUpdataAccount() {
-        //     if()
-            
-        // },
         //编辑账号
         async update() {
             // console.log(this.accountForm.contact);
@@ -345,7 +339,7 @@ export default {
 }
 
 .dialog-footer {
-    margin-left: 195px;
+    text-align: right;
 }
 
 .content-container .content-header {
