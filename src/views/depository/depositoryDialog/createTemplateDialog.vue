@@ -57,14 +57,6 @@
             class="el-input-width"
             filterable>
           </el-cascader>
-
-
-
-
-
-
-          
-
           <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
             style="marginLeft: 8px"></el-button>
         </el-form-item>
