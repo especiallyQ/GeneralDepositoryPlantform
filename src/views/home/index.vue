@@ -2,21 +2,20 @@
   <div class="gdp-login-container">
     <canvas id="canvas"></canvas>
     <div class="gdp-header">
-      <div class="gdp-title">通用存证平台</div>
-      <ul @click="changeTemplate">
-        <li id="HomePage" :class="comName == 'HomePage' ? 'action' : ''">
-          首页
-        </li>
-        <li id="Login" :class="comName == 'Login' ? 'action' : ''">登录</li>
-      </ul>
+      <span @click="isLoginDialogVisible">登 录</span>
     </div>
-    <component :is="comName"></component>
+    <HomePage></HomePage>
+    <Login 
+    v-if="loginDialogVisible" 
+    :loginDialogVisible.sync="loginDialogVisible"
+    ></Login>
+    <div class="gdp-footer"></div>
   </div>
 </template>
 
 <script>
 import { random } from "@/util/util";
-import Login from "@/views/home/login/login.vue";
+import Login from "@/views/home/login/index.vue";
 import HomePage from "@/views/home/homePage/homePage.vue";
 export default {
   name: "Home",
@@ -28,6 +27,7 @@ export default {
 
   data() {
     return {
+      loginDialogVisible:false,
       // canvas动画
       canvas1: null,
       canvas2: null,
@@ -140,6 +140,9 @@ export default {
       }
       window.requestAnimationFrame(this.animation);
     },
+    isLoginDialogVisible() {
+      this.loginDialogVisible = true;
+    }
   },
 };
 </script>
@@ -153,18 +156,46 @@ export default {
   align-items: center;
   width: 100%;
   height: 100%;
-  background-color: #070c14;
+  // background-color: #070c14;
   overflow: hidden;
+
+  .gdp-footer {
+    width: 100%;
+    height: 300px;
+    background-color: #F7F7F7;
+    box-shadow: 0 4px 12px 0 #dfe2e9;
+    border-radius: 3px;
+    position: fixed;
+    // opacity: 0.8;
+    bottom: 0;
+    left: 0;
+  }
 
   .gdp-header {
     width: 100%;
     height: 60px;
-    background-color: #3f3f3f;
+    // background-color: #3f3f3f;
     position: fixed;
+
     top: 0;
     left: 0;
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
+
+    span {
+      height: 100%;
+      display: flex;
+      font-size: 20px;
+      line-height: 60px;
+      margin-right: 30px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+
+      &:hover {
+        color: wheat;
+      }
+    }
 
     .gdp-title {
       width: 200px;
@@ -186,6 +217,7 @@ export default {
       margin-right: 30px;
       font-weight: bold;
       color: #fff;
+
       .action {
         color: skyblue;
       }

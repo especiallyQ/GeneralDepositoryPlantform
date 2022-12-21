@@ -8,7 +8,7 @@
                     <el-option v-for="item in dataTypes" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
-                <el-input placeholder="字典名称" v-model="inputKeyWords" clearable class="search" size="small">
+                <el-input placeholder="字典名称" v-model="inputKeyWords" @keyup.enter.native="selectPage" clearable class="search" size="small">
                 </el-input>
                 <el-button class="searchButton" icon="el-icon-search" @click="selectPage" size="small"></el-button>
                 <el-button type="primary" size="small" class="right" @click="newDictionary"
@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import _ from "lodash";
 import DictionaryDialog from "../dictionary/components/dictionaryDialog.vue";
 import EditDictionaryDialog from "../dictionary/components/editDictionaryDialog.vue"
 
@@ -86,15 +87,15 @@ export default {
                     label: "全部",
                 },
                 {
-                    value: "字符串",
+                    value: "string",
                     label: "字符串",
                 },
                 {
-                    value: "整数",
+                    value: "int",
                     label: "整数",
                 },
                 {
-                    value: "浮点数",
+                    value: "float",
                     label: "浮点数",
                 },
             ],
@@ -105,10 +106,14 @@ export default {
         this.getDictionaryList();
     },
     methods: {
-        selectPage() {
+        selectPage: _.debounce(function () { 
             this.pageNumber = 1;
             this.getDictionaryList();
-        },
+        }, 400), 
+        // {
+        //     this.pageNumber = 1;
+        //     this.getDictionaryList();
+        // },
         //字典管理初始化
         async getDictionaryList() {
             const res = await dictionaryList({
@@ -151,13 +156,12 @@ export default {
         },
         //删除账号
         delateDictionary(row) {
-
-            this.$confirm(`确定删除账号${row.dicName}?`, {
+            this.$confirm(`确定删除字典${row.dicName}?`, {
                 confirmButtonText: "确定",
                 cancelButtonText: "取消",
             })
                 .then(() => {
-                    this.$confirm(`确定删除${row.dicName}?`, {
+                    this.$confirm(`确定删除字典${row.dicName}?`, {
                         confirmButtonText: "确定",
                         cancelButtonText: "取消",
                     })
@@ -212,7 +216,6 @@ export default {
 <style scoped>
 .content-container {
     background-color: white;
-    /* margin: 10px; */
 }
 
 .content-container .content-header .search {

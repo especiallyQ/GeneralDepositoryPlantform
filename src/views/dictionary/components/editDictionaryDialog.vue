@@ -17,13 +17,14 @@
             <el-form-item label="字典内容" prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData1"
                 :key="index">
                 <el-input @input="(event) => changeInputDicData1(event)" v-model.trim="key.dictionaryContent"
-                    placeholder="请输入字典内容" style="width: 320px"></el-input>
+                    placeholder="请输入字典内容" style="width: 320px" maxlength="20" show-word-limit></el-input>
                 <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
             <el-form-item v-for="(key, index) in dictionaryForm.dictionaryData2" :key="index + 1">
                 <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" class="el-input-width"
-                    style="width: 320px" @input="(event) => changeInputDicData2(event)"></el-input>
+                    style="width: 320px" @input="(event) => changeInputDicData2(event)" maxlength="20"
+                    show-word-limit></el-input>
                 <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
@@ -119,6 +120,25 @@ export default {
             ];
         },
     },
+    watch: {
+        'dictionaryForm.dictionaryData2': {
+            handler(newVal, oldVal) {
+                let newData = newVal.map((obj) => {
+                    return obj.dictionaryContent
+                })
+                let oldData = this.oldDictionaryContent2.map((obj) => {
+                    return obj.dictionaryContent
+                })
+                if (JSON.stringify(newData) == JSON.stringify(oldData)) {
+                    this.disabled = true;
+                } else {
+                    this.disabled = false;
+                }
+            },
+            deep: true
+
+        }
+    },
     mounted() {
         this.open()
         this.getDictionaryName()
@@ -205,14 +225,13 @@ export default {
         async getDictionaryName() {
             const res = await dicictionaryName();
             if (res.data.code === 0) {
-                let dicDataName = res.data.data.map((obj) => {
+                this.allDicName = res.data.data.map((obj) => {
                     return obj.dicName
                 })
-                dicDataName.splice(this.editDictionaryId - 1, 1);
-                this.allDicName = dicDataName;
             }
         },
         submitForm(formName) {
+            this.allDicName.splice(this.allDicName.indexOf(this.oldDictionaryName), 1);
             let data = this.dictionaryForm.dictionaryData2.map(key => {
                 return key.dictionaryContent
             })
@@ -256,7 +275,6 @@ export default {
                                 }
                             }
                         case "浮点数":
-
                             let floatData = /^[0-9]+([.][0-9]{1,})?$/;
                             for (let j = 0; j < this.allDictionaryContent.length; j++) {
                                 if (!floatData.test(this.allDictionaryContent[j])) {
@@ -293,7 +311,7 @@ export default {
                     this.$parent.selectPage();
                     this.$message({
                         type: "success",
-                        message: "新建成功!",
+                        message: "编辑成功!",
                     });
                 } else {
                     this.closeDialog()
