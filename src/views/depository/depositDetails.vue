@@ -69,7 +69,7 @@
             show-overflow-tooltip
           >
           </el-table-column>
-          <el-table-column label="操作" align="center" min-width="220px">
+          <el-table-column label="操作" align="center" min-width="250px">
             <template slot-scope="scope">
               <el-button
                 type="text"
@@ -127,7 +127,7 @@
 import ContentHead from "@/components/contentHead";
 import { getTemplateDetailsData, getTemplateDetailsListData } from "@/util/api";
 import SaveDepositDialog from "@/views/depository/depositDetailsDialog/saveDepositDialog.vue";
-import { rgb } from "@/util/util";
+import { rgb, getDate } from "@/util/util";
 export default {
   name: "DepositDetails",
   components: {
@@ -146,7 +146,7 @@ export default {
       tableData: [], //存证信息列表数据
       newTableHeader: [], //存证信息列表表头
       enteringDepositDialogVisible: false, //录入存证信息Dialog
-      dialogFlag: 0, //区分Dialog 0表示录入 1表示数据校验
+      dialogFlag: 0, //区分Dialog 0表示录入Dialog 1表示编辑存证信息 2表示数据校验Dialog
       depositoryId: null, //数据校验列表id
       setBtnShow: false, //录入按钮是否可见
     };
@@ -174,6 +174,7 @@ export default {
               });
             }
             this.templateMsg = res.data.data;
+            this.templateMsg.createTime = getDate(res.data.data.createTime);
             this.firstCharacter =
               res.data.data.depositoryTemplateName.substring(0, 1);
             this.DepositPageLoading = false;
@@ -206,9 +207,10 @@ export default {
             this.tableData = [];
             for (let key of res.data.data.depositoryList) {
               const { createTime, creator, depositoryId, factHash } = key;
+              let create_time = getDate(createTime);
               this.tableData.push({
                 depositoryId,
-                createTime,
+                create_time,
                 creator,
                 factHash,
                 ...JSON.parse(key.content),
@@ -314,9 +316,9 @@ export default {
           width: "195px",
         },
         {
-          enName: "createTime",
+          enName: "create_time",
           name: "提交时间",
-          props: "createTime",
+          props: "create_time",
           align: "center",
           width: "195px",
         },
@@ -349,13 +351,13 @@ export default {
   .template-name-freeze {
     font-size: 18px;
     font-weight: bolder;
+    height: 35px;
     display: flex;
     letter-spacing: 0.5px;
-    margin-bottom: 10px;
-
+    line-height: 35px;
     .freeze-thaw {
       margin-left: 10px;
-      line-height: 22px;
+      line-height: 30px;
     }
   }
 }
