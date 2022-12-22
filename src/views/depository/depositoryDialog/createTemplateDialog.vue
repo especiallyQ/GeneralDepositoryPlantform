@@ -1,83 +1,153 @@
 <template>
   <div>
-    <el-dialog id="createTemplateDialog" title="新建存证模板" :visible.sync="dialogFormVisible" center
-      :close-on-click-modal="false" @close="close" width="498px">
-      <el-form :model="form" :rules="rules" ref="ruleForm" label-width="100px" class="selectForm">
-        <el-form-item label="存证模板名称" prop="depositoryTemplateName">
-          <el-input v-model.trim="form.depositoryTemplateName" placeholder="请输入存证模板名称" maxlength="20"
-            :show-word-limit="true"></el-input>
-        </el-form-item>
-      </el-form>
+    <el-dialog
+      title="新建存证模板"
+      :visible.sync="dialogFormVisible"
+      center
+      :close-on-click-modal="false"
+      @close="close"
+      width="498px"
+    >
+      <div v-loading="dialogLoading">
+        <el-form
+          :model="form"
+          :rules="rules"
+          ref="ruleForm"
+          label-width="100px"
+          class="selectForm"
+        >
+          <el-form-item label="存证模板名称" prop="depositoryTemplateName">
+            <el-input
+              v-model.trim="form.depositoryTemplateName"
+              placeholder="请输入存证模板名称"
+              maxlength="20"
+              :show-word-limit="true"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="所属数据源" prop="dataOriginId">
+            <el-select
+              v-model="form.dataOriginId"
+              placeholder="请选择数据源"
+              style="width: 346px"
+            >
+              <el-option
+                v-for="item in dataOriginOptions"
+                :key="item.id"
+                :label="item.label"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
 
-      <el-form :model="parameterParamsForm" label-width="100px" class="selectForm">
-        <el-form-item label="存证参数" prop="parameter" :show-message="false"
-          v-for="(key, index) in parameterParamsForm.parameterParams1" :key="index">
-          <el-input v-model.trim="key.parameterName" placeholder="参数名" class="el-input-width" maxlength="20"
-            style="marginRight: 8px"></el-input>
-            <el-cascader 
-          v-model="key.parameterType" 
-          placeholder="参数类型" 
-          @change="changeFileDisabled"
-            :options="parameterOption" 
-            :props="parameterProps"
-            :show-all-levels="false" 
-            class="el-input-width"
-            
-            filterable>
-          </el-cascader>
-          <!-- <el-select v-model="key.parameterType" placeholder="参数类型" class="el-input-width" @change="changeFileDisabled">
-            <el-option v-for="(item, index) in parameterOption" :key="index" :label="item.label" :value="item.value"
-              :disabled="item.disabled"  ></el-option>
-          </el-select> -->
-          <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
-            style="marginLeft: 8px"></el-button>
-        </el-form-item>
+        <el-form
+          :model="parameterParamsForm"
+          label-width="100px"
+          class="selectForm"
+        >
+          <el-form-item
+            label="存证参数"
+            prop="parameter"
+            :show-message="false"
+            v-for="(key, index) in parameterParamsForm.parameterParams1"
+            :key="index"
+          >
+            <el-input
+              v-model.trim="key.parameterName"
+              placeholder="参数名"
+              class="el-input-width"
+              maxlength="20"
+              style="marginRight: 8px"
+            ></el-input>
+            <el-cascader
+              v-model="key.parameterType"
+              placeholder="参数类型"
+              @change="changeFileDisabled"
+              :options="parameterOption"
+              :props="parameterProps"
+              :show-all-levels="false"
+              class="el-input-width"
+              filterable
+            >
+            </el-cascader>
+            <el-button
+              type="primary"
+              circle
+              icon="el-icon-plus"
+              @click="addParameter"
+              size="mini"
+              style="marginLeft: 8px"
+            ></el-button>
+          </el-form-item>
 
-        <el-form-item prop="parameter" :show-message="false"
-          v-for="(key, index) in parameterParamsForm.parameterParams2" :key="index + 1"
-          :validate-on-rule-change="false">
-          <el-input v-model.trim="key.parameterName" placeholder="参数名" class="el-input-width" style="marginRight: 8px">
-          </el-input>
+          <el-form-item
+            prop="parameter"
+            :show-message="false"
+            v-for="(key, index) in parameterParamsForm.parameterParams2"
+            :key="index + 1"
+            :validate-on-rule-change="false"
+          >
+            <el-input
+              v-model.trim="key.parameterName"
+              placeholder="参数名"
+              class="el-input-width"
+              style="marginRight: 8px"
+            >
+            </el-input>
+            <el-cascader
+              v-model="key.parameterType"
+              placeholder="参数类型"
+              @change="changeFileDisabled"
+              :options="parameterOption"
+              :props="parameterProps"
+              :show-all-levels="false"
+              class="el-input-width"
+              filterable
+            >
+            </el-cascader>
+            <el-button
+              type="danger"
+              circle
+              icon="el-icon-minus"
+              @click="removeParameter(index)"
+              size="mini"
+              style="marginLeft: 8px"
+            ></el-button>
+          </el-form-item>
 
-          <!-- <el-select filterable v-model="key.parameterType" placeholder="参数类型" class="el-input-width"
-            @change="changeFileDisabled">
-            <el-option v-for="(item, index) in parameterOption" :key="index" :type="item.value"
-                :label="item.label" :value="item.value"
-              :disabled="item.disabled">
-              
-            </el-option>
-          </el-select> -->
-          <el-cascader 
-          v-model="key.parameterType" 
-          placeholder="参数类型" 
-          @change="changeFileDisabled"
-            :options="parameterOption" 
-            :props="parameterProps"
-            :show-all-levels="false" 
-            class="el-input-width"
-            filterable>
-          </el-cascader>
-          <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
-            style="marginLeft: 8px"></el-button>
-        </el-form-item>
+          <el-form-item label="备注">
+            <el-input
+              type="textarea"
+              v-model="form.remark"
+              :rows="4"
+              resize="none"
+              maxlength="60"
+              :show-word-limit="true"
+            ></el-input>
+          </el-form-item>
+        </el-form>
 
-        <el-form-item label="备注">
-          <el-input type="textarea" v-model="form.remark" :rows="4" resize="none" maxlength="60"
-            :show-word-limit="true"></el-input>
-        </el-form-item>
-      </el-form>
-
-      <div class="dialog-footer">
-        <el-button @click="close">取消</el-button>
-        <el-button type="primary" @click="submitForm('ruleForm')" :loading="loading">确定</el-button>
+        <div class="dialog-footer">
+          <el-button @click="close">取消</el-button>
+          <el-button
+            type="primary"
+            @click="submitForm('ruleForm')"
+            :loading="loading"
+            >确定</el-button
+          >
+        </div>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { saveDepoTemplate,dicictionaryName} from "@/util/api";
-
+import {
+  getDepoTemplateDataOrigin,
+  saveDepoTemplate,
+  dicictionaryName,
+} from "@/util/api";
 export default {
   name: "createTemplateDialog",
   props: {
@@ -89,12 +159,13 @@ export default {
   },
   data() {
     return {
-
-      containerNode:null,
+      containerNode: null,
       timer: null,
       dialogFormVisible: this.createTemplateDialogVisible, //控制dialog是否显示
       loading: false, //loading图标
+      dialogLoading: true, //新建存证Dialog加载
       fileDisabled: false, //文件类型是否可选
+      dataOriginOptions: [], //数据源列表
       form: {
         depositoryTemplateName: null, //存证模板名称
         remark: null, //备注
@@ -110,19 +181,20 @@ export default {
         parameterParams2: [],
       },
       parameterProps: {
-        label: 'label',
+        label: "label",
         value: "value",
-        disabled: 'disabled',
-        children: 'children',
-        expandTrigger: 'hover',
+        disabled: "disabled",
+        children: "children",
+        expandTrigger: "hover",
       },
+
       //模板参数下拉框
       parameterOption: [
         {
           label: "自定义字典",
           value: "dictionary",
           disabled: false,
-          children:[]
+          children: [],
         },
         {
           label: "字符串",
@@ -155,6 +227,13 @@ export default {
             trigger: "blur",
           },
         ],
+        dataOriginId: [
+          {
+            required: true,
+            message: "请选择数据源",
+            trigger: "blur",
+          },
+        ],
       },
       parameterRules: {
         parameter: [{ required: true }],
@@ -182,25 +261,25 @@ export default {
     },
   },
   mounted() {
-    this.getDictionaryName()
+    this.getDictionaryName();
+    this.getDepoTemplateDataOriginList();
   },
   methods: {
     async getDictionaryName() {
       const res = await dicictionaryName();
       if (res.data.code === 0) {
-      let dicData =  res.data.data.map((obj) => {
-        return {
-          label: obj.dicName,
-          value:obj.id
-          }
-      })
+        let dicData = res.data.data.map((obj) => {
+          return {
+            label: obj.dicName,
+            value: obj.id,
+          };
+        });
         this.parameterOption[0].children = dicData;
-      }
-      else {
+      } else {
         this.$message({
-                type: "error",
-                message: "",
-              });
+          type: "error",
+          message: "",
+        });
       }
     },
     close() {
@@ -224,6 +303,30 @@ export default {
       const parameterNames = arr.map((item) => item[key]);
       const newParameterNames = Array.from(new Set(parameterNames));
       return parameterNames.length === newParameterNames.length ? true : false;
+    },
+
+    // 获取数据源列表
+    getDepoTemplateDataOriginList() {
+      getDepoTemplateDataOrigin()
+        .then((res) => {
+          if (res.data.code === 0) {
+            this.dialogLoading = false;
+            this.dataOriginOptions = res.data.data;
+          } else {
+            this.$message({
+              message: this.$chooseLang(res.data.code),
+              type: "error",
+              duration: 2000,
+            });
+          }
+        })
+        .catch(() => {
+          this.$message({
+            message: "系统错误",
+            type: "error",
+            duration: 2000,
+          });
+        });
     },
 
     //提交新建存证模板表单
@@ -261,17 +364,17 @@ export default {
 
     // 存证模板新建方法
     addDepositoryTemplate() {
-      for (let i = 0; i < this.params.length; i++){
+      for (let i = 0; i < this.params.length; i++) {
         if (this.params[i].parameterType[0] == "dictionary") {
-          this.params[i].parameterType = this.params[i].parameterType[1]
+          this.params[i].parameterType = this.params[i].parameterType[1];
         } else {
           this.params[i].parameterType = this.params[i].parameterType[0];
         }
-
       }
-      const { depositoryTemplateName, remark } = this.form;
+      const { depositoryTemplateName, dataOriginId, remark } = this.form;
       let data = {
         depositoryTemplateName,
+        dataOriginId,
         remark,
         params: this.params,
       };
@@ -341,7 +444,7 @@ export default {
   margin-right: 5px;
 }
 
-.selectForm>>>.el-form-item__label {
+.selectForm >>> .el-form-item__label {
   font-size: 12px;
   font-family: "Courier New", Courier, monospace;
 }

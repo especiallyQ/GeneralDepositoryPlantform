@@ -355,6 +355,8 @@ export default {
     display: flex;
     letter-spacing: 0.5px;
     line-height: 35px;
+    margin-bottom: 8px;
+    
     .freeze-thaw {
       margin-left: 10px;
       line-height: 30px;

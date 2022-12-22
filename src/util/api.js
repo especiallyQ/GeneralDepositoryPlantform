@@ -78,7 +78,7 @@ export function fileVerify(data) {
 }
 
 
-export function getFileHash(data,uploadProgress) {
+export function getFileHash(data, uploadProgress) {
     return post({
         url: `${url.ORG_LIST}/getFileHash`,
         method: 'post',
@@ -163,6 +163,28 @@ export function resetAccountPassword(data) {
         method: 'put',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+// 权限管理
+export function getAuthorityList(accountId) {
+    return get({
+        url: `${url.ORG_LIST}/authority/getAuthorityList/${accountId}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 提交权限树
+export function submitTree(data) {
+    return post({
+        url: `${url.ORG_LIST}/authority/submit`,
+        method: 'post',
+        data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
         }
     })
 }
@@ -296,16 +318,6 @@ export function deleteDatasource(data) {
         }
     })
 }
-export function getDataOrigin() {
-    return get({
-        url: `${url.ORG_LIST}/depository/getDataOrigin`,
-        method: 'get',
-        headers: {
-            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
-        }
-    })
-}
-
 
 
 //新建----获取存证合约列表下拉框
@@ -360,10 +372,21 @@ export function getDepositoryTemplateCreator() {
     })
 }
 
-// 存证管理-获取存证列表数据
-export function getTemplateListData(currentPage, pageSize, creatorId, templateName) {
+// 存证管理-获取数据源列表
+export function getDataOrigin() {
     return get({
-        url: `${url.ORG_LIST}/depository/getDepositoryTemplateList/${currentPage}/${pageSize}?creatorId=${creatorId}&depositoryTemplateName=${templateName}`,
+        url: `${url.ORG_LIST}/depository/getDataOrigin`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 存证管理-获取存证列表数据
+export function getTemplateListData(currentPage, pageSize, creatorId, dataOriginId, templateName) {
+    return get({
+        url: `${url.ORG_LIST}/depository/getDepositoryTemplateList/${currentPage}/${pageSize}?dataOriginId=${dataOriginId}&creatorId=${creatorId}&depositoryTemplateName=${templateName}`,
         method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || '',
@@ -371,12 +394,23 @@ export function getTemplateListData(currentPage, pageSize, creatorId, templateNa
     })
 }
 
-// 存证信息-保存存证模板
+// 存证管理-保存存证模板
 export function saveDepoTemplate(data) {
     return post({
         url: `${url.ORG_LIST}/depository/createDepositoryTemplate`,
         method: 'post',
         data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+// 存证管理-获取新建存证Dialog数据源列表
+export function getDepoTemplateDataOrigin() {
+    return get({
+        url: `${url.ORG_LIST}/depository/getDepoTemplateDataOrigin`,
+        method: 'get',
         headers: {
             AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
         }
