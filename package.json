@@ -16,12 +16,12 @@
     "default-passive-events": "^2.0.0",
     "element-ui": "^2.15.10",
     "es6-promise": "^4.2.8",
+    "js-base64": "^3.7.3",
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "sm-crypto": "^0.3.11",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.3",
-    "vue-dompurify-html": "^3.1.1",
     "vue-router": "^3.6.5"
   },
   "devDependencies": {

@@ -263,7 +263,64 @@ export function dicictionaryName() {
 
 //系统配置相关接口-----------------------------
 
-//获取存证合约列表下拉框
+
+//数据源列表初始化
+export function dataSourceList(data, list) {
+    const params = reviseParam(data, list);
+    return get({
+        url: `${url.ORG_LIST}/system/getDataList/${params.str}`,
+        method: 'get',
+        params: params.querys,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//编辑时通过id拿到当前数据
+export function dataSourceListById(data) {
+    return get({
+        url: `${url.ORG_LIST}/system/initEditData/${data}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//编辑时绑定
+export function editDatasource(data) {
+    return put({
+        url: `${url.ORG_LIST}/system/editDatasource`,
+        method: 'put',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//删除前拿到数据
+export function deleteDataSourceById(data) {
+    return get({
+        url: `${url.ORG_LIST}/system/beforeDeleteDatasource/${data}`,
+        method: 'get',
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+//删除数据源
+export function deleteDatasource(data) {
+    return deleted({
+        url: `${url.ORG_LIST}/system/deleteDatasource`,
+        method: 'delete',
+        data: data,
+        headers: {
+            AuthorizationToken: 'Token ' + localStorage.getItem('token') || ''
+        }
+    })
+}
+
+
+//新建----获取存证合约列表下拉框
 export function ContractList(data) {
     return get({
         url: `${url.ORG_LIST}/system/getContractList/${data}`,
@@ -275,7 +332,7 @@ export function ContractList(data) {
     })
 }
 
-//获取应用链列表下拉框
+//新建----获取应用链列表下拉框
 export function ChainList(data, list) {
     const params = reviseParam(data, list);
     return get({
@@ -288,7 +345,7 @@ export function ChainList(data, list) {
         }
     })
 }
-//配置系统
+//新建----配置系统
 export function bindAccount(data) {
     return post({
         url: `${url.ORG_LIST}/system/bindAccount`,

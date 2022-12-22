@@ -9,11 +9,10 @@ const DepositDetails = () => import('@/views/depository/depositDetails.vue')
 const DepositoryHis = () => import('@/views/depository/depositoryHis.vue')
 const ApprovalManagement = () => import('@/views/approvalManagement/approvalManagement.vue')
 const userManagement = () => import('@/views/userManagement/index.vue');
-const systemConfiguration = () => import('@/views/systemConfiguration')
+const systemConfiguration = () => import('@/views/systemConfiguration/index.vue')
 const dictionary = () => import('@/views/dictionary/index.vue')
 
 Vue.use(Router);
-
 const routes = [{
     path: '/',
     nameKey: 'main',

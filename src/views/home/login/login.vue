@@ -79,7 +79,7 @@ import { sm3 } from "sm-crypto";
 import router from "@/router";
 import _ from "lodash";
 export default {
-  name: "Login",
+  name: "Login1",
   data() {
     return {
       // 登录

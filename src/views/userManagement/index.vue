@@ -172,11 +172,11 @@
         v-loading="treeLoading"
       >
       </el-tree>
-      <div class="footer-btn" v-if="rowRoleId !== 1">
-        <el-button style="width: 200px" @click="resetTree">重置</el-button>
+      <div class="footer-btn" v-if="rowRoleId !== 1 && !treeLoading">
+        <el-button style="width: 250px" @click="resetTree">重置</el-button>
         <el-button
           type="primary"
-          style="width: 200px"
+          style="width: 250px"
           @click="submitDrawerTree"
           :loading="btnLoading"
           >提交</el-button
@@ -185,8 +185,8 @@
     </el-drawer>
   </div>
 </template>
-
-<script>
+  
+  <script>
 import ContentHead from "@/components/contentHead.vue";
 import userDialog from "./components/userDialog.vue";
 import {
@@ -559,8 +559,8 @@ export default {
   },
 };
 </script>
-
-<style scoped>
+  
+  <style scoped>
 .content-container {
   background-color: white;
   /* margin: 10px; */
@@ -572,7 +572,7 @@ export default {
 }
 
 .dialog-footer {
-  margin-left: 195px;
+  text-align: right;
 }
 
 .content-container .content-header {
@@ -623,8 +623,10 @@ export default {
 }
 
 .footer-btn {
+  width: 100%;
+  text-align: center;
   position: absolute;
   top: 93%;
-  left: 26px;
 }
 </style>
+  

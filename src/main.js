@@ -7,8 +7,6 @@ import router from './router';
 /* element-ui */
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-/* 解决v-html可能导致的XSS漏洞,使用v-dompurify-html替代*/
-import VueDOMPurifyHTML from 'vue-dompurify-html';
 /* cookies工具 */
 // import Cookies from 'js-cookie';
 // import { getCookie, setCookie, delCookie } from './util/util';
@@ -30,11 +28,13 @@ import { chooseLang } from './util/errcode.js';
 /* 剪贴板 */
 import VueClipboard from 'vue-clipboard2';
 import 'default-passive-events'
+//base64加密
+import {Base64} from 'js-base64'
+Vue.prototype.$Base64 = Base64;
 Vue.use(router);
 Vue.use(ElementUI, {
   size: 'medium'
 });
-Vue.use(VueDOMPurifyHTML);
 Vue.use(VueClipboard);
 Vue.config.productionTip = false
 // Vue.prototype.getCookie = getCookie;
