@@ -154,7 +154,7 @@ export default {
             // this.$refs.child.open();
 
         },
-        //删除账号
+        //删除字典
         delateDictionary(row) {
             this.$confirm(`确定删除字典${row.dicName}?`, {
                 confirmButtonText: "确定",
@@ -179,8 +179,7 @@ export default {
                                 this.getDictionaryList();
                             } else {
                                 this.$message({
-                                    message:
-                                        "删除失败",
+                                    message: this.$chooseLang(res.data.code),
                                     type: "error",
                                 });
                             }
