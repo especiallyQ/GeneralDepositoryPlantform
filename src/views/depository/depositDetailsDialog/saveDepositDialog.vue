@@ -23,7 +23,6 @@
             :disabled="dialogFlag !== 2"
           ></el-input>
         </el-form-item>
-
         <el-form-item
           v-for="item in oldParameter"
           :key="item.parameterName"
