@@ -173,10 +173,10 @@
       >
       </el-tree>
       <div class="footer-btn" v-if="rowRoleId !== 1 && !treeLoading">
-        <el-button style="width: 250px" @click="resetTree">重置</el-button>
+        <el-button style="width: 200px" @click="resetTree">重置</el-button>
         <el-button
           type="primary"
-          style="width: 250px"
+          style="width: 200px"
           @click="submitDrawerTree"
           :loading="btnLoading"
           >提交</el-button
