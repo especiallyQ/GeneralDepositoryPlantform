@@ -3,8 +3,8 @@
         <el-dialog :visible.sync="dialogFormVisible" @close="close" width="498px" center :close-on-click-modal="false">
             <div class="dialog-header" v-loading="getLoading">
                 <div v-if="depositoryTemplateList.length">
-                    <span class="margins">该数据源下包含个未冻结的存证模板：<span v-for="(item, index) in depositoryTemplateList"
-                            :key="index">{{ item.depositoryTemplateName }} </span></span>
+                    <span class="margins">该数据源下包含{{ count }}个未冻结的存证模板：<span v-for="(item, index) in depositoryTemplateList"
+                            :key="index">{{ item.depositoryTemplateName }}、 </span></span>
                     <span class="margins">删除后挂载在该数据源下的存证模板将会<span class="red">永久冻结</span></span>
                 </div>
                 <span class="marginss">是否确认删除数据源 {{ dataSourceName }}</span>
@@ -51,7 +51,8 @@ export default {
             loading: false,
             dataSourceName: this.deleteDataSourceName,
             depositoryTemplateList: [],
-            depositoryTemplateIds: []
+            depositoryTemplateIds: [],
+            count:'',
             // ms1:['慈善捐款模板', '慈善积分模板', '坤坤模板'],
         }
     },
@@ -63,6 +64,7 @@ export default {
             this.getLoading = true;
             deleteDataSourceById(this.deleteDataSourceId).then((res) => {
                 if (res.data.code === 0) {
+                    this.count = res.data.data.count;
                     this.getLoading = false;
                     this.depositoryTemplateList = res.data.data.depositoryList;
                     this.depositoryTemplateIds = JSON.stringify(this.depositoryTemplateList.map((key) => {
@@ -91,7 +93,7 @@ export default {
                     this.$emit("getNewDataSourceList");
                     this.$message({
                         message: "删除成功",
-                        type: "error",
+                        type: "success",
                         duration: 2000,
                     });
                     this.loading = false;
