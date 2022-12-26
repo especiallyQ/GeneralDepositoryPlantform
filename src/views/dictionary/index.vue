@@ -8,7 +8,8 @@
                     <el-option v-for="item in dataTypes" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
-                <el-input placeholder="字典名称" v-model="inputKeyWords" @keyup.enter.native="selectPage" clearable class="search" size="small">
+                <el-input placeholder="字典名称" v-model="inputKeyWords" @keyup.enter.native="selectPage" clearable
+                    class="search" size="small">
                 </el-input>
                 <el-button class="searchButton" icon="el-icon-search" @click="selectPage" size="small"></el-button>
                 <el-button type="primary" size="small" class="right" @click="newDictionary"
@@ -45,9 +46,10 @@
                 </el-pagination>
             </div>
         </div>
-        <DictionaryDialog v-if="createDictionaryDialogVisible" :createDictionaryDialogVisible.sync="createDictionaryDialogVisible"></DictionaryDialog>
-        <EditDictionaryDialog v-if="editDictionaryDialogVisible" :editDictionaryDialogVisible.sync="editDictionaryDialogVisible"
-            :editDictionaryId="editDictionaryId">
+        <DictionaryDialog v-if="createDictionaryDialogVisible"
+            :createDictionaryDialogVisible.sync="createDictionaryDialogVisible"></DictionaryDialog>
+        <EditDictionaryDialog v-if="editDictionaryDialogVisible"
+            :editDictionaryDialogVisible.sync="editDictionaryDialogVisible" :editDictionaryId="editDictionaryId">
         </EditDictionaryDialog>
     </div>
 </template>
@@ -106,21 +108,17 @@ export default {
         this.getDictionaryList();
     },
     methods: {
-        selectPage: _.debounce(function () { 
+        selectPage: _.debounce(function () {
             this.pageNumber = 1;
             this.getDictionaryList();
-        }, 400), 
-        // {
-        //     this.pageNumber = 1;
-        //     this.getDictionaryList();
-        // },
+        }, 400),
         //字典管理初始化
         async getDictionaryList() {
             const res = await dictionaryList({
                 pageNumber: this.pageNumber,
                 pageSize: `${this.pageSize}?type=${this.selectValue}&name=${this.inputKeyWords}`,
             });
-            
+
             if (res.data.code === 0) {
                 // console.log(res.data.data);
                 if (
@@ -181,12 +179,15 @@ export default {
                                 this.$message({
                                     message: this.$chooseLang(res.data.code),
                                     type: "error",
+                                    duration: 2000,
                                 });
                             }
                         })
-                        .catch(() => { });
+                        .catch(() => { 
+                            
+                        });
                 })
-                .catch(() => { });
+                .catch(() => {});
         },
         //底部页码跳转
         handleSizeChange(pageSize) {
