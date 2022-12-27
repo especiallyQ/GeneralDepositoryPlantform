@@ -4,51 +4,19 @@
     <div class="content-container module-wrapper">
       <div class="content-header">
         <span class="left-text"> 账号类型:</span>
-        <el-select
-          v-model="selectValue"
-          placeholder="请选择"
-          @change="selectPage"
-          size="small"
-        >
-          <el-option
-            v-for="item in roleOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
+        <el-select v-model="selectValue" placeholder="请选择" @change="selectPage" size="small">
+          <el-option v-for="item in roleOptions" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select>
-        <el-input
-          placeholder="账号名"
-          v-model="inputKeyWords"
-          clearable
-          class="search"
-          size="small"
-        >
+        <el-input placeholder="账号名" v-model="inputKeyWords" clearable class="search" size="small">
         </el-input>
-        <el-button
-          class="searchButton"
-          icon="el-icon-search"
-          @click="selectPage"
-          size="small"
-        ></el-button>
-        <el-button
-          type="primary"
-          size="small"
-          class="right"
-          @click="newAccount"
-          v-if="role == 1 || role == 2"
-        >
-          新建账号</el-button
-        >
+        <el-button class="searchButton" icon="el-icon-search" @click="selectPage" size="small"></el-button>
+        <el-button type="primary" size="small" class="right" @click="newAccount" v-if="role == 1 || role == 2">
+          新建账号</el-button>
       </div>
       <div class="content-center">
         <template>
-          <el-table
-            :data="accountListData"
-            style="width: 100%"
-            v-loading="loading"
-          >
+          <el-table :data="accountListData" style="width: 100%" v-loading="loading">
             <el-table-column prop="accountName" label="账号名" align="center">
             </el-table-column>
             <el-table-column prop="contact" label="联系方式" align="center">
@@ -57,74 +25,35 @@
             </el-table-column>
             <el-table-column label="操作" align="center" class="remarks">
               <template slot-scope="{ row }">
-                <el-button
-                  :disabled="isDeleteAccountDisabled(row)"
-                  type="text"
-                  style="color: red; font-size: 12px"
-                  @click="delateAccount(row)"
-                >
+                <el-button :disabled="isDeleteAccountDisabled(row)" type="text" style="color: red; font-size: 12px"
+                  @click="delateAccount(row)">
                   删除
                 </el-button>
-                <el-button
-                  :disabled="isReviseAccountDisabled()"
-                  type="text"
-                  style="font-size: 12px"
-                  @click="reviseAccount(row)"
-                >
-                  编辑</el-button
-                >
-                <el-button
-                  :disabled="isResetAccountDisabled(row)"
-                  type="text"
-                  style="font-size: 12px"
-                  @click="getResetAccountPassword(row)"
-                >
-                  重置密码</el-button
-                >
-                <el-button
-                  type="text"
-                  style="font-size: 12px"
-                  v-if="role !== '3'"
-                  @click="getAuthorityManagement(row)"
-                >
-                  权限管理</el-button
-                >
+                <el-button :disabled="isReviseAccountDisabled()" type="text" style="font-size: 12px"
+                  @click="reviseAccount(row)">
+                  编辑</el-button>
+                <el-button :disabled="isResetAccountDisabled(row)" type="text" style="font-size: 12px"
+                  @click="getResetAccountPassword(row)">
+                  重置密码</el-button>
+                <el-button type="text" style="font-size: 12px" v-if="role !== '3'" @click="getAuthorityManagement(row)">
+                  权限管理</el-button>
               </template>
             </el-table-column>
           </el-table>
         </template>
       </div>
       <div class="content-footer">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="changePage"
-          :current-page="pageNumber"
-          :page-sizes="[10, 20, 30, 50]"
-          :page-size="pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-        >
+        <el-pagination @size-change="handleSizeChange" @current-change="changePage" :current-page="pageNumber"
+          :page-sizes="[10, 20, 30, 50]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
         </el-pagination>
       </div>
     </div>
-    <userDialog
-      :createUserAccountDialogVisible.sync="createUserAccountDialogVisible"
-    >
+    <userDialog :createUserAccountDialogVisible.sync="createUserAccountDialogVisible">
     </userDialog>
-    <el-dialog
-      title="编辑账号"
-      :visible.sync="reviseUserAccountDialogVisible"
-      width="498px"
-      align="center"
-      :close-on-click-modal="false"
-    >
-      <el-form
-        :model="accountForm"
-        ref="ruleForm"
-        :rules="rules"
-        label-width="100px"
-        class="demo-ruleForm"
-      >
+    <el-dialog title="编辑账号" :visible.sync="reviseUserAccountDialogVisible" width="498px" align="center"
+      :close-on-click-modal="false">
+      <el-form :model="accountForm" ref="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm">
         <el-form-item label="账号名称" prop="name">
           <el-input v-model="accountForm.name" disabled></el-input>
         </el-form-item>
@@ -132,23 +61,14 @@
           <el-input v-model="accountForm.contact"></el-input>
         </el-form-item>
         <el-form-item label="账号类型" prop="type">
-          <el-select
-            v-model="accountForm.type"
-            placeholder="请选择活动区域"
-            style="width: 100%"
-            disabled
-          >
+          <el-select v-model="accountForm.type" placeholder="请选择活动区域" style="width: 100%" disabled>
             <el-option label="管理员" value="1"></el-option>
             <el-option label="普通用户" value="2"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item class="dialog-footer">
-          <el-button @click="reviseUserAccountDialogVisible = false"
-            >取 消</el-button
-          >
-          <el-button type="primary" @click="submitForm('ruleForm')"
-            >确 定</el-button
-          >
+          <el-button @click="reviseUserAccountDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -187,7 +107,7 @@
   </div>
 </template>
   
-  <script>
+<script>
 import ContentHead from "@/components/contentHead.vue";
 import userDialog from "./components/userDialog.vue";
 import {
@@ -410,7 +330,14 @@ export default {
               if (res.data.code === 0) {
                 this.$message({
                   type: "success",
+                  duration: 2000,
                   message: "重置成功!",
+                });
+              } else {
+                this.$message({
+                  message: this.$chooseLang(res.data.code),
+                  type: "error",
+                  duration: 2000,
                 });
               }
             })
@@ -561,10 +488,9 @@ export default {
 };
 </script>
   
-  <style scoped>
+<style scoped>
 .content-container {
   background-color: white;
-  /* margin: 10px; */
 }
 
 .content-container .content-header .search {
@@ -628,7 +554,5 @@ export default {
   text-align: center;
   margin-top: 15px;
 }
-
-
 </style>
   

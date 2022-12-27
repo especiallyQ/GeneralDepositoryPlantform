@@ -17,14 +17,14 @@
             <el-form-item label="字典内容" prop="dictionaryData1" v-for="(key, index) in dictionaryForm.dictionaryData1"
                 :key="index">
                 <el-input @input="(event) => changeInputDicData1(event)" v-model.trim="key.dictionaryContent"
-                    placeholder="请输入字典内容" style="width: 320px" maxlength="20" show-word-limit></el-input>
+                    placeholder="请输入字典内容" style="width: 320px" ></el-input>
                 <el-button type="primary" circle icon="el-icon-plus" @click="addParameter" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
             <el-form-item v-for="(key, index) in dictionaryForm.dictionaryData2" :key="index + 1">
                 <el-input v-model.trim="key.dictionaryContent" placeholder="请输入字典内容" class="el-input-width"
-                    style="width: 320px" @input="(event) => changeInputDicData2(event)" maxlength="20"
-                    show-word-limit></el-input>
+                    style="width: 320px" @input="(event) => changeInputDicData2(event)" 
+                    ></el-input>
                 <el-button type="danger" circle icon="el-icon-minus" @click="removeParameter(index)" size="mini"
                     style="margin-left: 8px"></el-button>
             </el-form-item>
@@ -66,15 +66,15 @@ export default {
             //存放选择框数据
             dataTypes: [
                 {
-                    value: "字符串",
+                    value: "string",
                     label: "字符串",
                 },
                 {
-                    value: "整数",
+                    value: "int",
                     label: "整数",
                 },
                 {
-                    value: "浮点数",
+                    value: "float",
                     label: "浮点数",
                 },
             ],
@@ -301,6 +301,7 @@ export default {
             let data = {
                 id: this.editDictionaryId,
                 dicName: this.dictionaryForm.dictionaryName,
+                dicType:this.dictionaryForm.dataType,
                 dicContent: dicContent,
             }
             this.loading = true;
