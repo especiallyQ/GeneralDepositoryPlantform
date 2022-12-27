@@ -170,13 +170,14 @@
         :props="defaultProps"
         @check="changeTree"
         v-loading="treeLoading"
+        style="minHeight:80vh"
       >
       </el-tree>
       <div class="footer-btn" v-if="rowRoleId !== 1 && !treeLoading">
-        <el-button style="width: 200px" @click="resetTree">重置</el-button>
+        <el-button style="width: 180px" @click="resetTree">重置</el-button>
         <el-button
           type="primary"
-          style="width: 200px"
+          style="width: 180px"
           @click="submitDrawerTree"
           :loading="btnLoading"
           >提交</el-button
@@ -625,8 +626,9 @@ export default {
 .footer-btn {
   width: 100%;
   text-align: center;
-  position: absolute;
-  top: 93%;
+  margin-top: 15px;
 }
+
+
 </style>
   

@@ -526,7 +526,7 @@ export default {
                 trigger: "blur",
               },
               {
-                pattern: /^[0-9]+([.][0-9]{1,})?$/,
+                pattern: /^[0-9]+([.][0-9]{1,})$/,
                 message: `${key.parameterName}必须是浮点数`,
                 trigger: "blur",
               },
