@@ -25,7 +25,7 @@ let errCode = {
     },
     "202004": {
         en: "token expire",
-        zh: "token过期"
+        zh: "身份认证过期"
     },
     "202026": {
         en: "account info already exists",
@@ -33,11 +33,11 @@ let errCode = {
     },
     "202030": {
         en: "password error",
-        zh:"原密码错误"
+        zh: "原密码错误"
     },
     "202045": {
         en: "",
-        zh:"新密码不能与原密码相同"
+        zh: "新密码不能与原密码相同"
     },
     "302000": {
         en: "user not logged in",
@@ -101,6 +101,9 @@ let errCode = {
     },
     "402006": {
         zh: "字典内容过长，字符长度在1-20之间"
+    },
+    "402007": {
+        zh: "存证模板绑定的数据源不存在，该模板无法解冻"
     },
     "700001": {
         en: "",
