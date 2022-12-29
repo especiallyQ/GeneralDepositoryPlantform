@@ -161,7 +161,7 @@ export default {
     form: {
       handler() {
         for (let key of this.parameter) {
-          delete key.parameterOption
+          delete key.parameterOption;
           key.parameterValue = this.form[key.parameterName];
         }
       },
@@ -197,7 +197,6 @@ export default {
   },
 
   methods: {
-    
     // 改变表单内容
     changeInput(event, item) {
       for (let key of this.oldParameter) {
@@ -244,6 +243,11 @@ export default {
       this.$set(this.form, parameterName, response.data);
       if (this.fileHash === response.data) {
         this.btnDisabledFileArr.pop();
+        this.$message({
+          message: "所选文件与原文件相同，请更换文件后重试!",
+          type: "warning",
+          duration: 2000,
+        });
       } else {
         this.btnDisabledFileArr.push(1);
       }
@@ -251,19 +255,27 @@ export default {
 
     handleExceed() {
       this.$message({
-        message: "当前限制选择 1 个文件",
+        message: "当前限制选择 1 个文件!",
         type: "warning",
         duration: 2000,
       });
     },
 
     // 上传文件错误处理
-    handleError() {
-      this.$message({
-        message: "文件上传失败或文件过大，请稍后重试",
-        type: "error",
-        duration: 2000,
-      });
+    handleError(err, file) {
+      if (file.size > 20971520) {
+        this.$message({
+          message: "所选文件过大，文件大小不超过20MB!",
+          type: "error",
+          duration: 2000,
+        });
+      } else {
+        this.$message({
+          message: "文件上传失败，请稍后重试!",
+          type: "error",
+          duration: 2000,
+        });
+      }
     },
 
     // 关闭Dialog时
@@ -526,7 +538,7 @@ export default {
                 trigger: "blur",
               },
               {
-                pattern: /^[0-9]+([.][0-9]{1,})?$/,
+                pattern: /^[0-9]+([.][0-9]{1,})$/,
                 message: `${key.parameterName}必须是浮点数`,
                 trigger: "blur",
               },

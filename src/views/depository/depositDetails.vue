@@ -8,7 +8,7 @@
         </div>
         <div class="template-details">
           <div class="template-name-freeze">
-            {{ templateMsg.depositoryTemplateName }}111
+            {{ templateMsg.depositoryTemplateName }}
             <div class="freeze-thaw">
               <el-tag effect="dark" size="mini" v-if="templateMsg.freeze === 0">
                 未冻结

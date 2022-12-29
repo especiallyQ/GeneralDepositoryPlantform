@@ -72,15 +72,36 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-    <el-drawer title="权限配置" :visible.sync="drawer" :wrapperClosable="false" :destroy-on-close="true"
-      @closed="data = []">
-      <el-tree :data="data" show-checkbox node-key="id" ref="tree" :default-expanded-keys="[2, 3]"
-        :default-checked-keys="attachment" :check-strictly="true" :props="defaultProps" @check="changeTree"
-        v-loading="treeLoading">
+    <el-drawer
+      title="权限配置"
+      :visible.sync="drawer"
+      :wrapperClosable="false"
+      :destroy-on-close="true"
+      @closed="data = []"
+    >
+      <el-tree
+        :data="data"
+        show-checkbox
+        node-key="id"
+        ref="tree"
+        :default-expanded-keys="[2, 3]"
+        :default-checked-keys="attachment"
+        :check-strictly="true"
+        :props="defaultProps"
+        @check="changeTree"
+        v-loading="treeLoading"
+        style="minHeight:80vh"
+      >
       </el-tree>
       <div class="footer-btn" v-if="rowRoleId !== 1 && !treeLoading">
-        <el-button style="width: 200px" @click="resetTree">重置</el-button>
-        <el-button type="primary" style="width: 200px" @click="submitDrawerTree" :loading="btnLoading">提交</el-button>
+        <el-button style="width: 180px" @click="resetTree">重置</el-button>
+        <el-button
+          type="primary"
+          style="width: 180px"
+          @click="submitDrawerTree"
+          :loading="btnLoading"
+          >提交</el-button
+        >
       </div>
     </el-drawer>
   </div>
@@ -288,9 +309,9 @@ export default {
                 });
               }
             })
-            .catch(() => { });
+            .catch(() => {});
         })
-        .catch(() => { });
+        .catch(() => {});
     },
     //重置账号密码
     getResetAccountPassword(row) {
@@ -320,9 +341,9 @@ export default {
                 });
               }
             })
-            .catch(() => { });
+            .catch(() => {});
         })
-        .catch(() => { });
+        .catch(() => {});
     },
 
     //底部页码跳转
@@ -531,8 +552,7 @@ export default {
 .footer-btn {
   width: 100%;
   text-align: center;
-  position: absolute;
-  top: 93%;
+  margin-top: 15px;
 }
 </style>
   
