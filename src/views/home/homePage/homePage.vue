@@ -49,13 +49,13 @@
             <div class="table-center">
                 <h1 class="table-header">验证结果：</h1>
                 <el-table :data="tableData" border style="margin:10px;height: 90px; width: 752px;">
-                    <el-table-column prop="factHash" label="凭证信息" width="180">
+                    <el-table-column prop="factHash" label="凭证信息" width="380" show-overflow-tooltip>
                     </el-table-column>
-                    <el-table-column prop="latestVersion" label="是否为最新版本" width="180">
+                    <el-table-column prop="latestVersion" label="是否为最新版本" width="120" show-overflow-tooltip>
                     </el-table-column>
-                    <el-table-column prop="creator" label="提交人">
+                    <el-table-column prop="creator" label="提交人"  width="80" show-overflow-tooltip>
                     </el-table-column>
-                    <el-table-column prop="createTime" label="提交时间">
+                    <el-table-column prop="createTime" label="提交时间" show-overflow-tooltip>
                     </el-table-column>
                 </el-table>
                 <h1>链上数据：</h1>
@@ -288,18 +288,16 @@ export default {
 </script>
 <style scoped >
 .home {
+    position: absolute;
     z-index: 1;
 }
 
 .home-page {
     /* position: absolute; */
-    margin-top: -650px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* margin-bottom: 200px; */
     width: 800px;
-    /* height: 300px; */
     padding: 0 24px 20px 24px;
     border-radius: 4px;
     box-sizing: border-box;
@@ -337,8 +335,6 @@ export default {
     font-size: 16px;
     border: none;
     font-family: 'Microsoft YaHei';
-    /* border-color: white; */
-    /* text-align: left; */
     border-radius: 4px;
 }
 
