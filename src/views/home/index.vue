@@ -5,10 +5,7 @@
       <span @click="isLoginDialogVisible">登 录</span>
     </div>
     <HomePage></HomePage>
-    <Login 
-    v-if="loginDialogVisible" 
-    :loginDialogVisible.sync="loginDialogVisible"
-    ></Login>
+    <Login v-if="loginDialogVisible" :loginDialogVisible.sync="loginDialogVisible"></Login>
     <div class="gdp-footer"></div>
   </div>
 </template>
@@ -27,7 +24,7 @@ export default {
 
   data() {
     return {
-      loginDialogVisible:false,
+      loginDialogVisible: false,
       // canvas动画
       canvas1: null,
       canvas2: null,
@@ -161,7 +158,7 @@ export default {
 
   .gdp-footer {
     width: 100%;
-    height: 300px;
+    height: 30%;
     background-color: #F7F7F7;
     box-shadow: 0 4px 12px 0 #dfe2e9;
     border-radius: 3px;
